@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 160" role="img" aria-labelledby="title desc">
+  <title id="title">GNANA Engineering Math Forum</title>
+  <desc id="desc">GNANA Engineering Math Forum video and channel identity in the GNANA MATH visual system.</desc>
+  <g aria-hidden="true">
+    <rect x="12" y="12" width="136" height="136" rx="27" fill="#102A43"/>
+    <path d="M46 34v92M80 34v92M114 34v92M34 46h92M34 80h92M34 114h92" stroke="#B8CBD9" stroke-opacity=".17" stroke-width="1"/>
+    <path d="M34 113h91M46 126V34" fill="none" stroke="#E7EDF2" stroke-opacity=".74" stroke-width="2"/>
+    <path d="M44 104c13-2 14-44 32-46 18-2 13 49 32 42 8-3 10-24 16-34" fill="none" stroke="#E9C274" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="76" cy="58" r="4" fill="#E9C274"/><circle cx="108" cy="100" r="4" fill="#E9C274"/>
+  </g>
+  <text x="181" y="69" fill="#102A43" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="1.8">GNANA</text>
+  <text x="181" y="107" fill="#263B80" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="1.1">ENGINEERING MATH FORUM</text>
+  <path d="M184 126h104" stroke="#C58A32" stroke-width="3"/>
+  <text x="304" y="131" fill="#52687A" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="1.4">VIDEO &amp; LEARNING CHANNEL</text>
+</svg>

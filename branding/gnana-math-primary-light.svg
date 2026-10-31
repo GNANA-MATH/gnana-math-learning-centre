@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 150" role="img" aria-labelledby="title desc">
+  <title id="title">GNANA MATH primary logo for light backgrounds</title>
+  <desc id="desc">GNANA MATH Learning Centre with Mathematics, Engineering, Research and AI descriptor.</desc>
+  <g aria-hidden="true">
+    <rect x="12" y="12" width="126" height="126" rx="25" fill="#102A43"/>
+    <path d="M43 31v82M75 31v82M107 31v82M31 43h88M31 75h88M31 107h88" stroke="#B8CBD9" stroke-opacity=".18" stroke-width="1"/>
+    <path d="M31 104h87M45 118V34" fill="none" stroke="#E7EDF2" stroke-opacity=".72" stroke-width="2"/>
+    <path d="M40 96c13-1 14-40 31-42 18-2 13 45 31 38 9-4 10-24 17-33" fill="none" stroke="#E9C274" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="71" cy="54" r="4" fill="#E9C274"/><circle cx="102" cy="92" r="4" fill="#E9C274"/>
+  </g>
+  <text x="166" y="77" fill="#102A43" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="58" font-weight="700" letter-spacing="2">GNANA MATH</text>
+  <path d="M169 95h64" stroke="#C58A32" stroke-width="3"/>
+  <text x="247" y="103" fill="#42596D" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="1.1">MATHEMATICS <tspan fill="#A66B17">•</tspan> ENGINEERING <tspan fill="#A66B17">•</tspan> RESEARCH <tspan fill="#A66B17">•</tspan> AI</text>
+</svg>

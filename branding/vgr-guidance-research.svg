@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 710 150" role="img" aria-labelledby="title desc">
+  <title id="title">V • Guidance • Research</title>
+  <desc id="desc">Personal academic signature for V. Guidance and Research.</desc>
+  <circle cx="76" cy="75" r="53" fill="#102A43"/>
+  <path d="M42 95h67" stroke="#E9C274" stroke-width="2.5"/>
+  <text x="51" y="88" fill="#F7F8FA" font-family="Georgia, Times New Roman, serif" font-size="44">V</text>
+  <text x="151" y="70" fill="#102A43" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="31" font-weight="700" letter-spacing="1.5">V <tspan fill="#C58A32">•</tspan> GUIDANCE <tspan fill="#C58A32">•</tspan> RESEARCH</text>
+  <path d="M153 94h94" stroke="#C58A32" stroke-width="2.5"/>
+  <text x="260" y="100" fill="#52687A" font-family="Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="1.2">PERSONAL ACADEMIC IDENTITY</text>
+</svg>

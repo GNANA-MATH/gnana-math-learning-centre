@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title desc">
+  <title id="title">GNANA MATH favicon</title>
+  <desc id="desc">A gold mathematical curve crossing a coordinate grid on indigo.</desc>
+  <rect x="1" y="1" width="46" height="46" rx="12" fill="#102A43"/>
+  <path d="M14 9v30M24 9v30M34 9v30M9 14h30M9 24h30M9 34h30" stroke="#B8CBD9" stroke-opacity=".18" stroke-width=".8"/>
+  <path d="M10 32h28M14 37V11" fill="none" stroke="#E7EDF2" stroke-opacity=".7" stroke-width="1.1"/>
+  <path d="M11 29c5 0 6-13 12-14 7-1 5 16 12 13 3-2 4-8 6-11" fill="none" stroke="#E9C274" stroke-width="2.3" stroke-linecap="round"/>
+  <circle cx="23" cy="15" r="1.6" fill="#E9C274"/>
+</svg>
