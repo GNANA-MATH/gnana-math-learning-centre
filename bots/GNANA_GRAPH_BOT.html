@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GNANA GRAPH BOT V1 — Interactive Mathematics Graphing Laboratory</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0a3651',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Math.js CDN for Safe Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+
+    <!-- Plotly.js CDN for 2D & 3D Interactive Plotting -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+
+    <style>
+        /* Custom styling for sleek academic dashboard */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        /* Ensure plot takes responsive space */
+        .plot-container {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col transition-colors duration-200">
+
+    <!-- TOP HEADER & BRANDING -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 shrink-0 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 text-center md:text-left">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                            GNANA GRAPH BOT <span class="text-xs px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-800">V1</span>
+                        </h1>
+                        <span class="hidden sm:inline-block text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">LABORATORY</span>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        GNANA MATH LEARNING CENTRE <span class="mx-1">•</span> V • G • R <span class="hidden sm:inline">(V • GUIDANCE • RESEARCH)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Action Bar -->
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <button onclick="exportGraph('png')" title="Export PNG" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-download text-sky-600 dark:text-sky-400"></i>
+                    <span class="hidden sm:inline">PNG</span>
+                </button>
+                <button onclick="exportGraph('svg')" title="Export SVG" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-file-code text-indigo-600 dark:text-indigo-400"></i>
+                    <span class="hidden sm:inline">SVG</span>
+                </button>
+                <button onclick="resetGraphView()" title="Reset View" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
+                    <i class="fa-solid fa-arrows-rotate text-amber-600 dark:text-amber-400"></i>
+                    <span class="hidden sm:inline">Reset</span>
+                </button>
+                <button onclick="clearCurrentGraph()" title="Clear Graph" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 transition-all flex items-center gap-1.5 border border-red-200 dark:border-red-900/60">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span class="hidden sm:inline">Clear</span>
+                </button>
+
+                <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 mx-1"></div>
+
+                <!-- Dark / Light Mode Toggle -->
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 shrink-0">
+        <div class="max-w-7xl mx-auto flex items-center overflow-x-auto space-x-1 py-1.5 scrollbar-none">
+            <button id="tab-2d" onclick="switchModule('2d')" class="module-tab active-tab px-3 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-chart-line text-sky-500"></i> Module A: 2D Cartesian
+            </button>
+            <button id="tab-parametric" onclick="switchModule('parametric')" class="module-tab px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-bezier-curve text-indigo-500"></i> Module B: Parametric 2D
+            </button>
+            <button id="tab-polar" onclick="switchModule('polar')" class="module-tab px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-compass text-emerald-500"></i> Module C: Polar Curves
+            </button>
+            <button id="tab-3d" onclick="switchModule('3d')" class="module-tab px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-cube text-amber-500"></i> Module D: 3D Surface
+            </button>
+            <button id="tab-3d-parametric" onclick="switchModule('3d-parametric')" class="module-tab px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-draw-polygon text-purple-500"></i> Module E: 3D Parametric
+            </button>
+            <button id="tab-examples" onclick="switchModule('examples')" class="module-tab px-3 py-2 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-all bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-900">
+                <i class="fa-solid fa-book-bookmark"></i> Example Library & Eng. Applications
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN APP CONTENT AREA -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden p-3 gap-3 min-h-0">
+        
+        <!-- SIDE CONTROL PANEL -->
+        <aside class="w-full lg:w-96 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden shadow-sm shrink-0 lg:h-full">
+            
+            <!-- Panel Header -->
+            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h2 id="panelTitle" class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-sky-600"></i> Graphing Controls
+                </h2>
+                <span id="activeModuleBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">2D Cartesian</span>
+            </div>
+
+            <!-- Scrollable Controls Container -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-5">
+                
+                <!-- ERROR DISPLAY BOX -->
+                <div id="errorPanel" class="hidden p-3 rounded-lg bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-xs">
+                    <div class="flex items-start gap-2">
+                        <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+                        <div id="errorMessage">Invalid expression syntax.</div>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC MODULE INPUT FORMS -->
+                <!-- MODULE A: 2D CARTESIAN -->
+                <div id="form-2d" class="module-form space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Functions y = f(x)</label>
+                        <button onclick="addFunction2D()" class="text-xs font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Add Function
+                        </button>
+                    </div>
+
+                    <div id="functionContainer2D" class="space-y-2">
+                        <!-- Default Function Row 1 -->
+                        <div class="func-row flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                            <input type="color" value="#0284c7" class="color-picker w-6 h-6 rounded cursor-pointer border-0">
+                            <input type="text" value="x^2 - 3" placeholder="e.g. sin(x) + x/2" class="func-expr flex-1 text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-sky-500">
+                            <button onclick="removeFunctionRow(this)" class="text-slate-400 hover:text-red-500 p-1"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Range and Grid Controls -->
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">X Min / Max</label>
+                            <div class="flex gap-1 mt-1">
+                                <input type="number" id="xMin2D" value="-10" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                                <input type="number" id="xMax2D" value="10" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Resolution (Points)</label>
+                            <input type="number" id="res2D" value="500" min="50" max="2000" class="w-full mt-1 text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400">
+                            <input type="checkbox" id="showGrid2D" checked class="rounded text-sky-600 focus:ring-sky-500">
+                            <span>Show Gridlines</span>
+                        </label>
+                    </div>
+
+                    <button onclick="plot2D()" class="w-full py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-medium text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Plot Cartesian Functions
+                    </button>
+                </div>
+
+                <!-- MODULE B: PARAMETRIC 2D -->
+                <div id="form-parametric" class="module-form space-y-4 hidden">
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Parametric Functions (t)</label>
+                        <div class="space-y-2 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <div>
+                                <label class="text-[11px] text-slate-500 code-font">x(t) =</label>
+                                <input type="text" id="paramX" value="3 * cos(t)" class="w-full text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 mt-0.5">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-500 code-font">y(t) =</label>
+                                <input type="text" id="paramY" value="3 * sin(2*t)" class="w-full text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 mt-0.5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">t Range (min to max)</label>
+                            <div class="flex gap-1 mt-1">
+                                <input type="text" id="tMin" value="0" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                                <input type="text" id="tMax" value="2*pi" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Samples</label>
+                            <input type="number" id="tSamples" value="500" class="w-full mt-1 text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                        </div>
+                    </div>
+
+                    <button onclick="plotParametric2D()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Plot Parametric Curve
+                    </button>
+                </div>
+
+                <!-- MODULE C: POLAR GRAPH -->
+                <div id="form-polar" class="module-form space-y-4 hidden">
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Polar Equation r = f(theta)</label>
+                        <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <label class="text-[11px] text-slate-500 code-font">r(theta) =</label>
+                            <input type="text" id="polarExpr" value="1 + cos(theta)" placeholder="e.g. 2*sin(3*theta)" class="w-full text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 mt-0.5">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">&theta; Min / Max</label>
+                            <div class="flex gap-1 mt-1">
+                                <input type="text" id="thetaMin" value="0" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                                <input type="text" id="thetaMax" value="2*pi" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Samples</label>
+                            <input type="number" id="thetaSamples" value="500" class="w-full mt-1 text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                        </div>
+                    </div>
+
+                    <button onclick="plotPolar()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Plot Polar Graph
+                    </button>
+                </div>
+
+                <!-- MODULE D: 3D SURFACE -->
+                <div id="form-3d" class="module-form space-y-4 hidden">
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Surface Equation z = f(x, y)</label>
+                        <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <input type="text" id="expr3D" value="sin(sqrt(x^2 + y^2))" placeholder="e.g. x^2 - y^2" class="w-full text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">X Range</label>
+                            <div class="flex gap-1 mt-1">
+                                <input type="number" id="xMin3D" value="-5" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                                <input type="number" id="xMax3D" value="5" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Y Range</label>
+                            <div class="flex gap-1 mt-1">
+                                <input type="number" id="yMin3D" value="-5" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                                <input type="number" id="yMax3D" value="5" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Color Scale</label>
+                            <select id="colorScale3D" class="w-full mt-1 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                                <option value="Viridis">Viridis</option>
+                                <option value="Plasma">Plasma</option>
+                                <option value="Electric">Electric</option>
+                                <option value="Rainbow">Rainbow</option>
+                                <option value="Jet">Jet</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Grid Resolution</label>
+                            <input type="number" id="gridRes3D" value="40" min="10" max="100" class="w-full mt-1 text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                        </div>
+                    </div>
+
+                    <button onclick="plot3DSurface()" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Plot 3D Surface
+                    </button>
+                </div>
+
+                <!-- MODULE E: 3D PARAMETRIC CURVE -->
+                <div id="form-3d-parametric" class="module-form space-y-4 hidden">
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">3D Parametric Equations (t)</label>
+                        <div class="space-y-2 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <div>
+                                <label class="text-[11px] text-slate-500 code-font">x(t) =</label>
+                                <input type="text" id="param3dX" value="cos(t)" class="w-full text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 mt-0.5">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-500 code-font">y(t) =</label>
+                                <input type="text" id="param3dY" value="sin(t)" class="w-full text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 mt-0.5">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-500 code-font">z(t) =</label>
+                                <input type="text" id="param3dZ" value="t/5" class="w-full text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 mt-0.5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">t Range (min to max)</label>
+                            <div class="flex gap-1 mt-1">
+                                <input type="text" id="tMin3D" value="0" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                                <input type="text" id="tMax3D" value="6*pi" class="w-full text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-medium text-slate-500">Samples</label>
+                            <input type="number" id="tSamples3D" value="500" class="w-full mt-1 text-xs code-font bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1">
+                        </div>
+                    </div>
+
+                    <button onclick="plotParametric3D()" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Plot 3D Curve
+                    </button>
+                </div>
+
+                <!-- NUMERICAL ANALYSIS SECTION (Visible primarily for 2D Cartesian) -->
+                <div id="analysisSection" class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-calculator text-emerald-600"></i> Numerical Analysis (2D)
+                        </h3>
+                        <span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Numerical Approx.</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <!-- Value & Derivative Evaluation -->
+                        <div class="p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-800 space-y-2">
+                            <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Point Evaluation at x₀</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="evalX" value="2" class="w-20 text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1">
+                                <button onclick="evaluateAtPoint()" class="flex-1 text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 rounded font-medium">Calculate</button>
+                            </div>
+                            <div id="evalOutput" class="text-[11px] code-font text-slate-600 dark:text-slate-300 hidden">
+                                <div>f(x₀) ≈ <span id="valY" class="font-bold text-sky-600">--</span></div>
+                                <div>f'(x₀) ≈ <span id="valDeriv" class="font-bold text-indigo-600">--</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Numerical Integration -->
+                        <div class="p-2 bg-slate-50 dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-800 space-y-2">
+                            <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Definite Integral ∫ f(x) dx</label>
+                            <div class="flex items-center gap-1">
+                                <span class="text-xs text-slate-400 font-mono">[a, b] =</span>
+                                <input type="number" id="intA" value="0" class="w-16 text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-1.5 py-1">
+                                <input type="number" id="intB" value="3" class="w-16 text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-1.5 py-1">
+                                <button onclick="computeIntegral()" class="flex-1 text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-100 rounded font-medium py-1">Integrate</button>
+                            </div>
+                            <div id="intOutput" class="text-[11px] code-font text-emerald-600 dark:text-emerald-400 font-bold hidden">
+                                Area ≈ <span id="intVal">--</span>
+                            </div>
+                        </div>
+
+                        <!-- Tangent & Extrema -->
+                        <div class="flex gap-2">
+                            <button onclick="plotTangentLine()" class="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs border border-slate-200 dark:border-slate-700">
+                                Draw Tangent
+                            </button>
+                            <button onclick="findExtremaRoots()" class="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs border border-slate-200 dark:border-slate-700">
+                                Find Roots & Max/Min
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- GRAPH CANVAS & DISPLAY AREA -->
+        <section class="flex-1 min-h-[420px] lg:min-h-0 lg:h-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden shadow-sm relative">
+            
+            <!-- Canvas Toolbar / Status -->
+            <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="plotStatus" class="font-medium text-slate-700 dark:text-slate-300">Ready</span>
+                </div>
+                <div class="text-[11px] text-slate-400 hidden sm:block">
+                    Powered by Math.js & Plotly Interactive Rendering Engine
+                </div>
+            </div>
+
+            <!-- Plotly Container -->
+            <div id="plotContainer" class="flex-1 w-full min-h-[360px] lg:min-h-0 relative"></div>
+
+            <!-- Overlay Summary Panel for Analysis Output -->
+            <div id="analysisOverlay" class="hidden absolute bottom-4 left-4 right-4 max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur border border-slate-200 dark:border-slate-700 rounded-lg p-3 shadow-lg text-xs space-y-1 z-10">
+                <div class="flex justify-between items-center font-bold text-slate-800 dark:text-slate-200">
+                    <span><i class="fa-solid fa-square-poll-vertical text-sky-500"></i> Curve Analysis Summary</span>
+                    <button onclick="document.getElementById('analysisOverlay').classList.add('hidden')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="analysisDetails" class="code-font text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5"></div>
+            </div>
+        </section>
+
+        <!-- EXAMPLES & APPLICATIONS OVERLAY MODAL / CONTAINER (when Tab Selected) -->
+        <div id="examplesView" class="hidden absolute inset-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 z-20 flex flex-col p-6 overflow-hidden shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-sky-600"></i> Mathematical Gallery & Engineering Applications
+                    </h2>
+                    <p class="text-xs text-slate-500">Preset equations curated for engineering mathematics, calculus, and scientific modeling.</p>
+                </div>
+                <button onclick="switchModule('2d')" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-semibold">
+                    <i class="fa-solid fa-xmark"></i> Close Library
+                </button>
+            </div>
+
+            <!-- Scrollable Examples List -->
+            <div class="flex-1 overflow-y-auto py-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                <!-- Category: Algebraic -->
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-square-root-variable"></i> Algebraic & Rational
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-sky-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Cubic Polynomial</h4>
+                                <span class="text-[10px] code-font text-slate-400">2D Cartesian</span>
+                            </div>
+                            <p class="text-[11px] code-font text-sky-600 dark:text-sky-400 my-1">y = x^3 - 3*x</p>
+                            <p class="text-[11px] text-slate-500">Classic cubic curve with local extrema at x = ±1.</p>
+                            <button onclick="loadExample('2d', ['x^3 - 3*x'])" class="mt-2 text-xs font-medium text-sky-600 dark:text-sky-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-sky-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Rational Function with Asymptotes</h4>
+                                <span class="text-[10px] code-font text-slate-400">2D Cartesian</span>
+                            </div>
+                            <p class="text-[11px] code-font text-sky-600 dark:text-sky-400 my-1">y = (x^2 - 1) / (x^2 - 4)</p>
+                            <p class="text-[11px] text-slate-500">Discontinuities at vertical asymptotes x = ±2.</p>
+                            <button onclick="loadExample('2d', ['(x^2 - 1)/(x^2 - 4)'])" class="mt-2 text-xs font-medium text-sky-600 dark:text-sky-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category: Trigonometric & Polar -->
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-compass"></i> Polar & Transcendental
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Four-Petaled Rose</h4>
+                                <span class="text-[10px] code-font text-slate-400">Polar</span>
+                            </div>
+                            <p class="text-[11px] code-font text-emerald-600 dark:text-emerald-400 my-1">r = 2 * cos(2*theta)</p>
+                            <p class="text-[11px] text-slate-500">Symmetric multi-petal rose curve in polar coordinates.</p>
+                            <button onclick="loadExample('polar', {expr: '2*cos(2*theta)', min: '0', max: '2*pi'})" class="mt-2 text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Cardioid Curve</h4>
+                                <span class="text-[10px] code-font text-slate-400">Polar</span>
+                            </div>
+                            <p class="text-[11px] code-font text-emerald-600 dark:text-emerald-400 my-1">r = 1 + cos(theta)</p>
+                            <p class="text-[11px] text-slate-500">Heart-shaped trajectory generated by rolling circles.</p>
+                            <button onclick="loadExample('polar', {expr: '1 + cos(theta)', min: '0', max: '2*pi'})" class="mt-2 text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category: Engineering Applications -->
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-gears"></i> Engineering Applications
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Damped Harmonic Oscillator</h4>
+                                <span class="text-[10px] code-font text-slate-400">Differential Eq.</span>
+                            </div>
+                            <p class="text-[11px] code-font text-amber-600 dark:text-amber-400 my-1">y = exp(-0.3*x) * cos(3*x)</p>
+                            <p class="text-[11px] text-slate-500">Models mechanical vibration and electrical RLC circuits.</p>
+                            <button onclick="loadExample('2d', ['exp(-0.3*x) * cos(3*x)'])" class="mt-2 text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-amber-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Fourier Series Approximation</h4>
+                                <span class="text-[10px] code-font text-slate-400">Signal Processing</span>
+                            </div>
+                            <p class="text-[11px] code-font text-amber-600 dark:text-amber-400 my-1">y = sin(x) + sin(3*x)/3 + sin(5*x)/5</p>
+                            <p class="text-[11px] text-slate-500">Square wave approximation using harmonic superposition.</p>
+                            <button onclick="loadExample('2d', ['sin(x) + sin(3*x)/3 + sin(5*x)/5'])" class="mt-2 text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category: 3D Surfaces & Curves -->
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-cube"></i> 3D Surfaces & Helices
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-purple-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Saddle Surface (Hyperbolic Paraboloid)</h4>
+                                <span class="text-[10px] code-font text-slate-400">3D Surface</span>
+                            </div>
+                            <p class="text-[11px] code-font text-purple-600 dark:text-purple-400 my-1">z = x^2 - y^2</p>
+                            <p class="text-[11px] text-slate-500">Classic saddle point at origin used in multivariable optimization.</p>
+                            <button onclick="loadExample('3d', {expr: 'x^2 - y^2'})" class="mt-2 text-xs font-medium text-purple-600 dark:text-purple-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-purple-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-xs font-bold">Circular Helix</h4>
+                                <span class="text-[10px] code-font text-slate-400">3D Parametric</span>
+                            </div>
+                            <p class="text-[11px] code-font text-purple-600 dark:text-purple-400 my-1">x=cos(t), y=sin(t), z=t/5</p>
+                            <p class="text-[11px] text-slate-500">Helical trajectory modeling spring geometry and DNA strands.</p>
+                            <button onclick="loadExample('3d-parametric', {x: 'cos(t)', y: 'sin(t)', z: 't/5'})" class="mt-2 text-xs font-medium text-purple-600 dark:text-purple-400 flex items-center gap-1 hover:underline">Load Preset &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-4 py-2 text-center text-xs text-slate-500 dark:text-slate-400 shrink-0 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div>
+            <span class="font-bold text-slate-700 dark:text-slate-300">GNANA GRAPH BOT V1</span> — Interactive Mathematics Graphing Laboratory
+        </div>
+        <div>
+            Developed for <span class="font-semibold text-slate-700 dark:text-slate-300">GNANA MATH LEARNING CENTRE</span> • V • GUIDANCE • RESEARCH
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+
+        // GLOBAL STATE
+        let activeModule = '2d';
+        let isDarkMode = false;
+        let activeColorPalette = ['#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#ef4444'];
+
+        // INITIALIZATION
+        window.onload = function() {
+            // Plot initial 2D graph
+            plot2D();
+
+            // Resize handle for responsive Plotly
+            window.addEventListener('resize', () => {
+                if (document.getElementById('plotContainer').data) if (document.getElementById('plotContainer').data) Plotly.Plots.resize('plotContainer');
+            });
+        };
+
+        // THEME TOGGLE
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            
+            if (isDarkMode) {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-amber-400';
+            } else {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon text-slate-600';
+            }
+
+            // Re-render plot with updated theme colors
+            refreshCurrentPlot();
+        }
+
+        function getPlotThemeLayout() {
+            const dark = document.documentElement.classList.contains('dark');
+            return {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: {
+                    family: 'Inter, sans-serif',
+                    color: dark ? '#cbd5e1' : '#334155',
+                    size: 11
+                },
+                xaxis: {
+                    gridcolor: dark ? '#334155' : '#e2e8f0',
+                    zerolinecolor: dark ? '#64748b' : '#94a3b8',
+                    showgrid: true
+                },
+                yaxis: {
+                    gridcolor: dark ? '#334155' : '#e2e8f0',
+                    zerolinecolor: dark ? '#64748b' : '#94a3b8',
+                    showgrid: true
+                },
+                margin: { l: 45, r: 25, t: 35, b: 40 },
+                autosize: true
+            };
+        }
+
+        // NAVIGATION MODULE SWITCHER
+        function switchModule(modId) {
+            activeModule = modId;
+
+            // Hide examples tab overlay if switching away
+            if (modId !== 'examples') {
+                document.getElementById('examplesView').classList.add('hidden');
+            } else {
+                document.getElementById('examplesView').classList.remove('hidden');
+                return;
+            }
+
+            // Update UI Tab States
+            document.querySelectorAll('.module-tab').forEach(tab => {
+                tab.classList.remove('active-tab', 'bg-sky-100', 'dark:bg-sky-900', 'text-sky-700', 'dark:text-sky-300');
+                tab.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+
+            const activeTab = document.getElementById(`tab-${modId}`);
+            if (activeTab) {
+                activeTab.classList.add('active-tab', 'bg-sky-100', 'dark:bg-sky-900', 'text-sky-700', 'dark:text-sky-300');
+                activeTab.classList.remove('text-slate-600', 'dark:text-slate-400');
+            }
+
+            // Update Form Visibility
+            document.querySelectorAll('.module-form').forEach(form => form.classList.add('hidden'));
+            const formEl = document.getElementById(`form-${modId}`);
+            if (formEl) formEl.classList.remove('hidden');
+
+            // Update Panel Titles & Analysis Display
+            const titles = {
+                '2d': 'Module A: 2D Cartesian Graphs',
+                'parametric': 'Module B: Parametric Curves (2D)',
+                'polar': 'Module C: Polar Graphing',
+                '3d': 'Module D: 3D Surface Grapher',
+                '3d-parametric': 'Module E: 3D Parametric Curve'
+            };
+            document.getElementById('panelTitle').innerHTML = `<i class="fa-solid fa-sliders text-sky-600"></i> ${titles[modId] || 'Controls'}`;
+            document.getElementById('activeModuleBadge').innerText = modId.toUpperCase();
+
+            // Toggle Numerical Analysis Panel Visibility (Mainly for 2D Cartesian)
+            document.getElementById('analysisSection').style.display = (modId === '2d') ? 'block' : 'none';
+
+            hideError();
+            refreshCurrentPlot();
+        }
+
+        function refreshCurrentPlot() {
+            if (activeModule === '2d') plot2D();
+            else if (activeModule === 'parametric') plotParametric2D();
+            else if (activeModule === 'polar') plotPolar();
+            else if (activeModule === '3d') plot3DSurface();
+            else if (activeModule === '3d-parametric') plotParametric3D();
+        }
+
+        // ERROR HANDLING UTILITIES
+        function showError(msg) {
+            const errPanel = document.getElementById('errorPanel');
+            document.getElementById('errorMessage').innerText = msg;
+            errPanel.classList.remove('hidden');
+            document.getElementById('plotStatus').innerText = 'Syntax Error';
+            document.getElementById('plotStatus').className = 'font-medium text-red-500';
+        }
+
+        function hideError() {
+            document.getElementById('errorPanel').classList.add('hidden');
+            document.getElementById('plotStatus').innerText = 'Active';
+            document.getElementById('plotStatus').className = 'font-medium text-emerald-500';
+        }
+
+        // Shared validation helpers: reject invalid ranges and constrain sampling work.
+        function requireFiniteRange(min, max, label) {
+            if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max) {
+                throw new Error(`${label} minimum and maximum must be finite, with minimum < maximum.`);
+            }
+        }
+
+        function requireSampleCount(value, label, min = 50, max = 2000) {
+            if (!Number.isInteger(value) || value < min || value > max) {
+                throw new Error(`${label} must be an integer between ${min} and ${max}.`);
+            }
+            return value;
+        }
+
+        function finiteReal(value) {
+            return typeof value === 'number' && Number.isFinite(value);
+        }
+
+        function ensurePlotExists() {
+            const plot = document.getElementById('plotContainer');
+            if (!plot || !plot.data) throw new Error('Plot is empty. Plot a graph before using this action.');
+            return plot;
+        }
+
+        // MODULE A: 2D CARTESIAN GRAPHING LOGIC
+        function addFunction2D() {
+            const container = document.getElementById('functionContainer2D');
+            const index = container.children.length;
+            const color = activeColorPalette[index % activeColorPalette.length];
+            
+            const div = document.createElement('div');
+            div.className = "func-row flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700";
+            div.innerHTML = `
+                <input type="color" value="${color}" class="color-picker w-6 h-6 rounded cursor-pointer border-0">
+                <input type="text" value="sin(x)" placeholder="e.g. x^2" class="func-expr flex-1 text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-sky-500">
+                <button onclick="removeFunctionRow(this)" class="text-slate-400 hover:text-red-500 p-1"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeFunctionRow(btn) {
+            const container = document.getElementById('functionContainer2D');
+            if (container.children.length > 1) {
+                btn.closest('.func-row').remove();
+                plot2D();
+            } else {
+                showError("At least one function must remain.");
+            }
+        }
+
+        function plot2D() {
+            hideError();
+            try {
+                const xMin = Number(document.getElementById('xMin2D').value);
+                const xMax = Number(document.getElementById('xMax2D').value);
+                const samples = requireSampleCount(Number(document.getElementById('res2D').value), 'Resolution', 50, 2000);
+                const showGrid = document.getElementById('showGrid2D').checked;
+                requireFiniteRange(xMin, xMax, 'X range');
+
+                const xValues = Array.from({ length: samples + 1 }, (_, i) => xMin + i * (xMax - xMin) / samples);
+                const rows = document.querySelectorAll('#functionContainer2D .func-row');
+                const traces = [];
+
+                rows.forEach((row, idx) => {
+                    const exprStr = row.querySelector('.func-expr').value.trim();
+                    const color = row.querySelector('.color-picker').value;
+                    if (!exprStr) return;
+
+                    const compiled = math.compile(exprStr);
+                    const yValues = xValues.map(x => {
+                        try {
+                            const val = compiled.evaluate({ x });
+                            return finiteReal(val) ? val : NaN;
+                        } catch (_) { return NaN; }
+                    });
+
+                    traces.push({
+                        x: xValues, y: yValues, mode: 'lines',
+                        name: `f${idx + 1}(x) = ${exprStr}`,
+                        line: { color, width: 2 }
+                    });
+                });
+
+                if (!traces.length) throw new Error('Enter at least one valid function.');
+                const layout = getPlotThemeLayout();
+                layout.xaxis.range = [xMin, xMax];
+                layout.xaxis.showgrid = showGrid;
+                layout.yaxis.showgrid = showGrid;
+                Plotly.newPlot('plotContainer', traces, layout, { responsive: true, displayModeBar: false });
+            } catch (err) {
+                showError("Graphing error: " + err.message);
+            }
+        }
+
+        // MODULE B: PARAMETRIC 2D GRAPHING
+        function plotParametric2D() {
+            hideError();
+            try {
+                const exprX = document.getElementById('paramX').value.trim();
+                const exprY = document.getElementById('paramY').value.trim();
+                
+                const tMin = math.evaluate(document.getElementById('tMin').value);
+                const tMax = math.evaluate(document.getElementById('tMax').value);
+                const samples = parseInt(document.getElementById('tSamples').value) || 500;
+
+                const compiledX = math.compile(exprX);
+                const compiledY = math.compile(exprY);
+
+                const tStep = (tMax - tMin) / samples;
+                const xValues = [];
+                const yValues = [];
+
+                for (let i = 0; i <= samples; i++) {
+                    const t = tMin + i * tStep;
+                    try {
+                        const vx = compiledX.evaluate({ t: t, pi: Math.PI, e: Math.E });
+                        const vy = compiledY.evaluate({ t: t, pi: Math.PI, e: Math.E });
+                        xValues.push(isFinite(vx) ? vx : NaN);
+                        yValues.push(isFinite(vy) ? vy : NaN);
+                    } catch (e) {
+                        xValues.push(NaN);
+                        yValues.push(NaN);
+                    }
+                }
+
+                const trace = {
+                    x: xValues,
+                    y: yValues,
+                    mode: 'lines',
+                    name: `x(t), y(t)`,
+                    line: { color: '#6366f1', width: 2.5 }
+                };
+
+                const layout = getPlotThemeLayout();
+                Plotly.newPlot('plotContainer', [trace], layout, { responsive: true, displayModeBar: false });
+            } catch (err) {
+                showError("Parametric parsing error: " + err.message);
+            }
+        }
+
+        // MODULE C: POLAR GRAPHING
+        function plotPolar() {
+            hideError();
+            try {
+                const exprStr = document.getElementById('polarExpr').value.trim();
+                const thetaMin = math.evaluate(document.getElementById('thetaMin').value);
+                const thetaMax = math.evaluate(document.getElementById('thetaMax').value);
+                const samples = parseInt(document.getElementById('thetaSamples').value) || 500;
+
+                const compiled = math.compile(exprStr);
+                const step = (thetaMax - thetaMin) / samples;
+
+                const rValues = [];
+                const thetaValues = [];
+
+                for (let i = 0; i <= samples; i++) {
+                    const th = thetaMin + i * step;
+                    try {
+                        const r = compiled.evaluate({ theta: th, th: th, pi: Math.PI });
+                        rValues.push(isFinite(r) ? r : NaN);
+                        thetaValues.push(th * (180 / Math.PI)); // Convert to degrees for Plotly Polar
+                    } catch (e) {
+                        rValues.push(NaN);
+                        thetaValues.push(th * (180 / Math.PI));
+                    }
+                }
+
+                const dark = document.documentElement.classList.contains('dark');
+                const trace = {
+                    r: rValues,
+                    theta: thetaValues,
+                    mode: 'lines',
+                    type: 'scatterpolar',
+                    line: { color: '#10b981', width: 2 }
+                };
+
+                const layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    polar: {
+                        bgcolor: 'rgba(0,0,0,0)',
+                        radialaxis: { gridcolor: dark ? '#334155' : '#e2e8f0', color: dark ? '#cbd5e1' : '#334155' },
+                        angularaxis: { gridcolor: dark ? '#334155' : '#e2e8f0', color: dark ? '#cbd5e1' : '#334155' }
+                    },
+                    margin: { l: 40, r: 40, t: 30, b: 30 }
+                };
+
+                Plotly.newPlot('plotContainer', [trace], layout, { responsive: true, displayModeBar: false });
+            } catch (err) {
+                showError("Polar expression error: " + err.message);
+            }
+        }
+
+        // MODULE D: 3D SURFACE GRAPHING
+        function plot3DSurface() {
+            hideError();
+            try {
+                const exprStr = document.getElementById('expr3D').value.trim();
+                const xMin = parseFloat(document.getElementById('xMin3D').value);
+                const xMax = parseFloat(document.getElementById('xMax3D').value);
+                const yMin = parseFloat(document.getElementById('yMin3D').value);
+                const yMax = parseFloat(document.getElementById('yMax3D').value);
+                const gridRes = parseInt(document.getElementById('gridRes3D').value) || 40;
+                const colorscale = document.getElementById('colorScale3D').value;
+
+                const compiled = math.compile(exprStr);
+
+                const xStep = (xMax - xMin) / gridRes;
+                const yStep = (yMax - yMin) / gridRes;
+
+                const xArr = [], yArr = [], zMatrix = [];
+
+                for (let i = 0; i <= gridRes; i++) xArr.push(xMin + i * xStep);
+                for (let j = 0; j <= gridRes; j++) yArr.push(yMin + j * yStep);
+
+                for (let j = 0; j <= gridRes; j++) {
+                    const yVal = yArr[j];
+                    const zRow = [];
+                    for (let i = 0; i <= gridRes; i++) {
+                        const xVal = xArr[i];
+                        try {
+                            const zVal = compiled.evaluate({ x: xVal, y: yVal });
+                            zRow.push(isFinite(zVal) ? zVal : NaN);
+                        } catch (e) {
+                            zRow.push(NaN);
+                        }
+                    }
+                    zMatrix.push(zRow);
+                }
+
+                const trace = {
+                    x: xArr,
+                    y: yArr,
+                    z: zMatrix,
+                    type: 'surface',
+                    colorscale: colorscale
+                };
+
+                const dark = document.documentElement.classList.contains('dark');
+                const layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    scene: {
+                        xaxis: { title: 'X', gridcolor: dark ? '#334155' : '#e2e8f0' },
+                        yaxis: { title: 'Y', gridcolor: dark ? '#334155' : '#e2e8f0' },
+                        zaxis: { title: 'Z', gridcolor: dark ? '#334155' : '#e2e8f0' }
+                    },
+                    margin: { l: 10, r: 10, t: 10, b: 10 }
+                };
+
+                Plotly.newPlot('plotContainer', [trace], layout, { responsive: true, displayModeBar: false });
+            } catch (err) {
+                showError("3D Surface error: " + err.message);
+            }
+        }
+
+        // MODULE E: 3D PARAMETRIC CURVE LOGIC
+        function plotParametric3D() {
+            hideError();
+            try {
+                const exprX = document.getElementById('param3dX').value.trim();
+                const exprY = document.getElementById('param3dY').value.trim();
+                const exprZ = document.getElementById('param3dZ').value.trim();
+
+                const tMin = math.evaluate(document.getElementById('tMin3D').value);
+                const tMax = math.evaluate(document.getElementById('tMax3D').value);
+                const samples = parseInt(document.getElementById('tSamples3D').value) || 500;
+
+                const compiledX = math.compile(exprX);
+                const compiledY = math.compile(exprY);
+                const compiledZ = math.compile(exprZ);
+
+                const step = (tMax - tMin) / samples;
+                const xVals = [], yVals = [], zVals = [];
+
+                for (let i = 0; i <= samples; i++) {
+                    const t = tMin + i * step;
+                    try {
+                        const vx = compiledX.evaluate({ t: t, pi: Math.PI });
+                        const vy = compiledY.evaluate({ t: t, pi: Math.PI });
+                        const vz = compiledZ.evaluate({ t: t, pi: Math.PI });
+                        xVals.push(isFinite(vx) ? vx : NaN);
+                        yVals.push(isFinite(vy) ? vy : NaN);
+                        zVals.push(isFinite(vz) ? vz : NaN);
+                    } catch (e) {
+                        xVals.push(NaN); yVals.push(NaN); zVals.push(NaN);
+                    }
+                }
+
+                const trace = {
+                    x: xVals, y: yVals, z: zVals,
+                    type: 'scatter3d',
+                    mode: 'lines',
+                    line: { color: '#a855f7', width: 4 }
+                };
+
+                const dark = document.documentElement.classList.contains('dark');
+                const layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    scene: {
+                        xaxis: { title: 'X', gridcolor: dark ? '#334155' : '#e2e8f0' },
+                        yaxis: { title: 'Y', gridcolor: dark ? '#334155' : '#e2e8f0' },
+                        zaxis: { title: 'Z', gridcolor: dark ? '#334155' : '#e2e8f0' }
+                    },
+                    margin: { l: 10, r: 10, t: 10, b: 10 }
+                };
+
+                Plotly.newPlot('plotContainer', [trace], layout, { responsive: true, displayModeBar: false });
+            } catch (err) {
+                showError("3D Parametric error: " + err.message);
+            }
+        }
+
+        // NUMERICAL ANALYSIS MODULE FUNCTIONS
+        function evaluateAtPoint() {
+            try {
+                const x0 = parseFloat(document.getElementById('evalX').value);
+                const firstRow = document.querySelector('#functionContainer2D .func-expr');
+                if (!firstRow) return;
+
+                const exprStr = firstRow.value.trim();
+                const compiled = math.compile(exprStr);
+
+                const y0 = compiled.evaluate({ x: x0 });
+
+                // Finite difference numerical derivative
+                const h = 1e-5;
+                const yPlus = compiled.evaluate({ x: x0 + h });
+                const yMinus = compiled.evaluate({ x: x0 - h });
+                const deriv = (yPlus - yMinus) / (2 * h);
+
+                document.getElementById('valY').innerText = isFinite(y0) ? y0.toFixed(4) : 'Undefined';
+                document.getElementById('valDeriv').innerText = isFinite(deriv) ? deriv.toFixed(4) : 'Undefined';
+                document.getElementById('evalOutput').classList.remove('hidden');
+            } catch (err) {
+                showError("Evaluation error: " + err.message);
+            }
+        }
+
+        function computeIntegral() {
+            try {
+                const a = parseFloat(document.getElementById('intA').value);
+                const b = parseFloat(document.getElementById('intB').value);
+                const firstRow = document.querySelector('#functionContainer2D .func-expr');
+                if (!firstRow) return;
+
+                const exprStr = firstRow.value.trim();
+                const compiled = math.compile(exprStr);
+
+                // Simpson's 1/3 Rule Numerical Integration
+                const n = 200; // Even subintervals
+                const h = (b - a) / n;
+                let sum = compiled.evaluate({ x: a }) + compiled.evaluate({ x: b });
+
+                for (let i = 1; i < n; i++) {
+                    const x = a + i * h;
+                    const val = compiled.evaluate({ x: x });
+                    sum += (i % 2 === 0 ? 2 : 4) * val;
+                }
+
+                const integralResult = (h / 3) * sum;
+                document.getElementById('intVal').innerText = isFinite(integralResult) ? integralResult.toFixed(4) : 'Divergent/Undefined';
+                document.getElementById('intOutput').classList.remove('hidden');
+            } catch (err) {
+                showError("Integration error: " + err.message);
+            }
+        }
+
+        function plotTangentLine() {
+            try {
+                const x0 = parseFloat(document.getElementById('evalX').value);
+                const firstRow = document.querySelector('#functionContainer2D .func-expr');
+                if (!firstRow) return;
+
+                const exprStr = firstRow.value.trim();
+                const compiled = math.compile(exprStr);
+
+                const y0 = compiled.evaluate({ x: x0 });
+                const h = 1e-5;
+                const m = (compiled.evaluate({ x: x0 + h }) - compiled.evaluate({ x: x0 - h })) / (2 * h);
+
+                // Tangent equation: y = m*(x - x0) + y0
+                const xMin = parseFloat(document.getElementById('xMin2D').value);
+                const xMax = parseFloat(document.getElementById('xMax2D').value);
+
+                const tangentTrace = {
+                    x: [xMin, xMax],
+                    y: [m * (xMin - x0) + y0, m * (xMax - x0) + y0],
+                    mode: 'lines',
+                    name: `Tangent at x=${x0}`,
+                    line: { color: '#ef4444', width: 1.5, dash: 'dash' }
+                };
+
+                const pointTrace = {
+                    x: [x0],
+                    y: [y0],
+                    mode: 'markers',
+                    name: `Point (${x0}, ${y0.toFixed(2)})`,
+                    marker: { color: '#ef4444', size: 8 }
+                };
+
+                Plotly.addTraces('plotContainer', [tangentTrace, pointTrace]);
+            } catch (err) {
+                showError("Tangent line calculation error.");
+            }
+        }
+
+        function findExtremaRoots() {
+            try {
+                const firstRow = document.querySelector('#functionContainer2D .func-expr');
+                if (!firstRow) return;
+
+                const exprStr = firstRow.value.trim();
+                const compiled = math.compile(exprStr);
+
+                const xMin = parseFloat(document.getElementById('xMin2D').value);
+                const xMax = parseFloat(document.getElementById('xMax2D').value);
+                const steps = 400;
+                const h = (xMax - xMin) / steps;
+
+                const roots = [];
+                const extrema = [];
+
+                let prevX = xMin;
+                let prevY = compiled.evaluate({ x: prevX });
+
+                for (let i = 1; i <= steps; i++) {
+                    const currX = xMin + i * h;
+                    const currY = compiled.evaluate({ x: currX });
+
+                    // Root Detection (Sign Change)
+                    if (prevY * currY < 0 && isFinite(prevY) && isFinite(currY)) {
+                        const approxRoot = prevX - prevY * (currX - prevX) / (currY - prevY);
+                        roots.push(approxRoot.toFixed(3));
+                    }
+
+                    // Extrema Detection (Derivative Sign Change)
+                    if (i > 1) {
+                        const midX = currX - h/2;
+                        const d1 = (currY - prevY) / h;
+                        const prevX2 = currX - 2*h;
+                        const prevY2 = compiled.evaluate({ x: prevX2 });
+                        const d0 = (prevY - prevY2) / h;
+
+                        if (d0 * d1 < 0) {
+                            extrema.push(`x ≈ ${midX.toFixed(3)} (y ≈ ${prevY.toFixed(3)})`);
+                        }
+                    }
+
+                    prevX = currX;
+                    prevY = currY;
+                }
+
+                // Display in overlay
+                const overlay = document.getElementById('analysisOverlay');
+                const details = document.getElementById('analysisDetails');
+                details.innerHTML = `
+                    <div><strong>Approximate Roots:</strong> ${roots.length > 0 ? roots.join(', ') : 'None detected in range'}</div>
+                    <div><strong>Approximate Local Extrema:</strong> ${extrema.length > 0 ? extrema.join(' | ') : 'None detected in range'}</div>
+                `;
+                overlay.classList.remove('hidden');
+            } catch (e) {
+                showError("Extrema calculation error.");
+            }
+        }
+
+        // LOAD PRESET EXAMPLES
+        function loadExample(modId, config) {
+            switchModule(modId);
+
+            if (modId === '2d') {
+                const container = document.getElementById('functionContainer2D');
+                container.innerHTML = '';
+                config.forEach((expr, idx) => {
+                    const color = activeColorPalette[idx % activeColorPalette.length];
+                    const div = document.createElement('div');
+                    div.className = "func-row flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700";
+                    div.innerHTML = `
+                        <input type="color" value="${color}" class="color-picker w-6 h-6 rounded cursor-pointer border-0">
+                        <input type="text" value="${expr}" class="func-expr flex-1 text-xs code-font bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-sky-500">
+                        <button onclick="removeFunctionRow(this)" class="text-slate-400 hover:text-red-500 p-1"><i class="fa-solid fa-xmark"></i></button>
+                    `;
+                    container.appendChild(div);
+                });
+                plot2D();
+            } else if (modId === 'polar') {
+                document.getElementById('polarExpr').value = config.expr;
+                document.getElementById('thetaMin').value = config.min;
+                document.getElementById('thetaMax').value = config.max;
+                plotPolar();
+            } else if (modId === '3d') {
+                document.getElementById('expr3D').value = config.expr;
+                plot3DSurface();
+            } else if (modId === '3d-parametric') {
+                document.getElementById('param3dX').value = config.x;
+                document.getElementById('param3dY').value = config.y;
+                document.getElementById('param3dZ').value = config.z;
+                plotParametric3D();
+            }
+        }
+
+        // GRAPH UTILITIES: RESET, CLEAR, EXPORT
+        function resetGraphView() {
+            try {
+                ensurePlotExists();
+                Plotly.relayout('plotContainer', {
+                    'xaxis.autorange': true,
+                    'yaxis.autorange': true,
+                    'polar.radialaxis.autorange': true,
+                    'polar.angularaxis.autorange': true,
+                    'scene.camera': { eye: { x: 1.25, y: 1.25, z: 1.25 } }
+                });
+            } catch (err) { showError(err.message); }
+        }
+
+        function clearCurrentGraph() {
+            Plotly.purge('plotContainer');
+            document.getElementById('plotStatus').innerText = 'Cleared';
+            document.getElementById('plotStatus').className = 'font-medium text-amber-500';
+        }
+
+        function exportGraph(format) {
+            try {
+                ensurePlotExists();
+                if (!['png', 'svg'].includes(format)) throw new Error('Unsupported export format.');
+                Plotly.downloadImage('plotContainer', {
+                    format, width: 1200, height: 800,
+                    filename: `GNANA_GRAPH_${activeModule.toUpperCase()}`
+                });
+            } catch (err) { showError(err.message); }
+        }
+
+    </script>
+</body>
+</html>

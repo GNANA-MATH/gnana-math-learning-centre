@@ -1,0 +1,391 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GNANA STATISTICS BOT V2 — Interactive Statistical Analysis Laboratory</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+/* Styling follows the GNANA Math Quiz Bot template (same palette, cards, tabs, buttons) + dark mode */
+:root{--navy:#142746;--blue:#2456a6;--teal:#087f8c;--gold:#f3b63f;--ink:#202b3b;--muted:#68758a;--paper:#f4f7fb;--line:#dce4ef;--red:#b83b4b;--green:#1f8a4c;--card:#fff;--th:#eef3fa;--sb:#eaf1f8;--sbt:#233c60;--soft:#fbfcfe}
+body.dark{--paper:#0d1626;--card:#16233a;--ink:#e6edf8;--muted:#9fb2cf;--line:#2b3d5c;--th:#1d2d4a;--sb:#243652;--sbt:#d6e3f7;--soft:#122038}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,'Noto Sans Tamil','Nirmala UI',Latha,sans-serif}
+.hero{background:linear-gradient(125deg,#142746,#2456a6 65%,#087f8c);color:#fff;padding:20px clamp(16px,4vw,40px)}
+.brand{font-size:12px;letter-spacing:3px;color:#f8d77a;font-weight:800}.hero h1{margin:4px 0;font-size:clamp(22px,3.5vw,32px)}.hero p{margin:4px 0 0;color:#e7efff;max-width:900px}
+.hero .bar{margin:12px 0 0}
+.tabs{display:flex;gap:6px;max-width:1300px;margin:14px auto 0;padding:0 20px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--card);padding:9px 14px;border-radius:10px 10px 0 0;font-weight:700;cursor:pointer;color:var(--ink);font-size:14px}
+.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.wrap{max-width:1300px;margin:0 auto;padding:0 20px 30px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 5px 22px #18355c08;margin-bottom:14px}
+h2{margin:0 0 10px;color:var(--navy);font-size:20px}h3{margin:12px 0 8px;color:var(--navy);font-size:16px}body.dark h2,body.dark h3{color:#9cc4ff}
+label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px}
+input,select,textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+textarea{min-height:90px;font-family:ui-monospace,Consolas,monospace}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;font:inherit;font-weight:700}
+.btn.s{background:var(--sb);color:var(--sbt)}.btn.g{background:var(--gold);color:#3c2a00}.btn.ok{background:var(--green)}.btn.no{background:var(--red)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.card{border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:12px;padding:14px;margin:10px 0;background:var(--soft)}
+.card b.f{font-family:ui-monospace,Consolas,monospace;color:var(--blue)}body.dark .card b.f{color:#8ec1ff}
+.note{font-size:12px;color:var(--muted);margin:6px 0}
+.warn{background:#fff9e8;color:#3c2a00;border-left:4px solid var(--gold);padding:10px 12px;border-radius:8px;font-size:13px;margin:10px 0}
+.ans{margin-top:10px;padding:12px;background:#e9f7ef;border:1px solid #bfe3cd;border-radius:10px;font-weight:700;color:#14633a}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid var(--line);padding:6px 9px;text-align:left}th{background:var(--th)}
+td.v{font-family:ui-monospace,Consolas,monospace;font-weight:700}
+.plot{width:100%;min-height:360px;margin-top:8px}
+.chip{display:inline-block;background:var(--sb);border-radius:99px;padding:2px 10px;margin:2px;font:13px ui-monospace,Consolas,monospace}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:10px}
+@media(max-width:700px){.tabs{flex-wrap:nowrap;overflow-x:auto}.tabs button{white-space:nowrap}.wrap{padding:0 10px 30px}.plot{min-height:320px}}
+@media print{.hero,.tabs,.noprint,footer,section:not(#v8){display:none!important}.panel{border:0;box-shadow:none}body{background:#fff;color:#000}.plot{page-break-inside:avoid}}
+</style></head><body>
+<header class="hero"><div class="brand">V • G • R / GNANA MATH LEARNING CENTRE</div>
+<h1>GNANA STATISTICS BOT <small>[V2]</small></h1>
+<p>MATHEMATICS • ENGINEERING • RESEARCH — Interactive Statistical Analysis Laboratory. Runs fully offline in the browser (Plotly.js loaded from CDN); no API key and no data leaves your device.</p>
+<div class="bar noprint"><button class="btn g" id="bdl">⬇ Download Results</button><button class="btn s" id="blang">தமிழ்</button><button class="btn s" id="bdk">🌓 Light / Dark</button><button class="btn no" id="brs">↺ Reset Application</button>
+<span style="margin-left:auto;display:flex;align-items:center;gap:6px;color:#e7efff;font-size:13px">Decimals <select id="prec" style="width:auto"><option>2</option><option>3</option><option selected>4</option><option>6</option><option>8</option></select></span></div></header>
+<nav class="tabs noprint" id="tabs"></nav>
+<div class="wrap">
+
+<section class="panel" id="v0"><h2>Data Input Laboratory</h2>
+<label>Observations (comma, space or newline separated)</label>
+<textarea id="raw" placeholder="12, 15, 18, 20, 22, 25, 28, 30"></textarea>
+<div class="row" style="margin-top:10px">
+<div><label>Example dataset</label><select id="ex"></select></div>
+<div><label>Upload CSV file</label><input type="file" id="csv" accept=".csv"></div>
+<div id="colbox" class="hidden"><label>Numerical column</label><select id="col"></select></div></div>
+<div class="bar"><button class="btn" id="load">Load data</button><button class="btn s" id="lex">Load example</button><button class="btn s hidden" id="ucol">Use column</button><button class="btn no" id="clr">Clear dataset</button></div>
+<div id="dmsg" class="hidden"></div><div id="dinfo" class="ans hidden"></div><div id="dprev"></div></section>
+
+<section class="panel hidden" id="v1"><h2>Descriptive Statistics</h2><div id="m1" class="hidden"></div>
+<div class="row"><div><label>Extra percentiles (comma separated, 0–100)</label><input id="pcts" value="10, 90"></div></div>
+<div class="bar"><button class="btn" id="rd">Compute statistics</button></div><div id="dtab"></div>
+<div class="note"><b>Conventions:</b> quartiles/percentiles use linear interpolation, position h = (n−1)p (R type 7, Excel QUARTILE.INC). Skewness g₁ = m₃/m₂^{3/2} and excess kurtosis g₂ = m₄/m₂² − 3 use <u>population moments</u> (no sample correction). Geometric and harmonic means require all values &gt; 0.</div></section>
+
+<section class="panel hidden" id="v2"><h2>Frequency Distribution</h2><div id="m2" class="hidden"></div>
+<div class="row"><div><label>Number of classes (blank = Sturges)</label><input id="fk" type="number" min="1" step="1"></div><div><label>Class width (blank = automatic)</label><input id="fw" type="number" min="0" step="any"></div></div>
+<div class="bar"><button class="btn" id="rf">Build distribution</button></div>
+<div class="note">Sturges: k = ⌈1 + 3.322 log₁₀ n⌉. Classes are [lower, upper) except the last, which is [lower, upper], so no observation is missed or double-counted.</div>
+<h3>Grouped frequency table</h3><div id="ftab"></div><h3>Ungrouped frequency table</h3><div id="fun"></div>
+<div id="fh" class="plot"></div><div id="fp" class="plot"></div><div id="fo" class="plot"></div></section>
+
+<section class="panel hidden" id="v3"><h2>Statistical Visualization</h2><div id="vmsg" class="hidden"></div>
+<div class="row"><div><label>Chart</label><select id="ctype"><option value="hist">Histogram</option><option value="poly">Frequency polygon</option><option value="bar">Bar chart</option><option value="pie">Pie chart</option><option value="box">Box plot</option><option value="scatter">Scatter plot</option><option value="ogive">Ogive</option><option value="normal">Normal distribution curve</option></select></div>
+<div><label>Graph title</label><input id="gt"></div><div><label>X-axis label</label><input id="gx"></div><div><label>Y-axis label</label><input id="gy"></div>
+<div><label>Gridlines</label><select id="grid"><option value="1">On</option><option value="">Off</option></select></div></div>
+<div class="bar"><button class="btn" id="dc">Draw chart</button><button class="btn s" id="rz">Reset axes</button><button class="btn g" id="png">⬇ Download PNG</button></div>
+<div class="note">Zoom, pan and tooltips are built in (use the Plotly toolbar). Scatter plot uses the X–Y data of the Correlation tab if present, otherwise observation number vs value.</div><div id="ch" class="plot"></div></section>
+
+<section class="panel hidden" id="v4"><h2>Correlation &amp; Regression</h2>
+<div class="row"><div><label>X observations</label><textarea id="xs" placeholder="1, 2, 3, 4, 5"></textarea></div><div><label>Y observations</label><textarea id="ys" placeholder="2, 4, 6, 8, 10"></textarea></div></div>
+<div class="bar"><button class="btn" id="rr">Analyse</button><button class="btn s" id="rt">Load test data (y = 2x)</button></div><div id="rmsg" class="hidden"></div><div id="rres"></div><div id="rg" class="plot"></div><div id="rtab"></div>
+<div class="warn">Limitations: Pearson r measures only <i>linear</i> association and is sensitive to outliers; correlation does not imply causation; the fitted line should not be extrapolated far beyond the observed X range; check the residuals for patterns.</div></section>
+
+<section class="panel hidden" id="v5"><h2>Probability Calculator</h2>
+<p class="note">Fill any fields you know (each between 0 and 1); every formula whose inputs are available is evaluated.</p>
+<div class="row"><div><label>P(A)</label><input id="pa" type="number" step="any"></div><div><label>P(B)</label><input id="pb" type="number" step="any"></div><div><label>P(A∩B)</label><input id="pab" type="number" step="any"></div><div><label>P(B|A)</label><input id="pba" type="number" step="any"></div></div>
+<div class="row"><div><label>Favourable outcomes</label><input id="fav" type="number" min="0"></div><div><label>Total equally-likely outcomes</label><input id="tot" type="number" min="1"></div></div>
+<div class="bar"><button class="btn" id="rp">Calculate</button></div><div id="pmsg" class="hidden"></div><div id="pres"></div></section>
+
+<section class="panel hidden" id="v6"><h2>Probability Distributions</h2>
+<div class="row"><div><label>Distribution</label><select id="dsel"></select></div></div><div class="row" id="dp"></div>
+<div class="bar"><button class="btn" id="rdist">Calculate</button></div><div id="dmsg2" class="hidden"></div><div id="dres"></div><div id="dpl" class="plot"></div></section>
+
+<section class="panel hidden" id="v9"><h2>Hypothesis Tests</h2><div id="hmsg" class="hidden"></div>
+<div class="row"><div><label>Test</label><select id="htest"><option value="t1">One-sample t-test</option><option value="t2">Two-sample t-test</option><option value="tp">Paired t-test</option><option value="cg">Chi-square goodness-of-fit</option><option value="ci">Chi-square test of independence</option></select></div>
+<div><label>Significance level α</label><input id="halpha" type="number" step="any" value="0.05"></div>
+<div id="hmu0w"><label>Hypothesised mean μ₀</label><input id="hmu0" type="number" step="any" value="0"></div>
+<div id="haltw"><label>Alternative hypothesis</label><select id="halt"><option value="two">Two-sided (≠)</option><option value="gt">Right-tailed (&gt;)</option><option value="lt">Left-tailed (&lt;)</option></select></div>
+<div id="hvarw" class="hidden"><label>Variance assumption</label><select id="hvar"><option value="w">Welch (unequal variances)</option><option value="p">Pooled (equal variances)</option></select></div></div>
+<div class="note" id="hhint"></div>
+<div class="row"><div><label>Sample 1 / observed counts / table</label><textarea id="h1"></textarea></div><div id="h2w"><label>Sample 2 / expected counts (optional)</label><textarea id="h2"></textarea></div></div>
+<div class="bar"><button class="btn" id="rh">Run test</button><button class="btn s" id="hfill">Use loaded dataset as Sample 1</button><button class="btn s" id="hex">Load example</button></div>
+<div id="hres"></div><div id="hpl" class="plot" style="min-height:0"></div>
+<div class="note">A small p-value means the data would be unusual if H₀ were true; it is not the probability that H₀ is true. Report effect sizes and confidence intervals alongside p-values.</div></section>
+<section class="panel hidden" id="v7"><h2>Statistical Interpretation</h2><div id="m7" class="hidden"></div>
+<div class="bar"><button class="btn" id="ri">Generate interpretation</button></div><div id="itxt"></div></section>
+
+<section class="panel hidden" id="v8"><h2>Export &amp; Reports</h2>
+<div class="bar noprint"><button class="btn" id="ecsv">⬇ CSV (data, statistics, frequency, regression, residuals)</button><button class="btn g" id="erep">📄 Build report</button><button class="btn s" id="eprint">🖨 Print / Save as PDF</button><button class="btn ok" id="etest">✔ Run self-tests</button></div>
+<div id="emsg" class="hidden"></div><div id="tests"></div><div id="rep"></div></section>
+</div><footer>GNANA MATH LEARNING CENTRE • V • G • R • AI &amp; MATHEMATICS → INTERACTIVE MATHEMATICS LAB → GNANA STATISTICS BOT V2.0</footer>
+
+<script>
+/* ===================== 1. UTILITIES ===================== */
+const $=i=>document.getElementById(i),css=v=>getComputedStyle(document.body).getPropertyValue(v).trim();
+let D=[],X=[],Y=[],RG=null,CSV=null;
+const pr=()=>+$('prec').value;
+// Display-only rounding (computations keep full precision); negative zero is suppressed.
+const F=(x,p=pr())=>{if(!Number.isFinite(x))return'undefined';if(Math.abs(x)<0.5*10**-p)x=0;return x.toFixed(p)};
+const msg=(i,t,ok)=>{const e=$(i);e.className=t?(ok?'note':'warn'):'hidden';e.textContent=t||''};
+const tb=(h,r)=>'<div class="sc"><table><tr>'+h.map(x=>'<th>'+x+'</th>').join('')+'</tr>'+r.map(a=>'<tr>'+a.map((x,j)=>'<td'+(j==a.length-1&&h.length>2?' class="v"':'')+'>'+x+'</td>').join('')+'</tr>').join('')+'</table></div>';
+const sum=a=>a.reduce((p,c)=>p+c,0),mean=a=>sum(a)/a.length;
+// Parses free text into numbers; non-numeric tokens (incl. NaN/Infinity) are returned in bad[] and never substituted.
+const nums=t=>{const v=[],bad=[];t.split(/[\s,;]+/).filter(s=>s!=='').forEach(s=>{const n=Number(s);Number.isFinite(n)?v.push(n):bad.push(s)});return{v,bad}};
+const need=m=>{if(!D.length){msg(m,'Please load a dataset first (Data Input tab).');return false}msg(m,'');return true};
+const dl=(name,text,type='text/csv')=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};
+const plot=(id,data,t,x,y,ex={})=>Plotly.newPlot(id,data,Object.assign({title:{text:L(t)},xaxis:{title:{text:L(x)},showgrid:!!$('grid').value,zeroline:false},yaxis:{title:{text:L(y)},showgrid:!!$('grid').value},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{color:css('--ink')},margin:{l:60,r:15,t:50,b:55},legend:{orientation:'h'}},ex),{responsive:true,displaylogo:false});
+
+/* ===================== 2. NUMERICAL CORE ===================== */
+// Descriptive statistics for array a (two-pass algorithm for stability).
+function desc(a){const n=a.length,s=[...a].sort((x,y)=>x-y),m=mean(a);
+ const q=p=>{const h=(n-1)*p,l=Math.floor(h),u=Math.min(l+1,n-1);return s[l]+(h-l)*(s[u]-s[l])};
+ const mo=k=>sum(a.map(x=>(x-m)**k))/n,m2=mo(2),m3=mo(3),m4=mo(4);
+ const c=new Map();a.forEach(x=>c.set(x,(c.get(x)||0)+1));const mx=Math.max(...c.values());
+ const modes=mx>1?[...c].filter(e=>e[1]==mx).map(e=>e[0]).sort((x,y)=>x-y):[];
+ const pos=a.every(x=>x>0),sv=n>1?m2*n/(n-1):NaN;
+ return{n,mean:m,median:q(.5),modes,gm:pos?Math.exp(mean(a.map(Math.log))):NaN,hm:pos?n/sum(a.map(x=>1/x)):NaN,min:s[0],max:s[n-1],range:s[n-1]-s[0],
+ pv:m2,sv,psd:Math.sqrt(m2),ssd:Math.sqrt(sv),q1:q(.25),q2:q(.5),q3:q(.75),iqr:q(.75)-q(.25),mad:mean(a.map(x=>Math.abs(x-m))),
+ sk:m2>0?m3/m2**1.5:NaN,ku:m2>0?m4/m2**2-3:NaN,q}}
+// Frequency classes from the UI settings (Sturges by default).
+function freqCalc(){const n=D.length,lo=Math.min(...D),hi=Math.max(...D),rg=hi-lo,fk=$('fk').value,fw=$('fw').value;let k,w;
+ if(fw!==''&&+fw>0){w=+fw;k=Math.max(1,Math.ceil(rg/w-1e-12))}else{k=fk!==''&&+fk>=1?Math.floor(+fk):Math.ceil(1+3.322*Math.log10(n));if(rg===0)k=1;w=rg===0?1:rg/k}
+ const f=new Array(k).fill(0);D.forEach(x=>f[Math.min(Math.floor((x-lo)/w+1e-12),k-1)]++);
+ let cf=0;const rows=f.map((c,i)=>{cf+=c;const a=lo+i*w,b=a+w;return{a,b,mid:(a+b)/2,f:c,rf:c/n,pf:100*c/n,cf,cpf:100*cf/n,lbl:'['+F(a)+', '+F(b)+(i==k-1?']':')')}});
+ return{k,w,lo,rows,n}}
+// Lanczos log-gamma (stable for factorials/binomials); erfc via series + continued fraction.
+const lg=x=>{const c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];x-=1;let a=c[0];const t=x+7.5;for(let i=1;i<9;i++)a+=c[i]/(x+i);return .5*Math.log(2*Math.PI)+(x+.5)*Math.log(t)-t+Math.log(a)};
+const erfc=x=>{if(x<0)return 2-erfc(-x);if(x<3){let s=x,t=x;for(let n=1;n<120;n++){t*=-x*x/n;s+=t/(2*n+1)}return 1-2/Math.sqrt(Math.PI)*s}let f=0;for(let k=80;k>=1;k--)f=k/2/(x+f);return Math.exp(-x*x)/Math.sqrt(Math.PI)/(x+f)};
+const Phi=z=>.5*erfc(-z/Math.SQRT2);
+const bpmf=(n,p,x)=>p===0?+(x===0):p===1?+(x===n):Math.exp(lg(n+1)-lg(x+1)-lg(n-x+1)+x*Math.log(p)+(n-x)*Math.log(1-p));
+const ppmf=(l,k)=>l===0?+(k===0):Math.exp(-l+k*Math.log(l)-lg(k+1));
+// Simple linear regression y = a + b x with Pearson r, covariance, residuals, SSE, R².
+function regress(x,y){const n=x.length,mx=mean(x),my=mean(y);let sxx=0,syy=0,sxy=0;x.forEach((v,i)=>{sxx+=(v-mx)**2;syy+=(y[i]-my)**2;sxy+=(v-mx)*(y[i]-my)});
+ const b=sxy/sxx,a=my-b*mx,yh=x.map(v=>a+b*v),res=y.map((v,i)=>v-yh[i]),sse=sum(res.map(e=>e*e));
+ return{n,a,b,r:sxy/Math.sqrt(sxx*syy),cov:sxy/(n-1),sse,r2:syy>0?1-sse/syy:NaN,yh,res}}
+
+/* ===================== 3. NAVIGATION, DARK MODE, RESET ===================== */
+const TABS=['📥 Data Input','📊 Descriptive','📋 Frequency','📈 Visualization','🔗 Correlation & Regression','🎲 Probability','🔔 Distributions','🧪 Hypothesis Tests','💡 Interpretation','📤 Export & Reports'],ORDER=[0,1,2,3,4,5,6,9,7,8];
+TABS.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>show(ORDER[i]);$('tabs').appendChild(b)});
+function show(i){if(i!=0&&!D.length&&$('raw').value.trim())$('load').click();[...$('tabs').children].forEach((b,j)=>b.classList.toggle('on',ORDER[j]==i));for(let j=0;j<10;j++)$('v'+j).classList.toggle('hidden',j!=i);
+ if(i==1&&D.length)renderDesc();if(i==2&&D.length)renderFreq(true);if(i==6&&!$('dpl').data)rdist();if(i==9)hint()}
+$('bdk').onclick=()=>{document.body.classList.toggle('dark');['fh','fp','fo','ch','rg','dpl','hpl'].forEach(id=>{if($(id).data)Plotly.relayout(id,{'font.color':css('--ink')})})};
+$('brs').onclick=()=>{if(!confirm('Reset the whole application and clear all data?'))return;D=[];X=[];Y=[];RG=null;CSV=null;document.querySelectorAll('textarea,input:not([type=file])').forEach(e=>{if(!['prec','halpha','hmu0'].includes(e.id))e.value=''});
+ ['fh','fp','fo','ch','rg','dpl','hpl'].forEach(id=>{try{Plotly.purge(id)}catch(e){}});['dtab','ftab','fun','rres','rtab','pres','dres','itxt','rep','tests','dprev','hres'].forEach(id=>$(id).innerHTML='');$('dinfo').className='hidden';$('colbox').classList.add('hidden');$('ucol').classList.add('hidden');
+ ['dmsg','m1','m2','vmsg','rmsg','pmsg','dmsg2','m7','emsg','hmsg'].forEach(id=>msg(id,''));params();show(0)};
+
+/* ===================== 4. MODULE A — DATA INPUT ===================== */
+const EX={'Engineering examination marks':'45,52,58,61,64,67,70,72,75,78,81,85,88,92,55,63,69,74,79,83','Student heights (cm)':'158,162,165,168,170,171,173,175,176,178,180,182,185,163,167,172,174,169,177,166','Manufacturing component diameters (mm)':'10.02,9.98,10.01,10.05,9.97,10.00,10.03,9.99,10.04,10.01,9.96,10.02,10.00,9.98,10.03','Daily temperature (°C)':'28.5,29.1,30.2,31.0,32.4,33.1,31.8,30.5,29.7,28.9,30.0,31.5,32.0,29.4,30.8','Research experimental measurements':'2.31,2.45,2.38,2.52,2.29,2.41,2.47,2.36,2.50,2.43,2.39,2.34,2.48,2.44,2.40'};
+Object.keys(EX).forEach(k=>{const o=document.createElement('option');o.textContent=k;$('ex').appendChild(o)});
+// Installs a validated dataset and refreshes summaries.
+function setData(v,src){D=v;const s=desc(v);msg('dmsg','');$('dinfo').className='ans';$('dinfo').textContent=src+' — n = '+v.length+', minimum = '+F(s.min)+', maximum = '+F(s.max);
+ $('dprev').innerHTML='<div class="note">Preview (first 60 values)</div>'+v.slice(0,60).map(x=>'<span class="chip">'+x+'</span>').join('')+(v.length>60?' …':'');
+ ['itxt','dtab','ftab','fun'].forEach(id=>$(id).innerHTML='');['fh','fp','fo','ch'].forEach(id=>{try{Plotly.purge(id)}catch(e){}})}
+$('load').onclick=()=>{const r=nums($('raw').value);if(r.bad.length)return msg('dmsg','Invalid (non-numerical) entries found: '+r.bad.slice(0,10).join(', ')+'. Please correct them; nothing was loaded.');
+ if(!r.v.length)return msg('dmsg','The dataset is empty. Enter at least one numerical observation.');setData(r.v,'Manual entry')};
+$('lex').onclick=()=>{const k=$('ex').value;$('raw').value=EX[k].split(',').join(', ');setData(EX[k].split(',').map(Number),k)};
+$('clr').onclick=()=>{D=[];$('raw').value='';$('dinfo').className='hidden';$('dprev').innerHTML='';msg('dmsg','Dataset cleared.',1)};
+$('csv').onchange=e=>{const fl=e.target.files[0];if(!fl)return;if(!/\.csv$/i.test(fl.name))return msg('dmsg','Please choose a .csv file.');const rd=new FileReader();
+ rd.onload=()=>{CSV=rd.result.split(/\r?\n/).filter(l=>l.trim()!=='').map(l=>l.split(/,|;|\t/).map(c=>c.trim().replace(/^"|"$/g,'')));if(!CSV.length)return msg('dmsg','The CSV file is empty.');
+  CSV.hdr=CSV[0].some(c=>c!==''&&!Number.isFinite(Number(c)));$('col').innerHTML='';CSV[0].forEach((n,i)=>{const o=document.createElement('option');o.value=i;o.textContent=CSV.hdr&&n?n:'Column '+(i+1);$('col').appendChild(o)});
+  $('colbox').classList.remove('hidden');$('ucol').classList.remove('hidden');msg('dmsg','CSV read ('+(CSV.length-(CSV.hdr?1:0))+' data rows, header '+(CSV.hdr?'detected':'not detected')+'). Choose a column and press “Use column”.',1)};rd.readAsText(fl)};
+$('ucol').onclick=()=>{const i=+$('col').value,cells=CSV.slice(CSV.hdr?1:0).map(r=>(r[i]??'').trim()).filter(c=>c!=='');const bad=cells.filter(c=>!Number.isFinite(Number(c)));
+ if(bad.length)return msg('dmsg','Invalid values in the selected column: '+bad.slice(0,10).join(', ')+'. Nothing was loaded.');if(!cells.length)return msg('dmsg','The selected column has no numerical values.');setData(cells.map(Number),'CSV column “'+$('col').selectedOptions[0].textContent+'”')};
+
+/* ===================== 5. MODULE B — DESCRIPTIVE ===================== */
+function descRows(s){const P=$('pcts').value?nums($('pcts').value).v.filter(p=>p>=0&&p<=100):[];
+ const n=s.n,u=x=>F(x),R=[['Central tendency','Arithmetic mean x̄ = Σx/n',u(s.mean)],['','Median',u(s.median)],['','Mode',s.modes.length?s.modes.join(', '):'none (all values unique)'],['','Geometric mean (x>0)',u(s.gm)],['','Harmonic mean (x>0)',u(s.hm)],
+ ['Dispersion','Minimum',u(s.min)],['','Maximum',u(s.max)],['','Range',u(s.range)],['','Population variance σ² = Σ(x−μ)²/N',u(s.pv)],['','Sample variance s² = Σ(x−x̄)²/(n−1)',u(s.sv)],['','Population SD σ',u(s.psd)],['','Sample SD s',u(s.ssd)],['','Interquartile range Q3−Q1',u(s.iqr)],['','Mean absolute deviation',u(s.mad)],
+ ['Position','Q1',u(s.q1)],['','Q2 (median)',u(s.q2)],['','Q3',u(s.q3)],['','Five-number summary',[s.min,s.q1,s.q2,s.q3,s.max].map(u).join(' | ')]];
+ P.forEach(p=>R.push(['','Percentile P'+p,u(s.q(p/100))]));R.push(['Shape','Skewness g₁ (population moments)',u(s.sk)],['','Excess kurtosis g₂ (population moments)',u(s.ku)]);return R}
+function renderDesc(){if(!need('m1'))return;const s=desc(D),w=[];if(D.length<2)w.push('Sample variance and sample SD are undefined for a single observation.');if(s.pv===0)w.push('The data are constant: skewness and kurtosis are undefined.');if(isNaN(s.gm))w.push('Geometric and harmonic means are undefined because some values are ≤ 0.');
+ if(w.length)msg('m1',w.join(' '));$('dtab').innerHTML=tb(['Group','Statistic','Value'],descRows(s).map(r=>[r[0]?'<b>'+r[0]+'</b>':'',r[1],r[2]]))+'<div class="note">n = '+s.n+'</div>'}
+$('rd').onclick=renderDesc;
+
+/* ===================== 6. MODULE C — FREQUENCY ===================== */
+function renderFreq(pl){if(!need('m2'))return;const q=freqCalc();
+ $('ftab').innerHTML=tb(['Class','Midpoint','f','Rel. f','%','Cum. f','Cum. %'],q.rows.map(r=>[r.lbl,F(r.mid),r.f,F(r.rf),F(r.pf,2),r.cf,F(r.cpf,2)]))+'<div class="note">k = '+q.k+' classes, class width = '+F(q.w)+', Σf = '+q.rows.reduce((p,r)=>p+r.f,0)+' (n = '+q.n+')</div>';
+ const c=new Map();[...D].sort((a,b)=>a-b).forEach(x=>c.set(x,(c.get(x)||0)+1));let cf=0;const U=[...c].slice(0,100).map(([x,f])=>{cf+=f;return[x,f,F(f/q.n),F(100*f/q.n,2),cf]});
+ $('fun').innerHTML=tb(['Value','f','Rel. f','%','Cum. f'],U)+(c.size>100?'<div class="note">Showing the first 100 distinct values of '+c.size+'.</div>':'');
+ if(pl){const m=q.rows.map(r=>r.mid);plot('fh',[{type:'bar',x:m,y:q.rows.map(r=>r.f),width:q.w,text:q.rows.map(r=>r.lbl),hovertemplate:'%{text}<br>f = %{y}<extra></extra>',marker:{color:'#2456a6',line:{color:'#fff',width:1}}}],'Histogram','Class interval','Frequency');
+  plot('fp',[{x:[m[0]-q.w,...m,m[m.length-1]+q.w],y:[0,...q.rows.map(r=>r.f),0],mode:'lines+markers',line:{color:'#087f8c'},name:'Frequency polygon'}],'Frequency polygon','Class midpoint','Frequency');
+  plot('fo',[{x:[q.lo,...q.rows.map(r=>r.b)],y:[0,...q.rows.map(r=>r.cf)],mode:'lines+markers',line:{color:'#b83b4b'},name:'Ogive'}],'Ogive (less-than cumulative frequency)','Upper class boundary','Cumulative frequency')}}
+$('rf').onclick=()=>renderFreq(true);
+
+/* ===================== 7. MODULE D — VISUALIZATION ===================== */
+function drawChart(){if(!need('vmsg'))return;const t=$('ctype').value,q=freqCalc(),s=desc(D),T=(d,x,y)=>[$('gt').value.trim()||d,$('gx').value.trim()||x,$('gy').value.trim()||y];let data,a,ex={};const L=q.rows.map(r=>r.lbl);
+ if(t=='hist'){a=T('Histogram','Class interval','Frequency');data=[{type:'bar',x:q.rows.map(r=>r.mid),y:q.rows.map(r=>r.f),width:q.w,text:L,hovertemplate:'%{text}<br>f = %{y}<extra></extra>',marker:{color:'#2456a6',line:{color:'#fff',width:1}}}]}
+ else if(t=='poly'){const m=q.rows.map(r=>r.mid);a=T('Frequency polygon','Class midpoint','Frequency');data=[{x:[m[0]-q.w,...m,m[m.length-1]+q.w],y:[0,...q.rows.map(r=>r.f),0],mode:'lines+markers',line:{color:'#087f8c'}}]}
+ else if(t=='bar'){const c=new Map();[...D].sort((x,y)=>x-y).forEach(x=>c.set(x,(c.get(x)||0)+1));a=T('Bar chart','Category','Frequency');data=c.size<=30?[{type:'bar',x:[...c.keys()].map(String),y:[...c.values()],marker:{color:'#2456a6'}}]:[{type:'bar',x:L,y:q.rows.map(r=>r.f),marker:{color:'#2456a6'}}]}
+ else if(t=='pie'){a=T('Pie chart of class frequencies','','');data=[{type:'pie',labels:L,values:q.rows.map(r=>r.f),textinfo:'label+percent'}]}
+ else if(t=='box'){a=T('Box plot','','Value');data=[{type:'box',y:D,name:'Data',boxpoints:'all',jitter:.4,boxmean:'sd',marker:{color:'#2456a6'}}]}
+ else if(t=='scatter'){const xy=X.length>1&&X.length==Y.length;a=T('Scatter plot',xy?'X':'Observation number',xy?'Y':'Value');data=[{type:'scatter',mode:'markers',x:xy?X:D.map((_,i)=>i+1),y:xy?Y:D,marker:{color:'#2456a6',size:9}}]}
+ else if(t=='ogive'){a=T('Ogive','Upper class boundary','Cumulative frequency');data=[{x:[q.lo,...q.rows.map(r=>r.b)],y:[0,...q.rows.map(r=>r.cf)],mode:'lines+markers',line:{color:'#b83b4b'}}]}
+ else{if(!(s.ssd>0))return msg('vmsg','Normal curve needs at least two distinct values (sample SD is zero or undefined).');a=T('Histogram (density) with fitted normal curve','Value','Density');const lo=s.min-s.ssd,hi=s.max+s.ssd,xs=Array.from({length:300},(_,i)=>lo+(hi-lo)*i/299);
+  data=[{type:'bar',x:q.rows.map(r=>r.mid),y:q.rows.map(r=>r.f/(q.n*q.w)),width:q.w,name:'Data',opacity:.55,marker:{color:'#2456a6'}},{x:xs,y:xs.map(x=>Math.exp(-(((x-s.mean)/s.ssd)**2)/2)/(s.ssd*Math.sqrt(2*Math.PI))),mode:'lines',name:'N(x̄, s²)',line:{color:'#b83b4b'}}]}
+ plot('ch',data,...a,ex)}
+$('dc').onclick=drawChart;$('ctype').onchange=()=>{if(D.length)drawChart()};$('grid').onchange=()=>{if(D.length)drawChart()};
+$('rz').onclick=()=>{if($('ch').data)Plotly.relayout('ch',{'xaxis.autorange':true,'yaxis.autorange':true})};
+$('png').onclick=()=>{if($('ch').data)Plotly.downloadImage('ch',{format:'png',filename:'gnana_statistics_chart',width:1000,height:620});else msg('vmsg','Draw a chart first.')};
+
+/* ===================== 8. MODULE E — CORRELATION & REGRESSION ===================== */
+const strength=r=>{const a=Math.abs(r);return a>=.9?'very strong':a>=.7?'strong':a>=.4?'moderate':a>=.1?'weak':'negligible'};
+function runReg(){const x=nums($('xs').value),y=nums($('ys').value);RG=null;$('rres').innerHTML=$('rtab').innerHTML='';
+ if(x.bad.length||y.bad.length)return msg('rmsg','Invalid entries: '+[...x.bad,...y.bad].slice(0,10).join(', '));if(x.v.length<2)return msg('rmsg','At least two paired observations are required.');
+ if(x.v.length!==y.v.length)return msg('rmsg','X has '+x.v.length+' and Y has '+y.v.length+' observations; they must be equal.');
+ X=x.v;Y=y.v;if(new Set(X).size<2)return msg('rmsg','All X values are identical: the slope is undefined.');msg('rmsg','');
+ const g=regress(X,Y);RG=g;const sg=g.b<0?'−':'+',eq='y = '+F(g.a)+' '+sg+' '+F(Math.abs(g.b))+'x',w=isNaN(g.r)?'<div class="warn">All Y values are identical: r and R² are undefined.</div>':'';
+ $('rres').innerHTML=tb(['Quantity','Formula','Value'],[['Pearson r','Σ(x−x̄)(y−ȳ)/√[Σ(x−x̄)²Σ(y−ȳ)²]',F(g.r)],['Strength / direction','',isNaN(g.r)?'undefined':strength(g.r)+' '+(g.r>0?'positive':g.r<0?'negative':'')+' linear association'],['Covariance (sample)','Σ(x−x̄)(y−ȳ)/(n−1)',F(g.cov)],['Slope b','Sxy/Sxx',F(g.b)],['Intercept a','ȳ − b x̄',F(g.a)],['Regression equation','',eq],['SSE','Σ(y−ŷ)²',F(g.sse)],['R²','1 − SSE/SST',F(g.r2)]])+w+'<div class="note">Association is not causation.</div>';
+ plot('rg',[{x:X,y:Y,mode:'markers',name:'Data',marker:{color:'#2456a6',size:9}},{x:[Math.min(...X),Math.max(...X)],y:[Math.min(...X),Math.max(...X)].map(v=>g.a+g.b*v),mode:'lines',name:eq,line:{color:'#b83b4b'}}],'Scatter plot with regression line','X','Y');
+ $('rtab').innerHTML='<h3>Residuals</h3>'+tb(['i','x','y','ŷ','Residual y−ŷ'],X.map((v,i)=>[i+1,v,Y[i],F(g.yh[i]),F(g.res[i])]))}
+$('rr').onclick=runReg;$('rt').onclick=()=>{$('xs').value='1, 2, 3, 4, 5';$('ys').value='2, 4, 6, 8, 10';runReg()};
+
+/* ===================== 9. MODULE F — PROBABILITY ===================== */
+$('rp').onclick=()=>{const g=i=>$(i).value===''?NaN:+$(i).value,pa=g('pa'),pb=g('pb'),pab=g('pab'),pba=g('pba'),fv=g('fav'),tt=g('tot'),R=[],has=(...a)=>a.every(Number.isFinite);
+ for(const [n,v] of [['P(A)',pa],['P(B)',pb],['P(A∩B)',pab],['P(B|A)',pba]])if(Number.isFinite(v)&&(v<0||v>1))return msg('pmsg',n+' must lie between 0 and 1.');msg('pmsg','');
+ if(has(fv,tt)){if(tt<=0||fv<0||fv>tt||!Number.isInteger(fv)||!Number.isInteger(tt))return msg('pmsg','Need integers with 0 ≤ favourable ≤ total and total ≥ 1.');R.push(['Probability of an event','P(E) = favourable / total',F(fv/tt)],['Complement of that event','1 − P(E)',F(1-fv/tt)])}
+ if(has(pa))R.push(['Complement','P(Aᶜ) = 1 − P(A)',F(1-pa)]);if(has(pb))R.push(['Complement','P(Bᶜ) = 1 − P(B)',F(1-pb)]);
+ if(has(pa,pb,pab)){if(pab>Math.min(pa,pb)+1e-12||pa+pb-pab>1+1e-12)return msg('pmsg','Inconsistent inputs: P(A∩B) cannot exceed min(P(A),P(B)) and P(A∪B) cannot exceed 1.');R.push(['Addition rule','P(A∪B) = P(A)+P(B)−P(A∩B)',F(pa+pb-pab)]);R.push(['Independence check','P(A∩B) vs P(A)P(B)',F(pab)+' vs '+F(pa*pb)+(Math.abs(pab-pa*pb)<1e-9?' → independent':' → not independent')])}
+ if(has(pa,pb)&&!has(pab))R.push(['Union if independent','P(A)+P(B)−P(A)P(B)',F(pa+pb-pa*pb)],['Multiplication (independent)','P(A∩B) = P(A)P(B)',F(pa*pb)]);
+ if(has(pa,pba))R.push(['Multiplication rule','P(A∩B) = P(A)P(B|A)',F(pa*pba)]);
+ if(has(pab,pb)){if(pb>0)R.push(['Conditional probability','P(A|B) = P(A∩B)/P(B)',F(pab/pb)]);else R.push(['Conditional probability','P(A|B)','undefined (P(B) = 0)'])}
+ if(has(pab,pa)){if(pa>0)R.push(['Conditional probability','P(B|A) = P(A∩B)/P(A)',F(pab/pa)]);else R.push(['Conditional probability','P(B|A)','undefined (P(A) = 0)'])}
+ if(has(pba,pa,pb)){if(pb>0){const v=pba*pa/pb;if(v>1+1e-12)return msg('pmsg','Inconsistent inputs: Bayes result exceeds 1.');R.push(['Bayes’ theorem','P(A|B) = P(B|A)P(A)/P(B)',F(v)])}else R.push(['Bayes’ theorem','P(A|B)','undefined (P(B) = 0)'])}
+ $('pres').innerHTML=R.length?tb(['Rule','Formula','Result'],R):'';if(!R.length)msg('pmsg','Enter enough values for at least one formula (e.g. P(A); P(A), P(B), P(A∩B); P(B|A), P(A), P(B)).')};
+
+/* ===================== 10. MODULE G — DISTRIBUTIONS ===================== */
+const DD={normal:['Normal',[['μ',0],['σ',1],['x',0],['a (lower)',-1],['b (upper)',1]]],binom:['Binomial',[['n',5],['p',.5],['x',2]]],pois:['Poisson',[['λ',2],['k',0]]],unif:['Uniform',[['a',0],['b',10],['x',3],['c (lower)',2],['d (upper)',5]]]};
+Object.entries(DD).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v[0];$('dsel').appendChild(o)});
+function params(){$('dp').innerHTML='';DD[$('dsel').value][1].forEach(([n,d])=>{const w=document.createElement('div'),l=document.createElement('label'),i=document.createElement('input');l.textContent=n;i.type='number';i.step='any';i.value=d;w.append(l,i);$('dp').appendChild(w)})}
+$('dsel').onchange=()=>{params();$('dres').innerHTML='';try{Plotly.purge('dpl')}catch(e){}};params();
+function rdist(){const t=$('dsel').value,v=[...document.querySelectorAll('#dp input')].map(e=>e.value===''?NaN:+e.value),E=m=>(msg('dmsg2',m),$('dres').innerHTML='');
+ if(v.some(z=>!Number.isFinite(z)))return E('All parameters must be finite numbers.');msg('dmsg2','');let R,data,ti;
+ if(t=='normal'){const[mu,s,x,a,b]=v;if(s<=0)return E('σ must be positive.');if(a>b)return E('Lower limit a must not exceed upper limit b.');const z=(x-mu)/s,pdf=Math.exp(-z*z/2)/(s*Math.sqrt(2*Math.PI));
+  R=[['Z-score','z = (x−μ)/σ',F(z)],['PDF','f(x) = e^{−z²/2}/(σ√(2π))',F(pdf,6)],['CDF','Φ(z) = P(X ≤ x)',F(Phi(z),6)],['Interval','P(a &lt; X &lt; b) = Φ((b−μ)/σ) − Φ((a−μ)/σ)',F(Phi((b-mu)/s)-Phi((a-mu)/s),6)]];
+  const xs=Array.from({length:401},(_,i)=>mu-4*s+8*s*i/400),f=x=>Math.exp(-(((x-mu)/s)**2)/2)/(s*Math.sqrt(2*Math.PI)),xi=xs.filter(q=>q>=a&&q<=b);
+  data=[{x:xs,y:xs.map(f),mode:'lines',name:'f(x)',line:{color:'#2456a6'}},{x:[a,...xi,b],y:[f(a),...xi.map(f),f(b)],fill:'tozeroy',mode:'lines',name:'P(a ≤ X ≤ b)',line:{color:'#087f8c'}}];ti='Normal N('+mu+', '+s+'²)'}
+ else if(t=='binom'){const[n,p,x]=v;if(!Number.isInteger(n)||n<0)return E('n must be a non-negative integer.');if(p<0||p>1)return E('p must lie between 0 and 1.');if(!Number.isInteger(x)||x<0||x>n)return E('x must be an integer between 0 and n.');
+  let c=0;for(let i=0;i<=x;i++)c+=bpmf(n,p,i);R=[['PMF','P(X=x) = C(n,x)pˣ(1−p)ⁿ⁻ˣ',F(bpmf(n,p,x),6)],['CDF','P(X ≤ x)',F(Math.min(c,1),6)],['Mean','np',F(n*p)],['Variance','np(1−p)',F(n*p*(1-p))],['Std. deviation','√(np(1−p))',F(Math.sqrt(n*p*(1-p)))]];
+  const m=n*p,sd=Math.sqrt(n*p*(1-p)),lo=n>200?Math.max(0,Math.floor(m-5*sd)):0,hi=n>200?Math.min(n,Math.ceil(m+5*sd)):n,ks=Array.from({length:hi-lo+1},(_,i)=>lo+i);
+  data=[{type:'bar',x:ks,y:ks.map(k=>bpmf(n,p,k)),marker:{color:ks.map(k=>k==x?'#b83b4b':'#2456a6')}}];ti='Binomial B('+n+', '+p+') PMF'}
+ else if(t=='pois'){const[l,k]=v;if(l<0)return E('λ must be non-negative.');if(!Number.isInteger(k)||k<0)return E('k must be a non-negative integer.');let c=0;for(let i=0;i<=k;i++)c+=ppmf(l,i);
+  R=[['PMF','P(X=k) = e^{−λ}λᵏ/k!',F(ppmf(l,k),6)],['CDF','P(X ≤ k)',F(Math.min(c,1),6)],['Mean','λ',F(l)],['Variance','λ',F(l)]];const hi=Math.max(k+5,Math.ceil(l+5*Math.sqrt(l))+5),ks=Array.from({length:hi+1},(_,i)=>i);
+  data=[{type:'bar',x:ks,y:ks.map(i=>ppmf(l,i)),marker:{color:ks.map(i=>i==k?'#b83b4b':'#2456a6')}}];ti='Poisson(λ = '+l+') PMF'}
+ else{const[a,b,x,c,d]=v;if(a>=b)return E('Need a < b.');if(c>d)return E('Lower limit c must not exceed upper limit d.');const w=b-a,cd=z=>Math.min(1,Math.max(0,(z-a)/w));
+  R=[['PDF','f(x) = 1/(b−a) for a ≤ x ≤ b',F(x>=a&&x<=b?1/w:0,6)],['CDF','F(x) = (x−a)/(b−a)',F(cd(x),6)],['Interval','P(c &lt; X &lt; d) = F(d) − F(c)',F(cd(d)-cd(c),6)],['Mean','(a+b)/2',F((a+b)/2)],['Variance','(b−a)²/12',F(w*w/12)]];
+  data=[{x:[a-w*.2,a,a,b,b,b+w*.2],y:[0,0,1/w,1/w,0,0],mode:'lines',line:{color:'#2456a6'},name:'f(x)'}];ti='Uniform U('+a+', '+b+') density'}
+ $('dres').innerHTML=tb(['Quantity','Formula','Value'],R);plot('dpl',data,ti,'x',t=='normal'||t=='unif'?'Density':'Probability',{showlegend:false})}
+$('rdist').onclick=rdist;
+
+/* ===================== 11. MODULE H — INTERPRETATION ===================== */
+function interp(){const s=desc(D),sk=isNaN(s.sk)?'undefined for constant data':Math.abs(s.sk)<.1?'approximately symmetric':s.sk>0?'right-skewed (longer upper tail)':'left-skewed (longer lower tail)';
+ const E=[['Mean','x̄ = Σx/n','The arithmetic mean is the balance point of the data: x̄ = '+F(s.mean)+'. It is sensitive to extreme values.'],
+ ['Standard deviation','s = √[Σ(x−x̄)²/(n−1)]','The sample SD is '+F(s.ssd)+' (population σ = '+F(s.psd)+'); it measures the typical distance of observations from the mean, in the units of the data.'],
+ ['Interquartile range','IQR = Q3 − Q1','The middle 50% of the data spans '+F(s.iqr)+' (from '+F(s.q1)+' to '+F(s.q3)+'); it is resistant to outliers.'],
+ ['Skewness','g₁ = m₃/m₂^{3/2}','g₁ = '+F(s.sk)+': the distribution is '+sk+'. Small samples give unstable skewness values.']];
+ const w=D.slice(0,4);E.push(['Worked example (mean of the first '+w.length+' values)','x̄ = ('+w.join(' + ')+')/'+w.length,'= '+F(mean(w))+'.']);
+ if(RG){E.push(['Correlation','r = Sxy/√(Sxx Syy)','r = '+F(RG.r)+' indicates a '+(isNaN(RG.r)?'undefined':strength(RG.r))+' linear association between X and Y. This describes association only; it does not establish causation.'],
+ ['Regression equation','ŷ = a + bx','The fitted line ŷ = '+F(RG.a)+' + '+F(RG.b)+'x predicts that Y changes by about '+F(RG.b)+' units per one-unit increase in X, within the observed range of X.'],
+ ['Coefficient of determination','R² = 1 − SSE/SST','R² = '+F(RG.r2)+': the line accounts for about '+F(100*RG.r2,1)+'% of the variation in Y in this sample.'])}
+ return E.map(e=>'<div class="card"><b>'+e[0]+'</b><br><b class="f">'+e[1]+'</b><br>'+e[2]+'</div>').join('')+'<div class="note">These are educational interpretations of the numbers only; they are not suitable for medical, financial or other high-stakes decisions.</div>'}
+$('ri').onclick=()=>{if(need('m7'))$('itxt').innerHTML=interp()};
+
+/* ===================== 12. MODULE I — EXPORT & REPORT ===================== */
+$('ecsv').onclick=()=>exportCSV();$('bdl').onclick=()=>exportCSV();
+function exportCSV(){if(!D.length&&!RG&&!HT){show(0);return msg('dmsg','Nothing to export yet. Load data first.')}const L=[];
+ if(D.length){const s=desc(D),q=freqCalc();L.push('# DATASET','index,value',...D.map((v,i)=>(i+1)+','+v),'','# DESCRIPTIVE STATISTICS','statistic,value',...descRows(s).map(r=>'"'+r[1]+'","'+r[2]+'"'),'','# FREQUENCY TABLE','class,midpoint,f,relative,percent,cumulative f,cumulative percent',...q.rows.map(r=>[r.lbl.replace(',',';'),r.mid,r.f,r.rf,r.pf,r.cf,r.cpf].join(',')),'')}
+ if(RG)L.push('# REGRESSION','quantity,value','r,'+RG.r,'covariance,'+RG.cov,'slope b,'+RG.b,'intercept a,'+RG.a,'SSE,'+RG.sse,'R2,'+RG.r2,'','# RESIDUALS','x,y,fitted,residual',...X.map((v,i)=>[v,Y[i],RG.yh[i],RG.res[i]].join(',')));
+ if(HT)L.push('','# HYPOTHESIS TEST','quantity,value',...HT.map(r=>'"'+r[0]+'","'+r[1]+'"'));dl('GNANA_Statistics_Results.csv',L.join('\n'))}
+async function buildReport(){if(!D.length){msg('emsg','Load a dataset first.');return false}msg('emsg','');renderDesc();renderFreq(false);if(!$('fh').data)renderFreq(true);
+ let h='<h2>GNANA STATISTICS BOT V2 — Statistical Report</h2><div class="note">GNANA MATH LEARNING CENTRE • V • G • R • Generated '+new Date().toLocaleString()+'</div><h3>1. Dataset description</h3><p>Number of observations n = '+D.length+'; minimum '+F(Math.min(...D))+'; maximum '+F(Math.max(...D))+'.</p><h3>2. Descriptive statistics</h3>'+$('dtab').innerHTML+'<h3>3. Frequency distribution</h3>'+$('ftab').innerHTML;
+ if(RG)h+='<h3>4. Correlation and regression</h3>'+$('rres').innerHTML+$('rtab').innerHTML;
+ if(HT)h+='<h3>4b. Hypothesis test</h3>'+tb(['Quantity','Value'],HT);h+='<h3>5. Graphs</h3><div id="rimg"></div><h3>6. Interpretation</h3>'+interp()+'<h3>7. Methodological conventions</h3><p>Quartiles/percentiles: linear interpolation (R type 7). Skewness and excess kurtosis: population moments. Variance/SD reported for both population (÷N) and sample (÷(n−1)). Classes: Sturges’ rule unless overridden; [lower, upper) with the last class closed. Computations are in double precision; only displayed values are rounded ('+pr()+' decimals).</p><h3>8. Limitations</h3><p>Results describe the supplied sample only. Linear regression and Pearson r assume a roughly linear relation and are sensitive to outliers; no causal claim is made. Sample size and data quality limit all conclusions.</p>';
+ $('rep').innerHTML=h;for(const id of ['fh','rg','hpl']){if($(id).data){const u=await Plotly.toImage(id,{format:'png',width:800,height:420}),i=new Image();i.src=u;i.style.maxWidth='100%';$('rimg').appendChild(i)}}return true}
+$('erep').onclick=buildReport;$('eprint').onclick=async()=>{if(await buildReport())setTimeout(()=>window.print(),200)};
+// Built-in numerical self-tests against the validation cases in the specification.
+$('etest').onclick=()=>{const ok=(a,b)=>Math.abs(a-b)<1e-9,s=desc([2,4,4,4,5,5,7,9]),g=regress([1,2,3,4,5],[2,4,6,8,10]);
+ const T=[['Mean = 5',s.mean,5],['Median = 4.5',s.median,4.5],['Mode = 4',s.modes[0],4],['Range = 7',s.range,7],['Population variance = 4',s.pv,4],['Population SD = 2',s.psd,2],['Sample variance = 32/7',s.sv,32/7],['Pearson r = 1',g.r,1],['Slope = 2',g.b,2],['Intercept = 0',g.a,0],['R² = 1',g.r2,1],['Binomial P(X=2; 5, 0.5) = 0.3125',bpmf(5,.5,2),.3125],['Poisson P(X=0; λ=2) = e⁻²',ppmf(2,0),Math.exp(-2)],['Normal PDF(0) = 1/√(2π)',1/Math.sqrt(2*Math.PI),0.3989422804014327],['Normal CDF(0) = 0.5',Phi(0),.5],['Φ(1.96) ≈ 0.9750021',Phi(1.96),0.9750021048517795],['t two-sided p at t = 2.2281388520, df = 10 → 0.05',tp2(2.2281388519649385,10),.05],['χ² upper tail at 3.8414588207, df = 1 → 0.05',gq(.5,3.841458820694124/2),.05],['χ² upper tail at 5.9914645471, df = 2 → 0.05',gq(1,5.991464547107979/2),.05]];
+ $('tests').innerHTML=tb(['Test','Computed','Expected','Result'],T.map(t=>[t[0],t[1].toPrecision(10),t[2].toPrecision(10),ok(t[1],t[2])?'✔ pass':'✘ FAIL']))};
+
+/* ===================== V2-A. SPECIAL FUNCTIONS FOR t AND χ² ===================== */
+// Continued fraction for the incomplete beta function (Lentz's method).
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1,tiny=1e-300;let c=1,d=1-qab*x/qap;if(Math.abs(d)<tiny)d=tiny;d=1/d;let h=d;
+ for(let m=1;m<=500;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<tiny)d=tiny;c=1+aa/c;if(Math.abs(c)<tiny)c=tiny;d=1/d;h*=d*c;
+  aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<tiny)d=tiny;c=1+aa/c;if(Math.abs(c)<tiny)c=tiny;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-16)break}return h}
+// Regularised incomplete beta I_x(a,b); gives the Student t tail probabilities.
+function ibeta(x,a,b){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lg(a+b)-lg(a)-lg(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b}
+// Regularised upper incomplete gamma Q(a,x) (series or continued fraction); χ² upper tail = Q(df/2, χ²/2).
+function gq(a,x){if(x<=0)return 1;const e=-x+a*Math.log(x)-lg(a),tiny=1e-300;
+ if(x<a+1){let ap=a,del=1/a,s=del;for(let n=0;n<1000;n++){ap++;del*=x/ap;s+=del;if(Math.abs(del)<Math.abs(s)*1e-16)break}return 1-s*Math.exp(e)}
+ let b=x+1-a,c=1/tiny,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<tiny)d=tiny;c=b+an/c;if(Math.abs(c)<tiny)c=tiny;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-16)break}return Math.exp(e)*h}
+const tp2=(t,df)=>ibeta(df/(df+t*t),df/2,.5);                     // two-sided p-value of t
+const bis=(g,lo,hi)=>{for(let i=0;i<200;i++){const m=(lo+hi)/2;g(m)>0?lo=m:hi=m}return(lo+hi)/2};  // root of a decreasing g
+const tcrit=(a,df)=>a>=1?0:bis(t=>tp2(t,df)-a,0,1e5),ccrit=(a,df)=>bis(x=>gq(df/2,x/2)-a,0,1e4+10*df);
+const lin=(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1)),sdv=v=>{const m=mean(v);return Math.sqrt(sum(v.map(q=>(q-m)**2))/(v.length-1))};
+
+/* ===================== V2-B. HYPOTHESIS TESTS ===================== */
+let HT=null;
+const HINT={t1:['One-sample t-test: enter the observations in Sample 1 (leave blank to use the loaded dataset) and the hypothesised mean μ₀.','ஒரு மாதிரி t-சோதனை: மாதிரி 1-இல் அவதானிப்புகளை உள்ளிடவும் (காலியாக விட்டால் ஏற்றிய தரவுத்தொகுப்பு பயன்படுத்தப்படும்); கருதுகோள் சராசரி μ₀ கொடுக்கவும்.'],
+ t2:['Two-sample t-test: enter independent samples in Sample 1 and Sample 2 (Welch is the default; choose pooled only if equal variances are justified).','இரு மாதிரி t-சோதனை: சார்பற்ற மாதிரிகளை மாதிரி 1, மாதிரி 2-இல் உள்ளிடவும் (இயல்பாக Welch; மாறுபாடுகள் சமம் என நியாயப்படுத்த முடிந்தால் மட்டுமே இணைந்த முறையைத் தேர்ந்தெடுக்கவும்).'],
+ tp:['Paired t-test: enter matched before/after values in the same order in both samples.','இணை t-சோதனை: முன்/பின் பொருந்தும் மதிப்புகளை இரு மாதிரிகளிலும் ஒரே வரிசையில் உள்ளிடவும்.'],
+ cg:['Chi-square goodness-of-fit: enter observed counts in Sample 1. Optionally enter expected counts or proportions in Sample 2 (blank = all categories equally likely).','கை-வர்க்கப் பொருத்த நன்மை சோதனை: காணப்பட்ட எண்ணிக்கைகளை மாதிரி 1-இல் உள்ளிடவும். விருப்பமெனில் எதிர்பார்க்கும் எண்ணிக்கை அல்லது விகிதங்களை மாதிரி 2-இல் உள்ளிடவும் (காலி = எல்லா வகைகளும் சம வாய்ப்பு).'],
+ ci:['Chi-square test of independence: enter the contingency table in Sample 1, one row per line, counts separated by commas or spaces.','கை-வர்க்கச் சார்பின்மை சோதனை: நிகழ்வு அட்டவணையை மாதிரி 1-இல் உள்ளிடவும்; ஒவ்வொரு வரிசையும் ஒரு வரியில், எண்ணிக்கைகள் காற்புள்ளி அல்லது இடைவெளியால் பிரிக்கப்பட வேண்டும்.']};
+const HEX={t1:['52, 55, 49, 61, 58, 54, 57, 60, 53, 56','',50],t2:['78, 82, 69, 91, 85, 74, 88, 80','70, 75, 66, 80, 72, 68, 77, 71',0],tp:['72, 75, 68, 80, 77, 71, 69, 74','75, 78, 70, 84, 80, 72, 73, 77',0],cg:['18, 22, 20, 25, 15, 20','',0],ci:['30, 20, 10\n20, 25, 35','',0]};
+// Shows/hides the inputs that apply to the chosen test and updates the instruction text.
+function hint(){const t=$('htest').value,tt=t[0]=='t';$('hmu0w').classList.toggle('hidden',t!='t1');$('haltw').classList.toggle('hidden',!tt);$('hvarw').classList.toggle('hidden',t!='t2');$('h2w').classList.toggle('hidden',t=='t1'||t=='ci');$('hhint').textContent=HINT[t][LANG=='ta'?1:0]}
+$('htest').onchange=hint;
+$('hfill').onclick=()=>{if(D.length)$('h1').value=D.join(', ');else msg('hmsg','Please load a dataset first (Data Input tab).')};
+$('hex').onclick=()=>{const e=HEX[$('htest').value];$('h1').value=e[0];$('h2').value=e[1];$('hmu0').value=e[2]};
+// Plots the null distribution (t or χ²), the rejection region and the observed statistic.
+function htPlot(isT,st,df,alt,al){let xs,f,reg,cv;
+ if(isT){const lim=Math.max(4.5,Math.abs(st)*1.2);xs=lin(-lim,lim,500);f=x=>Math.exp(lg((df+1)/2)-lg(df/2))/Math.sqrt(df*Math.PI)*Math.pow(1+x*x/df,-(df+1)/2);cv=alt=='two'?tcrit(al,df):tcrit(Math.min(2*al,.999999),df);reg=alt=='two'?[[-Infinity,-cv],[cv,Infinity]]:alt=='gt'?[[cv,Infinity]]:[[-Infinity,-cv]]}
+ else{cv=ccrit(al,df);xs=lin(df<3?.02:0,Math.max(cv*1.6,st*1.2,df+10),500);f=x=>Math.exp((df/2-1)*Math.log(x)-x/2-(df/2)*Math.LN2-lg(df/2));reg=[[cv,Infinity]]}
+ const ys=xs.map(f),tr=[{x:xs,y:ys,mode:'lines',name:'f(x) under H₀',line:{color:'#2456a6'}}];
+ reg.forEach(([a,b],i)=>{const xi=xs.filter(q=>q>=a&&q<=b);if(xi.length)tr.push({x:xi,y:xi.map(f),fill:'tozeroy',mode:'lines',name:'Rejection region',showlegend:!i,line:{color:'#b83b4b'}})});
+ tr.push({x:[st,st],y:[0,Math.max(...ys.filter(Number.isFinite))*.9],mode:'lines',name:'Test statistic',line:{color:'#f3b63f',dash:'dash',width:3}});
+ $('hpl').style.minHeight='360px';plot('hpl',tr,'Distribution under H₀',isT?'t':'χ²','Density')}
+// Runs the selected test, validating every input and showing statistic, df, p-value, CI, effect size and decision.
+function runHT(){const t=$('htest').value,al=+$('halpha').value,alt=t[0]=='t'?$('halt').value:'gt',pooled=$('hvar').value=='p',isT=t[0]=='t',E=m=>msg('hmsg',m),fp=p=>p<1e-6?'< 0.000001':F(p,6);
+ HT=null;$('hres').innerHTML='';try{Plotly.purge('hpl')}catch(e){}$('hpl').style.minHeight='0';
+ if(!(al>0&&al<1))return E('Significance level α must lie strictly between 0 and 1.');msg('hmsg','');
+ const a=nums($('h1').value),b=nums($('h2').value);if(a.bad.length||b.bad.length)return E('Invalid (non-numerical) entries: '+[...a.bad,...b.bad].slice(0,8).join(', '));
+ const sym={two:'≠',gt:'>',lt:'<'}[alt];let R,st,df,p,extra='',name,h0,h1,note;
+ if(isT){let x=$('h1').value.trim()?a.v:D.slice(),se,ctr,d,est;if(x.length<2)return E('Sample 1 needs at least two observations.');const zero='All values are identical: the t statistic is undefined.';
+  if(t=='t1'){const n=x.length,m=mean(x),s=sdv(x),mu0=+$('hmu0').value;if(!Number.isFinite(mu0))return E('μ₀ must be a number.');if(s===0)return E(zero);se=s/Math.sqrt(n);ctr=m;st=(m-mu0)/se;df=n-1;d=(m-mu0)/s;name='One-sample t-test';h0='μ = μ₀ = '+mu0;h1='μ '+sym+' μ₀';est=[['Sample mean',F(m)],['Sample SD',F(s)],['n',n]]}
+  else if(t=='tp'){const y=b.v;if(y.length!==x.length)return E('Paired samples must have equal numbers of observations.');const dd=x.map((v,i)=>v-y[i]),n=dd.length,m=mean(dd),s=sdv(dd);if(s===0)return E(zero);se=s/Math.sqrt(n);ctr=m;st=m/se;df=n-1;d=m/s;name='Paired t-test';h0='μ_d = 0';h1='μ_d '+sym+' 0';est=[['Mean difference (Sample 1 − Sample 2)',F(m)],['SD of differences',F(s)],['n pairs',n]]}
+  else{const y=b.v;if(y.length<2)return E('Sample 2 needs at least two observations.');const n1=x.length,n2=y.length,m1=mean(x),m2=mean(y),v1=sdv(x)**2,v2=sdv(y)**2;if(v1===0&&v2===0)return E(zero);
+   const sp2=((n1-1)*v1+(n2-1)*v2)/(n1+n2-2);if(pooled){se=Math.sqrt(sp2*(1/n1+1/n2));df=n1+n2-2}else{const a1=v1/n1,a2=v2/n2;se=Math.sqrt(a1+a2);df=(a1+a2)**2/(a1*a1/(n1-1)+a2*a2/(n2-1))}
+   ctr=m1-m2;st=ctr/se;d=ctr/Math.sqrt(sp2);name=pooled?'Two-sample t-test (pooled variance)':'Welch two-sample t-test';h0='μ₁ = μ₂';h1='μ₁ '+sym+' μ₂';est=[['Mean 1 / Mean 2',F(m1)+' / '+F(m2)],['SD 1 / SD 2',F(Math.sqrt(v1))+' / '+F(Math.sqrt(v2))],['n₁ / n₂',n1+' / '+n2],['Difference of means',F(ctr)]]}
+  const p2=tp2(st,df);p=alt=='two'?p2:alt=='gt'?(st>0?p2/2:1-p2/2):(st<0?p2/2:1-p2/2);const tc=tcrit(al,df);
+  R=[['Test',name],['Null hypothesis H₀',h0],['Alternative H₁',h1],['Significance level α',F(al,3)],['Test statistic t',F(st)],['Degrees of freedom',F(df,t=='t2'&&!pooled?3:0)],['p-value',fp(p)],...est,['Confidence interval (1 − α, two-sided)','['+F(ctr-tc*se)+', '+F(ctr+tc*se)+']'],['Cohen’s d (effect size)',F(d)]];
+  note=['Assumes independent observations and approximately normal data (or a reasonably large sample).','சார்பற்ற அவதானிப்புகள் மற்றும் ஏறத்தாழ இயல்நிலைத் தரவு (அல்லது போதிய பெரிய மாதிரி) எனக் கொள்கிறது.']}
+ else{let O,Ex,N,tbl,V=null,cells;
+  if(t=='cg'){O=a.v;const k=O.length;if(k<2)return E('At least two categories are required.');if(O.some(v=>v<0))return E('Observed counts cannot be negative.');N=sum(O);if(N<=0)return E('Observed counts sum to zero.');
+   if(b.v.length){if(b.v.length!==k)return E('Expected values must match the number of observed categories.');if(b.v.some(v=>v<=0))return E('Expected values must be positive.');const se=sum(b.v);Ex=b.v.map(v=>N*v/se)}else Ex=O.map(()=>N/k);
+   st=sum(O.map((v,i)=>(v-Ex[i])**2/Ex[i]));df=k-1;name='Chi-square goodness-of-fit test';h0='The observed frequencies follow the expected distribution';h1='The observed frequencies do not follow the expected distribution';cells=Ex;
+   tbl=tb(['Category','Observed','Expected','(O−E)²/E'],O.map((v,i)=>['C'+(i+1),v,F(Ex[i]),F((v-Ex[i])**2/Ex[i])]))}
+  else{const M=$('h1').value.split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>nums(l));if(M.some(r=>r.bad.length))return E('Invalid (non-numerical) entries in the table.');const Q=M.map(r=>r.v),r=Q.length,c=r?Q[0].length:0;
+   if(r<2||c<2)return E('Enter a table with at least 2 rows and 2 columns (one row per line).');if(Q.some(q=>q.length!==c))return E('All rows must have the same number of columns.');if(Q.some(q=>q.some(v=>v<0)))return E('Counts cannot be negative.');
+   const rs=Q.map(sum),cs=Array.from({length:c},(_,j)=>sum(Q.map(q=>q[j])));N=sum(rs);if(rs.some(v=>v===0)||cs.some(v=>v===0))return E('A row or column total is zero; remove it and retry.');
+   Ex=Q.map((q,i)=>q.map((_,j)=>rs[i]*cs[j]/N));st=sum(Q.map((q,i)=>sum(q.map((v,j)=>(v-Ex[i][j])**2/Ex[i][j]))));df=(r-1)*(c-1);V=Math.sqrt(st/(N*Math.min(r-1,c-1)));cells=Ex.flat();name='Chi-square test of independence';h0='The row and column variables are independent';h1='The row and column variables are associated';
+   const hd=['',...Array.from({length:c},(_,j)=>'C'+(j+1))];tbl='<h3>Observed</h3>'+tb(hd,Q.map((q,i)=>['R'+(i+1),...q]))+'<h3>Expected</h3>'+tb(hd,Ex.map((q,i)=>['R'+(i+1),...q.map(v=>F(v))]))}
+  p=gq(df/2,st/2);R=[['Test',name],['Null hypothesis H₀',h0],['Alternative H₁',h1],['Significance level α',F(al,3)],['Test statistic χ²',F(st)],['Degrees of freedom',df],['p-value',fp(p)],['Total count N',N]];if(V!==null)R.push(['Cramér’s V (effect size)',F(V)]);
+  extra=tbl+(cells.some(v=>v<5)?'<div class="warn">Some expected counts are below 5: the χ² approximation may be unreliable.</div>':'');
+  note=['Assumes independent observations and expected counts of at least 5 in most cells; no continuity correction is applied.','சார்பற்ற அவதானிப்புகள் மற்றும் பெரும்பாலான கலங்களில் எதிர்பார்க்கும் எண்ணிக்கை குறைந்தது 5 எனக் கொள்கிறது; தொடர்ச்சித் திருத்தம் பயன்படுத்தப்படவில்லை.']}
+ const rej=p<al;R.push(['Decision (reject if p < α)',rej?'Reject H₀':'Fail to reject H₀']);HT=R.map(r=>[r[0],String(r[1])]);
+ const sent=LANG=='ta'?(rej?'α = '+F(al,3)+' நிலையில், H₀-க்கு எதிராகப் போதிய சான்று உள்ளது (p = '+fp(p)+').':'α = '+F(al,3)+' நிலையில், H₀-க்கு எதிராகப் போதிய சான்று இல்லை (p = '+fp(p)+'). இது H₀ உண்மை என்பதை நிரூபிப்பதாகாது.'):(rej?'At α = '+F(al,3)+', the data provide sufficient evidence against H₀ (p = '+fp(p)+').':'At α = '+F(al,3)+', the data do not provide sufficient evidence against H₀ (p = '+fp(p)+'). This does not prove H₀ is true.');
+ $('hres').innerHTML=tb(['Quantity','Value'],R)+extra+'<div class="ans">'+sent+'</div><div class="note">'+note[LANG=='ta'?1:0]+'</div>';htPlot(isT,st,df,alt,al)}
+$('rh').onclick=runHT;
+
+/* ===================== V2-C. TAMIL / ENGLISH INTERFACE ===================== */
+let LANG='en';const TA={"GNANA STATISTICS BOT": "ஞான புள்ளியியல் உதவியாளர்", "MATHEMATICS • ENGINEERING • RESEARCH — Interactive Statistical Analysis Laboratory. Runs fully offline in the browser (Plotly.js loaded from CDN); no API key and no data leaves your device.": "கணிதம் • பொறியியல் • ஆராய்ச்சி — ஊடாடும் புள்ளியியல் பகுப்பாய்வு ஆய்வகம். உலாவியில் முழுமையாக இணைப்பின்றி இயங்கும் (Plotly.js CDN-இலிருந்து ஏற்றப்படுகிறது); API விசை தேவையில்லை; உங்கள் தரவு சாதனத்தை விட்டு வெளியேறாது.", "⬇ Download Results": "⬇ முடிவுகளைப் பதிவிறக்கு", "🌓 Light / Dark": "🌓 ஒளி / இருள்", "↺ Reset Application": "↺ பயன்பாட்டை மீட்டமை", "Decimals": "தசம இலக்கங்கள்", "📥 Data Input": "📥 தரவு உள்ளீடு", "📊 Descriptive": "📊 விவரணப் புள்ளியியல்", "📋 Frequency": "📋 நிகழ்வெண்", "📈 Visualization": "📈 காட்சிப்படுத்தல்", "🔗 Correlation & Regression": "🔗 ஒட்டுறவு & தொடர்புப்போக்கு", "🎲 Probability": "🎲 நிகழ்தகவு", "🔔 Distributions": "🔔 பரவல்கள்", "🧪 Hypothesis Tests": "🧪 கருதுகோள் சோதனைகள்", "💡 Interpretation": "💡 விளக்கம்", "📤 Export & Reports": "📤 ஏற்றுமதி & அறிக்கைகள்", "Data Input Laboratory": "தரவு உள்ளீட்டு ஆய்வகம்", "Observations (comma, space or newline separated)": "அவதானிப்புகள் (காற்புள்ளி, இடைவெளி அல்லது புதிய வரியால் பிரிக்கவும்)", "Example dataset": "எடுத்துக்காட்டுத் தரவுத்தொகுப்பு", "Engineering examination marks": "பொறியியல் தேர்வு மதிப்பெண்கள்", "Student heights (cm)": "மாணவர் உயரங்கள் (செ.மீ)", "Manufacturing component diameters (mm)": "உற்பத்திக் கூறுகளின் விட்டங்கள் (மி.மீ)", "Daily temperature (°C)": "தினசரி வெப்பநிலை (°C)", "Research experimental measurements": "ஆராய்ச்சிச் சோதனை அளவீடுகள்", "Upload CSV file": "CSV கோப்பைப் பதிவேற்று", "Numerical column": "எண் நெடுவரிசை", "Load data": "தரவை ஏற்று", "Load example": "எடுத்துக்காட்டை ஏற்று", "Use column": "நெடுவரிசையைப் பயன்படுத்து", "Clear dataset": "தரவுத்தொகுப்பை அழி", "Preview (first 60 values)": "முன்னோட்டம் (முதல் 60 மதிப்புகள்)", "Descriptive Statistics": "விவரணப் புள்ளியியல்", "Extra percentiles (comma separated, 0–100)": "கூடுதல் நூற்றுமானங்கள் (காற்புள்ளியால் பிரிக்கவும், 0–100)", "Compute statistics": "புள்ளியியலைக் கணக்கிடு", "Group": "தொகுதி", "Statistic": "புள்ளிவிவரம்", "Value": "மதிப்பு", "Central tendency": "மையப் போக்கு", "Arithmetic mean x̄ = Σx/n": "கூட்டுச் சராசரி x̄ = Σx/n", "Median": "இடைநிலை", "Mode": "முகடு", "none (all values unique)": "இல்லை (அனைத்து மதிப்புகளும் தனித்தவை)", "Geometric mean (x>0)": "பெருக்கற் சராசரி (x>0)", "Harmonic mean (x>0)": "இசைச் சராசரி (x>0)", "Dispersion": "சிதறல்", "Minimum": "சிறுமம்", "Maximum": "பெருமம்", "Range": "வீச்சு", "Population variance σ² = Σ(x−μ)²/N": "முழுமைத்தொகுதிப் பரவற்படி σ² = Σ(x−μ)²/N", "Sample variance s² = Σ(x−x̄)²/(n−1)": "மாதிரிப் பரவற்படி s² = Σ(x−x̄)²/(n−1)", "Population SD σ": "முழுமைத்தொகுதித் திட்ட விலக்கம் σ", "Sample SD s": "மாதிரித் திட்ட விலக்கம் s", "Interquartile range Q3−Q1": "கால்மான வீச்சு Q3−Q1", "Mean absolute deviation": "சராசரி தனிமதிப்பு விலக்கம்", "Position": "நிலை அளவைகள்", "Q2 (median)": "Q2 (இடைநிலை)", "Five-number summary": "ஐந்தெண் சுருக்கம்", "Shape": "வடிவம்", "Skewness g₁ (population moments)": "கோட்டம் g₁ (முழுமைத்தொகுதித் திருப்புத்திறன்கள்)", "Excess kurtosis g₂ (population moments)": "மிகைக் கூர்மை g₂ (முழுமைத்தொகுதித் திருப்புத்திறன்கள்)", "Conventions:": "மரபுகள்:", "quartiles/percentiles use linear interpolation, position h = (n−1)p (R type 7, Excel QUARTILE.INC). Skewness g₁ = m₃/m₂^{3/2} and excess kurtosis g₂ = m₄/m₂² − 3 use": "கால்மானங்கள்/நூற்றுமானங்கள் நேரியல் இடைச்செருகலைப் பயன்படுத்துகின்றன; நிலை h = (n−1)p (R வகை 7, Excel QUARTILE.INC). கோட்டம் g₁ = m₃/m₂^{3/2}, மிகைக் கூர்மை g₂ = m₄/m₂² − 3 ஆகியவை", "population moments": "முழுமைத்தொகுதித் திருப்புத்திறன்களை", "(no sample correction). Geometric and harmonic means require all values > 0.": "(மாதிரித் திருத்தம் இல்லாமல்) பயன்படுத்துகின்றன. பெருக்கற் சராசரி, இசைச் சராசரிக்கு எல்லா மதிப்புகளும் > 0 ஆக இருக்க வேண்டும்.", "Frequency Distribution": "நிகழ்வெண் பரவல்", "Number of classes (blank = Sturges)": "வகுப்புகளின் எண்ணிக்கை (காலி = ஸ்டர்ஜஸ்)", "Class width (blank = automatic)": "வகுப்பு அகலம் (காலி = தானியங்கி)", "Build distribution": "பரவலை உருவாக்கு", "Sturges: k = ⌈1 + 3.322 log₁₀ n⌉. Classes are [lower, upper) except the last, which is [lower, upper], so no observation is missed or double-counted.": "ஸ்டர்ஜஸ்: k = ⌈1 + 3.322 log₁₀ n⌉. வகுப்புகள் [கீழ், மேல்) வடிவில் இருக்கும்; கடைசி வகுப்பு மட்டும் [கீழ், மேல்]. எனவே எந்த அவதானிப்பும் விடுபடாது, இருமுறை எண்ணப்படாது.", "Grouped frequency table": "தொகுக்கப்பட்ட நிகழ்வெண் அட்டவணை", "Ungrouped frequency table": "தொகுக்கப்படாத நிகழ்வெண் அட்டவணை", "Class": "வகுப்பு", "Midpoint": "நடுப்புள்ளி", "Rel. f": "ஒப்பு நிகழ்வெண்", "Cum. f": "குவி நிகழ்வெண்", "Cum. %": "குவி %", "Statistical Visualization": "புள்ளியியல் காட்சிப்படுத்தல்", "Chart": "வரைபடம்", "Histogram": "நிகழ்வெண் செவ்வகப் படம்", "Frequency polygon": "நிகழ்வெண் பல்கோணம்", "Bar chart": "பட்டை வரைபடம்", "Pie chart": "வட்ட வரைபடம்", "Box plot": "பெட்டி வரைபடம்", "Scatter plot": "சிதறல் வரைபடம்", "Ogive": "குவி நிகழ்வெண் வளைவு", "Normal distribution curve": "இயல்நிலைப் பரவல் வளைவு", "Graph title": "வரைபடத் தலைப்பு", "X-axis label": "X-அச்சுப் பெயர்", "Y-axis label": "Y-அச்சுப் பெயர்", "Gridlines": "கட்டக் கோடுகள்", "On": "இயக்கு", "Off": "நிறுத்து", "Draw chart": "வரைபடம் வரை", "Reset axes": "அச்சுகளை மீட்டமை", "⬇ Download PNG": "⬇ PNG பதிவிறக்கு", "Zoom, pan and tooltips are built in (use the Plotly toolbar). Scatter plot uses the X–Y data of the Correlation tab if present, otherwise observation number vs value.": "பெரிதாக்கல், நகர்த்தல், சுட்டிக்குறிப்புகள் உள்ளமைந்துள்ளன (Plotly கருவிப்பட்டையைப் பயன்படுத்தவும்). சிதறல் வரைபடம், ஒட்டுறவுத் தாவலின் X–Y தரவு இருந்தால் அதையும், இல்லையெனில் அவதானிப்பு எண் – மதிப்பையும் பயன்படுத்தும்.", "Class interval": "வகுப்பு இடைவெளி", "Frequency": "நிகழ்வெண்", "Class midpoint": "வகுப்பு நடுப்புள்ளி", "Upper class boundary": "வகுப்பின் மேல் எல்லை", "Cumulative frequency": "குவி நிகழ்வெண்", "Ogive (less-than cumulative frequency)": "குவி நிகழ்வெண் வளைவு (குறைவு வகை)", "Category": "வகை", "Density": "அடர்த்தி", "Observation number": "அவதானிப்பு எண்", "Scatter plot with regression line": "தொடர்புப்போக்குக் கோட்டுடன் சிதறல் வரைபடம்", "Distribution under H₀": "H₀ கீழ் பரவல்", "Pie chart of class frequencies": "வகுப்பு நிகழ்வெண்களின் வட்ட வரைபடம்", "Histogram (density) with fitted normal curve": "பொருத்திய இயல்நிலை வளைவுடன் செவ்வகப் படம் (அடர்த்தி)", "Correlation & Regression": "ஒட்டுறவும் தொடர்புப்போக்கும்", "X observations": "X அவதானிப்புகள்", "Y observations": "Y அவதானிப்புகள்", "Analyse": "பகுப்பாய்வு செய்", "Load test data (y = 2x)": "சோதனைத் தரவை ஏற்று (y = 2x)", "Quantity": "அளவு", "Formula": "வாய்பாடு", "Pearson r": "பியர்சன் ஒட்டுறவுக் குணகம் r", "Strength / direction": "வலிமை / திசை", "Covariance (sample)": "இணைமாறுபாடு (மாதிரி)", "Slope b": "சாய்வு b", "Intercept a": "வெட்டுத்துண்டு a", "Regression equation": "தொடர்புப்போக்குச் சமன்பாடு", "SSE": "பிழை வர்க்கக் கூட்டுத்தொகை SSE", "Association is not causation.": "தொடர்பு என்பது காரணத்தை நிரூபிக்காது.", "Residuals": "எச்சங்கள்", "Residual y−ŷ": "எச்சம் y−ŷ", "Limitations: Pearson r measures only": "வரம்புகள்: பியர்சன் r அளவிடுவது", "linear": "நேரியல்", "association and is sensitive to outliers; correlation does not imply causation; the fitted line should not be extrapolated far beyond the observed X range; check the residuals for patterns.": "தொடர்பை மட்டுமே; இது விலகல் மதிப்புகளுக்கு உணர்திறன் கொண்டது; ஒட்டுறவு காரணத்தைக் குறிக்காது; பொருத்திய கோட்டைக் கவனிக்கப்பட்ட X வீச்சுக்கு அப்பால் வெகுதூரம் நீட்டிக்கக் கூடாது; வடிவங்கள் உள்ளனவா என எச்சங்களைச் சரிபாருங்கள்.", "Probability Calculator": "நிகழ்தகவுக் கணிப்பான்", "Fill any fields you know (each between 0 and 1); every formula whose inputs are available is evaluated.": "தெரிந்த புலங்களை நிரப்பவும் (ஒவ்வொன்றும் 0 முதல் 1 வரை); உள்ளீடுகள் கிடைக்கும் ஒவ்வொரு வாய்பாடும் கணக்கிடப்படும்.", "Favourable outcomes": "சாதகமான விளைவுகள்", "Total equally-likely outcomes": "மொத்த சம வாய்ப்பு விளைவுகள்", "Calculate": "கணக்கிடு", "Rule": "விதி", "Result": "முடிவு", "Complement": "நிரப்பு நிகழ்வு", "Addition rule": "கூட்டல் விதி", "Independence check": "சார்பின்மைச் சரிபார்ப்பு", "Multiplication rule": "பெருக்கல் விதி", "Conditional probability": "நிபந்தனை நிகழ்தகவு", "Bayes’ theorem": "பேய்ஸ் தேற்றம்", "Probability of an event": "நிகழ்வின் நிகழ்தகவு", "Complement of that event": "அந்த நிகழ்வின் நிரப்பு", "Union if independent": "சார்பற்றவையெனில் சேர்ப்பு", "Multiplication (independent)": "பெருக்கல் (சார்பற்றவை)", "Probability Distributions": "நிகழ்தகவுப் பரவல்கள்", "Distribution": "பரவல்", "Normal": "இயல்நிலை", "Binomial": "ஈருறுப்பு", "Poisson": "பாய்சான்", "Uniform": "சீரான", "a (lower)": "a (கீழ்)", "b (upper)": "b (மேல்)", "c (lower)": "c (கீழ்)", "d (upper)": "d (மேல்)", "PDF": "நிகழ்தகவு அடர்த்திச் சார்பு (PDF)", "CDF": "குவிப் பரவல் சார்பு (CDF)", "PMF": "நிகழ்தகவு நிறைச் சார்பு (PMF)", "Interval": "இடைவெளி", "Mean": "சராசரி", "Variance": "பரவற்படி", "Std. deviation": "திட்ட விலக்கம்", "Z-score": "Z-மதிப்பெண்", "Hypothesis Tests": "கருதுகோள் சோதனைகள்", "Test": "சோதனை", "One-sample t-test": "ஒரு மாதிரி t-சோதனை", "Two-sample t-test": "இரு மாதிரி t-சோதனை", "Paired t-test": "இணை t-சோதனை", "Chi-square goodness-of-fit": "கை-வர்க்கப் பொருத்த நன்மை", "Chi-square test of independence": "கை-வர்க்கச் சார்பின்மைச் சோதனை", "Significance level α": "முக்கியத்துவ நிலை α", "Hypothesised mean μ₀": "கருதுகோள் சராசரி μ₀", "Alternative hypothesis": "மாற்றுக் கருதுகோள்", "Two-sided (≠)": "இருபக்க (≠)", "Right-tailed (>)": "வலப்பக்க (>)", "Left-tailed (<)": "இடப்பக்க (<)", "Variance assumption": "பரவற்படி அனுமானம்", "Welch (unequal variances)": "Welch (சமமற்ற பரவற்படிகள்)", "Pooled (equal variances)": "இணைந்த (சம பரவற்படிகள்)", "Sample 1 / observed counts / table": "மாதிரி 1 / காணப்பட்ட எண்ணிக்கைகள் / அட்டவணை", "Sample 2 / expected counts (optional)": "மாதிரி 2 / எதிர்பார்க்கும் எண்ணிக்கைகள் (விருப்பம்)", "Run test": "சோதனையை இயக்கு", "Use loaded dataset as Sample 1": "ஏற்றிய தரவுத்தொகுப்பை மாதிரி 1-ஆகப் பயன்படுத்து", "Null hypothesis H₀": "சுழிக் கருதுகோள் H₀", "Alternative H₁": "மாற்றுக் கருதுகோள் H₁", "Test statistic t": "சோதனைப் புள்ளிவிவரம் t", "Test statistic χ²": "சோதனைப் புள்ளிவிவரம் χ²", "Degrees of freedom": "கட்டற்ற படிகள்", "p-value": "p-மதிப்பு", "Total count N": "மொத்த எண்ணிக்கை N", "Cramér’s V (effect size)": "கிரேமர் V (விளைவு அளவு)", "Decision (reject if p < α)": "முடிவு (p < α எனில் நிராகரி)", "Reject H₀": "H₀-ஐ நிராகரி", "Fail to reject H₀": "H₀-ஐ நிராகரிக்க இயலாது", "Observed": "காணப்பட்டது", "Expected": "எதிர்பார்த்தது", "Confidence interval (1 − α, two-sided)": "நம்பக இடைவெளி (1 − α, இருபக்க)", "Cohen’s d (effect size)": "கோஹன் d (விளைவு அளவு)", "Sample mean": "மாதிரிச் சராசரி", "Sample SD": "மாதிரித் திட்ட விலக்கம்", "Mean difference (Sample 1 − Sample 2)": "சராசரி வேறுபாடு (மாதிரி 1 − மாதிரி 2)", "SD of differences": "வேறுபாடுகளின் திட்ட விலக்கம்", "n pairs": "இணைகளின் எண்ணிக்கை", "Mean 1 / Mean 2": "சராசரி 1 / சராசரி 2", "SD 1 / SD 2": "திட்ட விலக்கம் 1 / 2", "Difference of means": "சராசரிகளின் வேறுபாடு", "Welch two-sample t-test": "Welch இரு மாதிரி t-சோதனை", "Two-sample t-test (pooled variance)": "இரு மாதிரி t-சோதனை (இணைந்த பரவற்படி)", "Chi-square goodness-of-fit test": "கை-வர்க்கப் பொருத்த நன்மைச் சோதனை", "The observed frequencies follow the expected distribution": "காணப்பட்ட நிகழ்வெண்கள் எதிர்பார்க்கும் பரவலைப் பின்பற்றுகின்றன", "The observed frequencies do not follow the expected distribution": "காணப்பட்ட நிகழ்வெண்கள் எதிர்பார்க்கும் பரவலைப் பின்பற்றவில்லை", "The row and column variables are independent": "வரிசை, நெடுவரிசை மாறிகள் சார்பற்றவை", "The row and column variables are associated": "வரிசை, நெடுவரிசை மாறிகள் தொடர்புடையவை", "Some expected counts are below 5: the χ² approximation may be unreliable.": "சில எதிர்பார்க்கும் எண்ணிக்கைகள் 5-க்குக் குறைவு: χ² தோராயம் நம்பகமற்றதாக இருக்கலாம்.", "A small p-value means the data would be unusual if H₀ were true; it is not the probability that H₀ is true. Report effect sizes and confidence intervals alongside p-values.": "சிறிய p-மதிப்பு என்பது H₀ உண்மையாக இருந்தால் இத்தகைய தரவு அரிதாகும் என்பதைக் காட்டுகிறது; H₀ உண்மையாக இருப்பதற்கான நிகழ்தகவு அல்ல. p-மதிப்புடன் விளைவு அளவையும் நம்பக இடைவெளியையும் குறிப்பிடவும்.", "Statistical Interpretation": "புள்ளியியல் விளக்கம்", "Generate interpretation": "விளக்கத்தை உருவாக்கு", "Standard deviation": "திட்ட விலக்கம்", "Interquartile range": "கால்மான வீச்சு", "Skewness": "கோட்டம்", "Correlation": "ஒட்டுறவு", "Coefficient of determination": "நிர்ணயக் குணகம்", "These are educational interpretations of the numbers only; they are not suitable for medical, financial or other high-stakes decisions.": "இவை எண்களின் கல்வி நோக்கிலான விளக்கங்கள் மட்டுமே; மருத்துவ, நிதி அல்லது பிற உயர் இடர் முடிவுகளுக்கு ஏற்றவை அல்ல.", "Export & Reports": "ஏற்றுமதியும் அறிக்கைகளும்", "⬇ CSV (data, statistics, frequency, regression, residuals)": "⬇ CSV (தரவு, புள்ளியியல், நிகழ்வெண், தொடர்புப்போக்கு, எச்சங்கள்)", "📄 Build report": "📄 அறிக்கை உருவாக்கு", "🖨 Print / Save as PDF": "🖨 அச்சிடு / PDF-ஆகச் சேமி", "✔ Run self-tests": "✔ தன்-சோதனைகளை இயக்கு", "Computed": "கணக்கிட்டது", "✔ pass": "✔ தேர்ச்சி", "✘ FAIL": "✘ தோல்வி", "GNANA MATH LEARNING CENTRE • V • G • R • AI & MATHEMATICS → INTERACTIVE MATHEMATICS LAB → GNANA STATISTICS BOT V2.0": "GNANA MATH LEARNING CENTRE • V • G • R • செயற்கை நுண்ணறிவும் கணிதமும் → ஊடாடும் கணித ஆய்வகம் → ஞான புள்ளியியல் உதவியாளர் V2.0", "GNANA STATISTICS BOT V2 — Statistical Report": "ஞான புள்ளியியல் உதவியாளர் V2 — புள்ளியியல் அறிக்கை", "1. Dataset description": "1. தரவுத்தொகுப்பு விளக்கம்", "2. Descriptive statistics": "2. விவரணப் புள்ளியியல்", "3. Frequency distribution": "3. நிகழ்வெண் பரவல்", "4. Correlation and regression": "4. ஒட்டுறவும் தொடர்புப்போக்கும்", "4b. Hypothesis test": "4ஆ. கருதுகோள் சோதனை", "5. Graphs": "5. வரைபடங்கள்", "6. Interpretation": "6. விளக்கம்", "7. Methodological conventions": "7. முறையியல் மரபுகள்", "8. Limitations": "8. வரம்புகள்", "Results describe the supplied sample only. Linear regression and Pearson r assume a roughly linear relation and are sensitive to outliers; no causal claim is made. Sample size and data quality limit all conclusions.": "முடிவுகள் வழங்கப்பட்ட மாதிரியை மட்டுமே விவரிக்கின்றன. நேரியல் தொடர்புப்போக்கும் பியர்சன் r-உம் ஏறத்தாழ நேரியல் உறவை அனுமானிக்கின்றன; விலகல் மதிப்புகளுக்கு உணர்திறன் கொண்டவை; காரணக் கூற்று எதுவும் இல்லை. மாதிரி அளவும் தரவுத் தரமும் அனைத்து முடிவுகளையும் வரையறுக்கின்றன.", "Please load a dataset first (Data Input tab).": "முதலில் தரவுத்தொகுப்பை ஏற்றவும் (தரவு உள்ளீடு தாவல்).", "The dataset is empty. Enter at least one numerical observation.": "தரவுத்தொகுப்பு காலியாக உள்ளது. குறைந்தது ஓர் எண் அவதானிப்பை உள்ளிடவும்.", "Dataset cleared.": "தரவுத்தொகுப்பு அழிக்கப்பட்டது.", "Please choose a .csv file.": ".csv கோப்பைத் தேர்ந்தெடுக்கவும்.", "The CSV file is empty.": "CSV கோப்பு காலியாக உள்ளது.", "At least two paired observations are required.": "குறைந்தது இரண்டு இணை அவதானிப்புகள் தேவை.", "Draw a chart first.": "முதலில் வரைபடத்தை வரையவும்.", "Load a dataset first.": "முதலில் தரவுத்தொகுப்பை ஏற்றவும்.", "Significance level α must lie strictly between 0 and 1.": "முக்கியத்துவ நிலை α என்பது 0-க்கும் 1-க்கும் இடையில் இருக்க வேண்டும்.", "Sample 1 needs at least two observations.": "மாதிரி 1-இல் குறைந்தது இரண்டு அவதானிப்புகள் தேவை.", "Sample 2 needs at least two observations.": "மாதிரி 2-இல் குறைந்தது இரண்டு அவதானிப்புகள் தேவை.", "Paired samples must have equal numbers of observations.": "இணை மாதிரிகளில் அவதானிப்புகளின் எண்ணிக்கை சமமாக இருக்க வேண்டும்.", "All values are identical: the t statistic is undefined.": "எல்லா மதிப்புகளும் ஒன்றே: t புள்ளிவிவரம் வரையறுக்கப்படவில்லை.", "μ₀ must be a number.": "μ₀ ஓர் எண்ணாக இருக்க வேண்டும்.", "At least two categories are required.": "குறைந்தது இரண்டு வகைகள் தேவை.", "Observed counts cannot be negative.": "காணப்பட்ட எண்ணிக்கைகள் எதிர்மறையாக இருக்கக் கூடாது.", "Observed counts sum to zero.": "காணப்பட்ட எண்ணிக்கைகளின் கூட்டுத்தொகை பூஜ்ஜியம்.", "Expected values must match the number of observed categories.": "எதிர்பார்க்கும் மதிப்புகள் காணப்பட்ட வகைகளின் எண்ணிக்கையுடன் பொருந்த வேண்டும்.", "Expected values must be positive.": "எதிர்பார்க்கும் மதிப்புகள் நேர்மறையாக இருக்க வேண்டும்.", "Invalid (non-numerical) entries in the table.": "அட்டவணையில் தவறான (எண்ணற்ற) உள்ளீடுகள் உள்ளன.", "Enter a table with at least 2 rows and 2 columns (one row per line).": "குறைந்தது 2 வரிசை, 2 நெடுவரிசை கொண்ட அட்டவணையை உள்ளிடவும் (ஒரு வரிக்கு ஒரு வரிசை).", "All rows must have the same number of columns.": "எல்லா வரிசைகளிலும் நெடுவரிசைகளின் எண்ணிக்கை சமமாக இருக்க வேண்டும்.", "Counts cannot be negative.": "எண்ணிக்கைகள் எதிர்மறையாக இருக்கக் கூடாது.", "A row or column total is zero; remove it and retry.": "ஒரு வரிசை அல்லது நெடுவரிசையின் மொத்தம் பூஜ்ஜியம்; அதை நீக்கி மீண்டும் முயலவும்.", "very strong positive linear association": "மிக வலுவான நேர்மறை நேரியல் தொடர்பு", "very strong negative linear association": "மிக வலுவான எதிர்மறை நேரியல் தொடர்பு", "strong positive linear association": "வலுவான நேர்மறை நேரியல் தொடர்பு", "strong negative linear association": "வலுவான எதிர்மறை நேரியல் தொடர்பு", "moderate positive linear association": "மிதமான நேர்மறை நேரியல் தொடர்பு", "moderate negative linear association": "மிதமான எதிர்மறை நேரியல் தொடர்பு", "weak positive linear association": "பலவீனமான நேர்மறை நேரியல் தொடர்பு", "weak negative linear association": "பலவீனமான எதிர்மறை நேரியல் தொடர்பு", "negligible positive linear association": "மிகச் சிறிய நேர்மறை நேரியல் தொடர்பு", "negligible negative linear association": "மிகச் சிறிய எதிர்மறை நேரியல் தொடர்பு"};
+const L=s=>LANG=='ta'&&TA[s]?TA[s]:s;                              // translate chart titles at draw time
+// Replaces every whole text node found in the dictionary (originals are remembered so English can be restored).
+function tr(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement&&!n.parentElement.closest('.plot,script,style')?1:2}),a=[];let n;while(n=w.nextNode())a.push(n);
+ a.forEach(n=>{const k=n.nodeValue.trim();if(LANG=='ta'){if(TA[k]){if(n.__o==null)n.__o=n.nodeValue;n.nodeValue=n.nodeValue.replace(k,()=>TA[k])}}else if(n.__o!=null){n.nodeValue=n.__o;n.__o=null}})}
+const obs=new MutationObserver(()=>{if(LANG=='ta'){tr();obs.takeRecords()}});obs.observe(document.body,{childList:true,subtree:true,characterData:true});
+function redraw(){if(D.length){if(!$('v2').classList.contains('hidden'))renderFreq(true);if($('ch').data)drawChart()}if(RG&&$('rg').data)runReg();if($('dpl').data)rdist();if($('hpl').data&&HT)runHT()}
+$('blang').onclick=()=>{LANG=LANG=='ta'?'en':'ta';document.documentElement.lang=LANG;tr();$('blang').textContent=LANG=='ta'?'English':'தமிழ்';obs.takeRecords();hint();redraw()};
+hint();
+
+// Tamil version of the interpretation panel; the English builder is kept for LANG = 'en'.
+const interpEN=interp;
+interp=function(){if(LANG!='ta')return interpEN();const s=desc(D),sk=isNaN(s.sk)?'மாறாத் தரவுக்கு வரையறுக்கப்படவில்லை':Math.abs(s.sk)<.1?'ஏறத்தாழ சமச்சீர்':s.sk>0?'வலக்கோட்டம் (மேல் வால் நீளமானது)':'இடக்கோட்டம் (கீழ் வால் நீளமானது)',w=D.slice(0,4);
+ const E=[['சராசரி','x̄ = Σx/n','கூட்டுச் சராசரி என்பது தரவின் சமநிலைப் புள்ளி: x̄ = '+F(s.mean)+'. இது மிகை மதிப்புகளுக்கு உணர்திறன் கொண்டது.'],
+ ['திட்ட விலக்கம்','s = √[Σ(x−x̄)²/(n−1)]','மாதிரித் திட்ட விலக்கம் '+F(s.ssd)+' (முழுமைத்தொகுதி σ = '+F(s.psd)+'); அவதானிப்புகள் சராசரியிலிருந்து எவ்வளவு தொலைவில் உள்ளன என்பதைத் தரவின் அலகிலேயே அளக்கிறது.'],
+ ['கால்மான வீச்சு','IQR = Q3 − Q1','தரவின் நடுப்பாதி 50% '+F(s.iqr)+' அளவுக்குப் பரவியுள்ளது ('+F(s.q1)+' முதல் '+F(s.q3)+' வரை); விலகல் மதிப்புகளால் குறைவாகவே பாதிக்கப்படும்.'],
+ ['கோட்டம்','g₁ = m₃/m₂^{3/2}','g₁ = '+F(s.sk)+': பரவல் '+sk+'. சிறிய மாதிரிகளில் கோட்டம் நிலையற்றது.'],
+ ['எடுத்துக்காட்டு (முதல் '+w.length+' மதிப்புகளின் சராசரி)','x̄ = ('+w.join(' + ')+')/'+w.length,'= '+F(mean(w))+'.']];
+ if(RG){const st={'very strong':'மிக வலுவான','strong':'வலுவான','moderate':'மிதமான','weak':'பலவீனமான','negligible':'மிகச் சிறிய'}[isNaN(RG.r)?'weak':strength(RG.r)];
+  E.push(['ஒட்டுறவு','r = Sxy/√(Sxx Syy)','r = '+F(RG.r)+' என்பது X, Y இடையே '+st+' நேரியல் தொடர்பைக் காட்டுகிறது. இது தொடர்பை மட்டுமே விவரிக்கிறது; காரணத்தை நிறுவாது.'],
+  ['தொடர்புப்போக்குச் சமன்பாடு','ŷ = a + bx','பொருத்திய கோடு ŷ = '+F(RG.a)+' + '+F(RG.b)+'x; X-இன் கவனிக்கப்பட்ட வீச்சுக்குள் X ஒரு அலகு உயரும்போது Y சுமார் '+F(RG.b)+' அலகு மாறும் எனக் கணிக்கிறது.'],
+  ['நிர்ணயக் குணகம்','R² = 1 − SSE/SST','R² = '+F(RG.r2)+': இந்த மாதிரியில் Y-இன் மாறுபாட்டில் சுமார் '+F(100*RG.r2,1)+'% -ஐ இக்கோடு விளக்குகிறது.'])}
+ return E.map(e=>'<div class="card"><b>'+e[0]+'</b><br><b class="f">'+e[1]+'</b><br>'+e[2]+'</div>').join('')+'<div class="note">These are educational interpretations of the numbers only; they are not suitable for medical, financial or other high-stakes decisions.</div>'};
+</script></body></html>

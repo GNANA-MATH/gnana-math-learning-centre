@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GNANA SOLVER BOT — Numerical Equation Tutor</title>
+<style>
+:root{--navy:#0b2447;--gold:#b08d3c;--line:#d9dde5;--bg:#f6f7fa}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--navy);font:15px/1.5 Georgia,'Times New Roman',serif}
+header{text-align:center;padding:22px 12px 14px;border-bottom:4px solid var(--gold)}
+.b1{font-size:22px;letter-spacing:6px;font-weight:bold;color:var(--gold)}.b2{font-size:12px;letter-spacing:3px}
+h1{margin:8px 0 2px;font-size:clamp(20px,4vw,30px);letter-spacing:1px}header p{margin:0;font-style:italic}
+main{max-width:1050px;margin:auto;padding:12px}
+.card{border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:6px;padding:14px;margin:14px 0;background:#fff}
+h2{margin:0 0 10px;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+label{display:block;font-size:13px;font-weight:bold;margin-bottom:2px}
+input,select,button{font:inherit;color:var(--navy);padding:7px 9px;border:1px solid #9aa4b5;border-radius:4px;width:100%;background:#fff}
+button{width:auto;cursor:pointer;background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;margin:4px 4px 0 0}
+button.alt{background:#fff;color:var(--navy)}button.gold{background:var(--gold);border-color:var(--gold);color:#1b1500}
+:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.hide{display:none}.note{font-size:13px;color:#33415c}
+.msg{padding:10px 12px;border-radius:5px;border-left:6px solid;margin:8px 0;font-weight:bold}
+.ok{background:#e8f5ec;border-color:#2e7d4f}.warn{background:#fff3d6;border-color:#b07a00}.err{background:#fdecea;border-color:#b3261e}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.sum div{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:8px}.sum small{display:block;color:#4a5875}.sum b{font-size:16px;word-break:break-all}
+.tw{overflow-x:auto;max-height:430px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-family:Consolas,monospace}
+th{background:var(--navy);color:#fff;position:sticky;top:0}th,td{border:1px solid var(--line);padding:4px 8px;text-align:right}
+tbody tr:nth-child(even){background:var(--bg)}td.pf{text-align:left}
+svg{width:100%;height:auto;background:#fff;border:1px solid var(--line)}
+details{margin-top:6px}summary{cursor:pointer;font-weight:bold;font-size:16px}
+ul{margin:4px 0 8px 18px;padding:0}
+@media print{.noprint{display:none!important}.card{break-inside:avoid}.tw{max-height:none}}
+</style>
+</head>
+<body>
+<header>
+<div class="b1">V • G • R</div><div class="b2">V • GUIDANCE • RESEARCH</div>
+<h1>GNANA SOLVER BOT</h1>
+<p>Voice-enabled Numerical Equation Tutor · Algebraic and Transcendental Equations</p>
+</header>
+<main>
+
+<section class="card" aria-labelledby="h-eq">
+<h2 id="h-eq">1. Equation Input</h2>
+<label for="eq">Equation f(x) = 0, or L(x) = R(x) (trigonometric functions use radians)</label>
+<input id="eq" type="text" maxlength="200" placeholder="e.g. x^3-x-2=0" autocomplete="off" spellcheck="false">
+<div class="noprint" style="margin-top:7px;display:flex;flex-wrap:wrap;align-items:center;gap:6px">
+  <button id="voiceEq" type="button" class="alt">🎙 Speak equation (English)</button>
+  <button id="voiceStop" type="button" class="alt">Stop listening</button>
+  <label for="voiceLang" style="margin-left:4px">Recognition language</label>
+  <select id="voiceLang" style="width:auto;max-width:180px"><option value="en-IN" selected>English (India)</option><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option></select>
+</div>
+<div id="voiceStatus" class="msg" role="status" aria-live="polite">Voice input is idle. Type an equation if voice is unavailable.</div>
+<details class="noprint"><summary>Voice troubleshooting</summary>
+<ul>
+<li>Use a recent version of Chrome or Edge. Speech recognition is not supported in every browser.</li>
+<li>Allow microphone permission for the browser/site and check that no other app is blocking the microphone.</li>
+<li>Speech recognition may require internet access even though the numerical solver works offline.</li>
+<li>If you opened this file directly, try opening it in Chrome. If recognition still fails, host the file on HTTPS or use typed input.</li>
+<li>Read the recognized equation carefully and edit it before pressing Solve.</li>
+</ul></details>
+<div class="grid" style="margin-top:8px">
+<div><label for="example">Worked example</label><select id="example"></select></div>
+<div style="align-self:end"><button class="alt" id="btnEx" type="button">Load worked example</button></div>
+</div>
+<p class="note" id="exnote">Numerical methods return an <b>approximation</b>. The solver also checks whether a simple rational root candidate (denominator ≤ 100) satisfies the original function to a strict residual tolerance; this is not a general symbolic exact-root engine. Bracketing methods require continuity for the usual root guarantee.</p>
+<details><summary>Equation-format help</summary>
+<ul>
+<li>Operators: <code>+ − * / ^</code> and parentheses. Implicit products such as <code>2x</code> or <code>3(x+1)</code> are accepted.</li>
+<li>Constants: <code>pi</code>, <code>e</code>. Variable: <code>x</code> only.</li>
+<li>Functions (all need parentheses): <code>sin cos tan asin acos atan sinh cosh tanh exp log ln sqrt abs</code>. Here <code>log</code> and <code>ln</code> are both the natural logarithm; <code>log10</code> is also available.</li>
+<li>Angles are in <b>radians</b>. A single "=" is allowed: <code>x^2=5</code> is treated as <code>x^2−5=0</code>.</li>
+<li>Examples: <code>x^3-x-2=0</code>, <code>e^(-x)-x=0</code>, <code>cos(x)-x=0</code>, <code>ln(x)+x-2=0</code>, <code>sin(x)-0.5=0</code>.</li>
+<li>Equations are parsed by a built-in recursive-descent parser; <code>eval()</code> is never used.</li>
+</ul></details>
+</section>
+
+<section class="card noprint" aria-labelledby="h-bot">
+<h2 id="h-bot">GNANA SOLVER BOT · Root Interval Finder</h2>
+<p class="note">Enter a search interval and number of subintervals. The bot scans for endpoints near zero and sign changes f(xᵢ)f(xᵢ₊₁) &lt; 0. A sign change suggests a root only when the function is continuous on that interval; even-multiplicity roots may be missed.</p>
+<div class="grid">
+<div><label for="scanA">Search lower bound</label><input id="scanA" value="-5" inputmode="decimal"></div>
+<div><label for="scanB">Search upper bound</label><input id="scanB" value="5" inputmode="decimal"></div>
+<div><label for="scanN">Subintervals (10–5000)</label><input id="scanN" value="200" inputmode="numeric"></div>
+<div style="align-self:end"><button id="btnScan" class="gold" type="button">Find root intervals</button></div>
+</div>
+<div id="scanOut" class="note" aria-live="polite" style="margin-top:10px">Enter an equation above, then scan an interval.</div>
+<hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+<h2>Ask GNANA SOLVER BOT</h2>
+<p class="note">Try: “Which method uses a bracket?”, “Explain Newton Raphson”, or “What does a sign change mean?” This is an offline rule-based helper, not a general-purpose online AI model.</p>
+<div class="grid"><div style="grid-column:1/-1"><label for="botQuestion">Your question</label><input id="botQuestion" placeholder="Ask a numerical-method question…"></div></div>
+<button id="btnAsk" type="button">Ask</button> <button id="btnSpeakAnswer" type="button" class="alt">🔊 Read answer</button>
+<div id="botAnswer" class="msg" aria-live="polite">Hello! I can explain the four numerical methods and help locate sign-change intervals.</div>
+</section>
+
+<section class="card" aria-labelledby="h-m">
+<h2 id="h-m">2. Method and Parameters</h2>
+<div class="grid">
+<div><label for="method">Numerical method</label>
+<select id="method">
+<option value="bisection">Bisection Method</option>
+<option value="falseposition">False Position Method</option>
+<option value="newton">Newton–Raphson Method</option>
+<option value="fixed">Fixed-Point Iteration Method</option>
+</select></div>
+<div id="brA"><label for="a">Lower bound a</label><input id="a" inputmode="decimal" value="1"></div>
+<div id="brB"><label for="b">Upper bound b</label><input id="b" inputmode="decimal" value="2"></div>
+<div id="x0box" class="hide"><label for="x0">Initial approximation x₀</label><input id="x0" inputmode="decimal" value="1.5"></div>
+<div id="dfbox" class="hide"><label for="df">f′(x) (optional; blank = numerical)</label><input id="df" maxlength="200" placeholder="e.g. 3*x^2-1"></div>
+<div id="gbox" class="hide"><label for="g">Iteration function g(x)</label><input id="g" maxlength="200" placeholder="e.g. (x+2)^(1/3)"></div>
+<div><label for="tol">Tolerance</label><input id="tol" inputmode="decimal" value="1e-6"></div>
+<div><label for="maxIter">Maximum iterations</label><input id="maxIter" inputmode="numeric" value="100"></div>
+<div><label for="crit">Principal convergence criterion</label>
+<select id="crit"><option value="abs">Absolute step / interval error + residual check</option><option value="rel">Relative step error + residual check</option><option value="resid">Absolute residual |f(x)|</option></select></div>
+</div>
+<p class="note" id="fpnote">For step-based criteria, convergence also requires the residual |f(x)| to be within tolerance.</p>
+<div class="noprint">
+<button id="btnSolve" type="button" class="gold">Solve</button>
+<button id="btnReset" type="button" class="alt">Reset</button>
+</div>
+</section>
+
+<section class="card" aria-live="polite"><h2>3. Solution Summary</h2><div id="summary" class="note">Press <b>Solve</b> to compute.</div></section>
+
+<section class="card"><h2>4. Iteration Table</h2>
+<div class="tw" id="tbl"></div>
+<div class="noprint">
+<button id="btnCsv" type="button" class="alt">Export CSV</button>
+<button id="btnPrint" type="button" class="alt">Print / Save as PDF</button>
+</div></section>
+
+<section class="card"><h2>5. Graphical Visualization</h2>
+<div class="grid noprint">
+<div><label for="xmin">x min</label><input id="xmin" inputmode="decimal"></div>
+<div><label for="xmax">x max</label><input id="xmax" inputmode="decimal"></div>
+<div style="align-self:end"><button id="btnPlot" type="button" class="alt">Replot</button><button id="btnZoom" type="button" class="alt">Reset zoom</button></div>
+</div>
+<svg id="graph" viewBox="0 0 720 380" role="img" aria-label="Interactive function plot with computed numerical root and verified rational root candidate when available"></svg>
+<p class="note">Rational candidate is a verification aid, not proof of a symbolic closed form. Gold band = initial bracket; dashed line = initial guess; red dot = computed numerical root. The solution summary reports a verified simple rational candidate when one is detected. Breaks in the curve mark undefined values or discontinuities. For fixed-point iteration the cobweb path is drawn on y = g(x) and y = x.</p>
+<h3 style="margin:8px 0 2px">Convergence plot</h3>
+<svg id="conv" viewBox="0 0 720 260" role="img" aria-label="Residual versus iteration"></svg>
+</section>
+
+<section class="card"><h2>6. Method Theory and Algorithm</h2>
+<details id="theoryBox" open><summary>Show / hide theory for the selected method</summary><div id="theory"></div></details></section>
+
+<section class="card noprint"><h2>7. Built-in Verification</h2>
+<p class="note">Runs numerical and parser checks with the same solver code. Offline operation still requires a manual test.</p>
+<button id="btnTest" type="button" class="alt">Run self-tests</button>
+<div class="tw" id="testOut"></div></section>
+</main>
+
+<!-- ===================== NUMERICAL CORE (no DOM access) ===================== -->
+<script id="core">
+'use strict';
+/* Safeguards: bounded input length, magnitude and iteration count. */
+const LIMITS={maxLen:200,maxIter:10000,maxAbs:1e12};
+const FUNCS={sin:Math.sin,cos:Math.cos,tan:Math.tan,asin:Math.asin,acos:Math.acos,atan:Math.atan,
+ sinh:Math.sinh,cosh:Math.cosh,tanh:Math.tanh,exp:Math.exp,log:Math.log,ln:Math.log,log10:Math.log10,sqrt:Math.sqrt,abs:Math.abs};
+const STATUS_TEXT={CONVERGED:'Converged solution',EXACT:'Exact root detected numerically',MAXITER:'Maximum iterations reached',
+ INVALID:'Invalid input',BRACKET:'Invalid bracket',DERIV:'Derivative failure',DIVERGED:'Divergence or numerical breakdown'};
+const CRIT_TEXT={abs:'absolute step / interval error',rel:'relative approximate error',resid:'absolute residual |f(x)|'};
+
+/* tokenize(): converts text into number / identifier / operator tokens; rejects every other symbol. */
+function tokenize(src){
+  const s=src.toLowerCase(),t=[];let i=0,m;
+  while(i<s.length){
+    const c=s[i];
+    if(/\s/.test(c)){i++;continue;}
+    if((m=/^(\d+\.?\d*|\.\d+)(e[+-]?\d+)?/.exec(s.slice(i)))){t.push({k:'num',v:parseFloat(m[0])});i+=m[0].length;continue;}
+    if((m=/^[a-z_][a-z0-9_]*/.exec(s.slice(i)))){t.push({k:'id',v:m[0]});i+=m[0].length;continue;}
+    if('+-*/^()'.includes(c)){t.push({k:'op',v:c});i++;continue;}
+    throw new Error("Unsupported symbol '"+c+"' in the expression.");
+  }
+  return t;
+}
+/* compileExpr(): recursive-descent parser that returns a JavaScript closure x -> number.
+   Grammar: expr=term{(+|-)term}; term=unary{(*|/|implicit)unary}; unary=[+-]unary|power; power=primary[^unary]. */
+function compileExpr(src){
+  if(typeof src!=='string'||!src.trim())throw new Error('The expression is empty.');
+  if(src.length>LIMITS.maxLen)throw new Error('The expression is longer than '+LIMITS.maxLen+' characters.');
+  const tk=tokenize(src);let p=0;
+  const isOp=(t,v)=>t&&t.k==='op'&&t.v===v;
+  function expr(){let l=term();
+    while(isOp(tk[p],'+')||isOp(tk[p],'-')){const op=tk[p++].v,r=term(),a=l;l=op==='+'?x=>a(x)+r(x):x=>a(x)-r(x);}
+    return l;}
+  function term(){let l=unary();
+    for(;;){const t=tk[p];if(!t)break;
+      if(isOp(t,'*')||isOp(t,'/')){p++;const div=t.v==='/',r=unary(),a=l;l=div?x=>{const d=r(x);return d===0?NaN:a(x)/d;}:x=>a(x)*r(x);}
+      else if(t.k==='num'||t.k==='id'||isOp(t,'(')){const r=power(),a=l;l=x=>a(x)*r(x);} /* implicit multiplication */
+      else break;}
+    return l;}
+  function unary(){
+    if(isOp(tk[p],'-')){p++;const u=unary();return x=>-u(x);}
+    if(isOp(tk[p],'+')){p++;return unary();}
+    return power();}
+  function power(){const b=primary();
+    if(isOp(tk[p],'^')){p++;const e=unary();return x=>Math.pow(b(x),e(x));}
+    return b;}
+  function primary(){const t=tk[p++];
+    if(!t)throw new Error('The expression ends unexpectedly.');
+    if(t.k==='num'){const v=t.v;return()=>v;}
+    if(isOp(t,'(')){const e=expr();if(!isOp(tk[p],')'))throw new Error("Missing closing parenthesis ')'.");p++;return e;}
+    if(t.k==='id'){
+      if(t.v==='x')return x=>x;
+      if(t.v==='pi')return()=>Math.PI;
+      if(t.v==='e')return()=>Math.E;
+      if(Object.prototype.hasOwnProperty.call(FUNCS,t.v)){
+        if(!isOp(tk[p],'('))throw new Error("Function '"+t.v+"' must be followed by parentheses, e.g. "+t.v+"(x).");
+        p++;const a=expr();if(!isOp(tk[p],')'))throw new Error("Missing closing parenthesis ')' after "+t.v+"(.");p++;
+        const fn=FUNCS[t.v];return x=>fn(a(x));}
+      throw new Error("Unsupported function or symbol '"+t.v+"'.");}
+    throw new Error("Unexpected token '"+t.v+"'.");}
+  const fn=expr();
+  if(p<tk.length)throw new Error("Unexpected token '"+tk[p].v+"'.");
+  /* Non-finite results (log of x<=0, sqrt of negatives, 1/0, overflow) are reported as NaN = "undefined". */
+  return x=>{const v=fn(x);return Number.isFinite(v)?v:NaN;};
+}
+/* parseEquation(): accepts "f(x)=0" or "L(x)=R(x)" and returns f(x)=L(x)-R(x). */
+function parseEquation(text){
+  if(typeof text!=='string'||!text.trim())throw new Error('The equation is empty.');
+  if(text.length>LIMITS.maxLen)throw new Error('The equation is longer than '+LIMITS.maxLen+' characters.');
+  const parts=text.split('=');
+  if(parts.length>2)throw new Error("An equation may contain at most one '=' sign.");
+  if(parts.length===1)return{f:compileExpr(parts[0])};
+  if(!parts[0].trim()||!parts[1].trim())throw new Error("Both sides of '=' must be non-empty.");
+  const L=compileExpr(parts[0]),R=compileExpr(parts[1]);
+  return{f:x=>L(x)-R(x)};
+}
+/* evaluateFunction(): evaluates f at x; returns NaN when f is undefined there. */
+function evaluateFunction(f,x){return f(x);}
+/* numericalDerivative(): five-point central difference, error O(h^4); NaN if any sample is undefined. */
+function numericalDerivative(f,x){
+  /* Five-point central difference. The scale-aware h balances truncation and round-off. */
+  const h=Math.pow(Number.EPSILON,1/5)*Math.max(1,Math.abs(x));
+  const a=f(x+2*h),b=f(x+h),c=f(x-h),d=f(x-2*h);
+  if(![a,b,c,d].every(Number.isFinite)) return NaN;
+  const derivative=(8*(b-c)-(a-d))/(12*h);
+  return Number.isFinite(derivative)?derivative:NaN;
+}
+/* calculateError(): absolute and relative approximate error; relative falls back to absolute near x=0. */
+function calculateError(abs,x){return{abs,rel:Math.abs(x)>1e-300?abs/Math.abs(x):abs};}
+const shownErr=(e,crit)=>crit==='rel'?e.rel:e.abs;
+/* isConverged(): the ONLY place where a convergence claim is decided, using the user-selected criterion. */
+function isConverged(e,resid,crit,tol){
+  /* A root is accepted only when the selected criterion is satisfied AND the residual is small.
+     For the residual criterion, the residual itself is the primary test. */
+  if(crit==='resid') return resid<=tol;
+  const stepOK=crit==='rel'?e.rel<=tol:e.abs<=tol;
+  return stepOK && resid<=tol;
+}
+
+function mkResult(method,headers){return{method,headers,rows:[],status:'INVALID',message:'',ok:false,root:NaN,froot:NaN,iter:0,err:NaN,resid:NaN,ms:0,note:''};}
+function done(r,f,status,message,root,iter,err,resid){
+  Object.assign(r,{status,message,root,froot:Number.isFinite(root)?f(root):NaN,iter,err,resid,ok:status==='CONVERGED'||status==='EXACT'});return r;}
+const okMsg=(p,n)=>p.crit==='resid' ? 'Residual criterion satisfied after '+n+' iteration(s): |f(x)| ≤ '+p.tol+'.' : 'Converged after '+n+' iteration(s): '+CRIT_TEXT[p.crit]+' and residual |f(x)| ≤ '+p.tol+'.';
+const maxMsg=p=>'Maximum iterations ('+p.maxIter+') reached before the '+CRIT_TEXT[p.crit]+' fell below '+p.tol+'. The value shown is NOT a converged solution.';
+
+/* Shared bracket checks for Bisection and False Position. Returns a finished result on failure, otherwise null. */
+function checkBracket(r,f,p){
+  if(!(p.a<p.b))return done(r,f,'INVALID','The lower bound a must be strictly less than the upper bound b.',NaN,0,NaN,NaN);
+  const fa=f(p.a),fb=f(p.b);
+  if(Number.isNaN(fa)||Number.isNaN(fb))return done(r,f,'INVALID','f(x) is undefined at an endpoint (check log/sqrt domains, division by zero, overflow).',NaN,0,NaN,NaN);
+  if(fa===0)return done(r,f,'EXACT','The endpoint a = '+p.a+' is an exact root: f(a) = 0.',p.a,0,0,0);
+  if(fb===0)return done(r,f,'EXACT','The endpoint b = '+p.b+' is an exact root: f(b) = 0.',p.b,0,0,0);
+  if(Math.sign(fa)===Math.sign(fb))return done(r,f,'BRACKET','The sign-change condition f(a)·f(b) < 0 is NOT satisfied (f(a) = '+fa.toPrecision(6)+', f(b) = '+fb.toPrecision(6)+'). A root is not guaranteed in ['+p.a+', '+p.b+'].',NaN,0,NaN,NaN);
+  return null;
+}
+/* solveBisection(): halves the bracket [a,b]; error bound = half-width of the current interval. */
+function solveBisection(f,p){
+  const r=mkResult('bisection',['n','a_n','b_n','x_r','f(x_r)','Error','Residual']);r.a=p.a;r.b=p.b;
+  const bad=checkBracket(r,f,p);if(bad)return bad;
+  let a=p.a,b=p.b,fa=f(a),xr=NaN,se=NaN,res=NaN;
+  for(let n=1;n<=p.maxIter;n++){
+    xr=a+(b-a)/2;const fr=f(xr);
+    if(Number.isNaN(fr))return done(r,f,'DIVERGED','f(x) is undefined at the midpoint x = '+xr+' (the function may have a singularity or domain break inside the bracket).',xr,n,se,res);
+    const e=calculateError((b-a)/2,xr);res=Math.abs(fr);se=shownErr(e,p.crit);
+    r.rows.push([n,a,b,xr,fr,se,res]);
+    if(fr===0)return done(r,f,'EXACT','f(x_r) = 0 exactly at iteration '+n+'.',xr,n,se,res);
+    if(isConverged(e,res,p.crit,p.tol))return done(r,f,'CONVERGED',okMsg(p,n),xr,n,se,res);
+    if(Math.sign(fa)!==Math.sign(fr)){b=xr;}else{a=xr;fa=fr;}
+  }
+  return done(r,f,'MAXITER',maxMsg(p),xr,p.maxIter,se,res);
+}
+/* solveFalsePosition(): secant line through (a,f(a)),(b,f(b)); the bracket always keeps a sign change. */
+function solveFalsePosition(f,p){
+  const r=mkResult('falseposition',['n','a_n','b_n','x_r','f(x_r)','Error','Residual']);r.a=p.a;r.b=p.b;
+  const bad=checkBracket(r,f,p);if(bad)return bad;
+  let a=p.a,b=p.b,fa=f(a),fb=f(b),xr=NaN,xold=NaN,se=NaN,res=NaN;
+  for(let n=1;n<=p.maxIter;n++){
+    const den=fb-fa;
+    if(!(Math.abs(den)>1e-300))return done(r,f,'DIVERGED','Numerical breakdown: f(b) − f(a) is zero or insignificant.',xr,n-1,se,res);
+    xr=(a*fb-b*fa)/den;const fr=f(xr);
+    if(!Number.isFinite(xr)||Number.isNaN(fr))return done(r,f,'DIVERGED','Numerical breakdown: the false-position estimate or f(x_r) is undefined.',xr,n,se,res);
+    const e=calculateError(n===1?Infinity:Math.abs(xr-xold),xr);res=Math.abs(fr);se=shownErr(e,p.crit);
+    r.rows.push([n,a,b,xr,fr,se,res]);
+    if(fr===0)return done(r,f,'EXACT','f(x_r) = 0 exactly at iteration '+n+'.',xr,n,se,res);
+    if(isConverged(e,res,p.crit,p.tol))return done(r,f,'CONVERGED',okMsg(p,n),xr,n,se,res);
+    if(Math.sign(fa)!==Math.sign(fr)){b=xr;fb=fr;}else{a=xr;fa=fr;}
+    xold=xr;
+  }
+  return done(r,f,'MAXITER',maxMsg(p),xr,p.maxIter,se,res);
+}
+/* solveNewtonRaphson(): x_{n+1}=x_n-f(x_n)/f'(x_n) with a numerical or user-supplied derivative. */
+function solveNewtonRaphson(f,p){
+  const r=mkResult('newton',['n','x_n','f(x_n)','f′(x_n)','x_{n+1}','Error','Residual']);r.x0=p.x0;
+  let x=p.x0,se=NaN,res=NaN;
+  for(let n=1;n<=p.maxIter;n++){
+    const fx=f(x);
+    if(Number.isNaN(fx))return done(r,f,'DIVERGED','f(x) is undefined at x_n = '+x+'.',x,n-1,se,res);
+    if(fx===0)return done(r,f,'EXACT','f(x_n) = 0 exactly at x = '+x+'.',x,n-1,0,0);
+    const d=p.df?p.df(x):numericalDerivative(f,x);
+    const derivativeStep=Math.pow(Number.EPSILON,1/5)*Math.max(1,Math.abs(x));
+    /* Numerical differences can be dominated by cancellation when f is nearly flat. */
+    const derivativeFloor=p.df ? 64*Number.EPSILON*Math.max(1,Math.abs(fx)/Math.max(1,Math.abs(x))) :
+      32*Number.EPSILON*Math.max(1,Math.abs(fx))/Math.max(derivativeStep,Number.EPSILON);
+    if(!Number.isFinite(d)||Math.abs(d)<=derivativeFloor){r.rows.push([n,x,fx,d,NaN,NaN,Math.abs(fx)]);
+      return done(r,f,'DERIV','Derivative failure: f′(x_n) is zero, non-finite, or too small to distinguish reliably from numerical noise at x_n = '+x+'. The Newton step cannot be computed reliably.',x,n,se,Math.abs(fx));}
+    const xn=x-fx/d,fn=f(xn);
+    if(!Number.isFinite(xn)||Math.abs(xn)>1e12)return done(r,f,'DIVERGED','Divergence: the Newton iterate left the range |x| ≤ 1e12.',x,n,se,res);
+    if(Number.isNaN(fn))return done(r,f,'DIVERGED','f(x) is undefined at the next iterate x = '+xn+'.',xn,n,se,res);
+    const e=calculateError(Math.abs(xn-x),xn);res=Math.abs(fn);se=shownErr(e,p.crit);
+    r.rows.push([n,x,fx,d,xn,se,res]);x=xn;
+    if(isConverged(e,res,p.crit,p.tol))return done(r,f,'CONVERGED',okMsg(p,n),x,n,se,res);
+  }
+  return done(r,f,'MAXITER',maxMsg(p),x,p.maxIter,se,res);
+}
+/* solveFixedPoint(): x_{n+1}=g(x_n); convergence depends on the chosen g (|g'(x*)|<1 is sufficient locally). */
+function solveFixedPoint(f,g,p){
+  const r=mkResult('fixed',['n','x_n','g(x_n)','f(x_n)','Error','Residual']);r.x0=p.x0;
+  let x=p.x0,prevPrev=NaN,se=NaN,res=NaN;
+  for(let n=1;n<=p.maxIter;n++){
+    const gx=g(x),fx=f(x);
+    if(!Number.isFinite(gx))return done(r,f,'DIVERGED','g(x) is undefined or overflowed at x_n = '+x+'.',x,n-1,se,res);
+    if(!Number.isFinite(fx))return done(r,f,'DIVERGED','f(x) is undefined at x_n = '+x+'.',x,n-1,se,res);
+    const nextFx=f(gx);
+    if(!Number.isFinite(nextFx))return done(r,f,'DIVERGED','f(x) is undefined at the next iterate x = '+gx+'.',gx,n,se,NaN);
+    const e=calculateError(Math.abs(gx-x),gx);
+    res=Math.abs(nextFx);se=shownErr(e,p.crit);
+    r.rows.push([n,x,gx,fx,se,Math.abs(fx)]);
+
+    /* For a residual criterion, verify the candidate x_(n+1); for step criteria,
+       require BOTH a small step and a small residual at that candidate. */
+    if(isConverged(e,res,p.crit,p.tol))
+      return done(r,f,nextFx===0?'EXACT':'CONVERGED',nextFx===0?'The next iterate is an exact root.':okMsg(p,n),gx,n,se,res);
+
+    /* A zero step with a nonzero residual is a fixed point of g, not a root of f. */
+    if(e.abs===0 && res>p.tol)
+      return done(r,f,'DIVERGED','Stagnation: g(x_n) = x_n, but |f(x_n)| = '+res.toExponential(3)+'. This fixed point of g is not a root of f.',gx,n,se,res);
+    if(Math.abs(gx)>LIMITS.maxAbs)
+      return done(r,f,'DIVERGED','Divergence: |x_n| exceeded '+LIMITS.maxAbs+' after '+n+' iterations.',gx,n,se,res);
+
+    /* Detect a two-cycle: x_(n+1) approximately equals x_(n-1), while the step remains non-small. */
+    if(Number.isFinite(prevPrev) && Math.abs(gx-prevPrev)<=1e-12*Math.max(1,Math.abs(gx)) && e.abs>p.tol)
+      return done(r,f,'DIVERGED','Oscillation detected: the iterates appear to form a two-cycle rather than converge.',gx,n,se,res);
+    prevPrev=x;
+    x=gx;
+  }
+  return done(r,f,'MAXITER',maxMsg(p),x,p.maxIter,se,res);
+}
+/* num(): strict numeric validation — invalid input is reported, never replaced by a default. */
+function num(v,label){
+  if(v===null||v===undefined||String(v).trim()==='')throw new Error(label+' is required.');
+  const x=Number(String(v).trim());
+  if(!Number.isFinite(x)||Math.abs(x)>LIMITS.maxAbs)throw new Error(label+' must be a finite number with magnitude at most 1e12.');
+  return x;
+}
+/* solve(): validates all inputs, runs the chosen method and returns a result object (never throws). */
+function solve(method,o){
+  const t0=performance.now();let res,f,g;
+  try{
+    f=parseEquation(o.eq).f;
+    const tol=num(o.tol,'Tolerance'),maxIter=num(o.maxIter,'Maximum iterations');
+    if(!(tol>0&&tol<1))throw new Error('Tolerance must satisfy 0 < tolerance < 1.');
+    if(!Number.isInteger(maxIter)||maxIter<1||maxIter>LIMITS.maxIter)throw new Error('Maximum iterations must be an integer between 1 and '+LIMITS.maxIter+'.');
+    if(!CRIT_TEXT[o.crit])throw new Error('Unknown convergence criterion.');
+    const p={tol,maxIter,crit:o.crit};
+    if(method==='bisection'||method==='falseposition'){
+      p.a=num(o.a,'Lower bound a');p.b=num(o.b,'Upper bound b');
+      res=(method==='bisection'?solveBisection:solveFalsePosition)(f,p);
+    }else if(method==='newton'){
+      p.x0=num(o.x0,'Initial approximation x₀');
+      if(o.df&&o.df.trim())p.df=compileExpr(o.df);
+      res=solveNewtonRaphson(f,p);
+    }else if(method==='fixed'){
+      p.x0=num(o.x0,'Initial approximation x₀');
+      if(!o.g||!o.g.trim())throw new Error('The iteration function g(x) is required for fixed-point iteration.');
+      g=compileExpr(o.g);res=solveFixedPoint(f,g,p);res.g=g;
+      const d=Math.abs(numericalDerivative(g,res.root));
+      res.note=Number.isFinite(d)?'|g′(x*)| ≈ '+d.toPrecision(4)+(d<1?' < 1: the local contraction condition appears satisfied.':' ≥ 1: the local contraction condition is NOT satisfied; convergence is not expected.'):'|g′| could not be evaluated at the final iterate.';
+      if(res.ok&&res.froot>1e-3)res.note+=' Warning: |f(x*)| = '+res.froot.toExponential(3)+', so this fixed point of g is not a root of f.';
+    }else throw new Error('Unknown method.');
+    res.f=f;
+  }catch(e){res=mkResult(method,[]);res.status='INVALID';res.message=e.message;}
+  res.ms=performance.now()-t0;return res;
+}
+/* runSelfTests(): acceptance tests 1-9 (test 10, offline operation, is manual). */
+function runSelfTests(){
+  const D={tol:'1e-6',maxIter:'100',crit:'abs'},T=[];
+  const add=(n,input,expected,r,pass)=>T.push({n,input,expected,actual:(Number.isFinite(r.root)?'root = '+r.root.toFixed(6)+'; ':'')+STATUS_TEXT[r.status]+' ('+r.iter+' it.)',pass});
+  let r=solve('bisection',{...D,eq:'x^3-x-2=0',a:1,b:2});add(1,'Bisection, x^3-x-2, [1,2]','≈ 1.52138',r,r.ok&&Math.abs(r.root-1.52138)<1e-5);
+  r=solve('falseposition',{...D,eq:'x^2-5=0',a:2,b:3});add(2,'False Position, x^2-5, [2,3]','≈ 2.23607',r,r.ok&&Math.abs(r.root-2.23607)<1e-5);
+  r=solve('newton',{...D,eq:'cos(x)-x=0',x0:0.5});add(3,'Newton, cos(x)-x, x0=0.5','≈ 0.739085',r,r.ok&&Math.abs(r.root-0.739085)<1e-5);
+  r=solve('fixed',{...D,eq:'x^2-5=0',g:'(x+5/x)/2',x0:2});add(4,'Fixed point, g=(x+5/x)/2, x0=2','≈ 2.23607',r,r.ok&&Math.abs(r.root-2.23607)<1e-5&&r.resid<=1e-6);
+  r=solve('bisection',{...D,eq:'e^(-x)-x=0',a:0,b:1});add(5,'Bisection, e^(-x)-x, [0,1]','≈ 0.567143',r,r.ok&&Math.abs(r.root-0.567143)<1e-5);
+  r=solve('bisection',{...D,eq:'x^2+1=0',a:-1,b:1});add(6,'Bisection, x^2+1, [-1,1]','Invalid bracket reported',r,r.status==='BRACKET');
+  r=solve('newton',{...D,eq:'x^3+1=0',x0:0});add(7,'Newton, x^3+1, x0=0','Derivative failure reported',r,r.status==='DERIV');
+  r=solve('fixed',{...D,eq:'x^2-5=0',g:'2*x',x0:1});add(8,'Fixed point, g=2x, x0=1','Divergence or iteration limit reported',r,r.status==='DIVERGED'||r.status==='MAXITER');
+  const A=parseEquation('x^2-5=0').f,B=parseEquation('x^2=5').f;
+  const r1=solve('bisection',{...D,eq:'x^2-5=0',a:2,b:3}),r2=solve('bisection',{...D,eq:'x^2=5',a:2,b:3});
+  add(9,'Parse x^2-5=0 vs x^2=5','Identical f and root',r2,[0.5,1.7,2.9].every(x=>A(x)===B(x))&&r1.root===r2.root);
+  r=solve('fixed',{...D,eq:'x^2-5=0',g:'1',x0:1});add(10,'False convergence: f=x^2-5, g=1, x0=1','Must not report converged root',r,!r.ok&&r.status==='DIVERGED'&&r.resid>1);
+  const negSquare=compileExpr('-x^2');add(11,'Parser precedence: -x^2 at x=3','-9', {root:negSquare(3),status:'CONVERGED',iter:0},negSquare(3)===-9);
+  r=solve('bisection',{...D,eq:'1/(x-1)=0',a:0,b:2});add(12,'Discontinuous sign change, 1/(x-1), [0,2]','Must not be described as guaranteed root',r,r.status!=='CONVERGED'||r.resid<=1e-6);
+  return T;
+}
+</script>
+
+<!-- ===================== USER INTERFACE ===================== -->
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let last=null;
+const EXAMPLES=[
+ {n:'Polynomial: x³ − x − 2 = 0',eq:'x^3-x-2=0',a:1,b:2,x0:1.5,g:'(x+2)^(1/3)'},
+ {n:'Square root: x² − 5 = 0',eq:'x^2-5=0',a:2,b:3,x0:2,g:'(x+5/x)/2'},
+ {n:'Exponential: e^(−x) − x = 0',eq:'e^(-x)-x=0',a:0,b:1,x0:0.5,g:'exp(-x)'},
+ {n:'Trigonometric: cos x − x = 0',eq:'cos(x)-x=0',a:0,b:1,x0:0.5,g:'cos(x)'}];
+const THEORY={
+bisection:`<ul><li><b>Principle:</b> if f is continuous on [a,b] and f(a)f(b)&lt;0, the Intermediate Value Theorem guarantees a root in (a,b).</li>
+<li><b>Formula:</b> x<sub>r</sub> = (a+b)/2; keep the half whose end-points still have opposite signs.</li>
+<li><b>Algorithm:</b> (1) verify the bracket; (2) compute x<sub>r</sub> and f(x<sub>r</sub>); (3) replace a or b by x<sub>r</sub> according to the sign; (4) stop when the chosen criterion is met or the iteration limit is reached.</li>
+<li><b>Convergence:</b> always converges for a continuous function with a valid bracket; error ≤ (b−a)/2<sup>n</sup>, i.e. linear with ratio 1/2.</li>
+<li><b>Advantages:</b> robust, simple, rigorous error bound.</li><li><b>Limitations:</b> slow; cannot detect roots where f does not change sign (e.g. double roots).</li>
+<li><b>Failure cases:</b> no sign change, discontinuities (a pole can be mistaken for a root), undefined f inside the bracket.</li>
+<li><b>Complexity:</b> one function evaluation per iteration; about log<sub>2</sub>((b−a)/tol) iterations.</li></ul>`,
+falseposition:`<ul><li><b>Principle:</b> replace f by the straight line through (a,f(a)) and (b,f(b)) and take its zero, keeping a bracket.</li>
+<li><b>Formula:</b> x<sub>r</sub> = (a f(b) − b f(a)) / (f(b) − f(a)).</li>
+<li><b>Algorithm:</b> (1) verify the bracket; (2) compute x<sub>r</sub>; (3) retain the sub-interval with a sign change; (4) test the stopping criterion.</li>
+<li><b>Convergence:</b> guaranteed for continuous f with a valid bracket; generally linear, often faster than bisection.</li>
+<li><b>Advantages:</b> bracketing safety with secant-like speed. <b>Limitations:</b> one end-point may stay fixed, causing slow convergence for strongly convex or concave f; the bracket width need not shrink to zero, so the step error is used instead.</li>
+<li><b>Failure cases:</b> invalid bracket, f(b) ≈ f(a), discontinuities.</li><li><b>Complexity:</b> one evaluation per iteration.</li></ul>`,
+newton:`<ul><li><b>Principle:</b> linearise f at x<sub>n</sub> by its tangent and move to the tangent's zero.</li>
+<li><b>Formula:</b> x<sub>n+1</sub> = x<sub>n</sub> − f(x<sub>n</sub>)/f′(x<sub>n</sub>); f′ is a five-point central difference unless supplied.</li>
+<li><b>Algorithm:</b> (1) choose x₀; (2) evaluate f and f′; (3) reject a tiny or undefined f′; (4) update; (5) test the criterion.</li>
+<li><b>Convergence:</b> quadratic near a simple root when f′(x*)≠0 and x₀ is close enough; only linear for repeated roots.</li>
+<li><b>Advantages:</b> very fast. <b>Limitations:</b> needs a good starting value and a non-vanishing derivative; no bracketing guarantee.</li>
+<li><b>Failure cases:</b> f′(x<sub>n</sub>)=0 (e.g. x³+1 at x₀=0), cycling, divergence, leaving the domain of f.</li>
+<li><b>Complexity:</b> one f and one f′ evaluation (five f-evaluations if numerical) per iteration.</li></ul>`,
+fixed:`<ul><li><b>Principle:</b> rewrite f(x)=0 as x=g(x) and iterate; a root of f is a fixed point of g.</li>
+<li><b>Formula:</b> x<sub>n+1</sub> = g(x<sub>n</sub>).</li>
+<li><b>Algorithm:</b> (1) supply g and x₀; (2) compute g(x<sub>n</sub>) and f(x<sub>n</sub>); (3) test the criterion; (4) set x<sub>n+1</sub>=g(x<sub>n</sub>); (5) watch for divergence or stagnation.</li>
+<li><b>Convergence:</b> if g is a contraction near x* (|g′(x*)|&lt;1) and x₀ is close, the convergence is linear with ratio |g′(x*)|. Not every equation has a convergent fixed-point form.</li>
+<li><b>Advantages:</b> simple, no derivative of f. <b>Limitations:</b> convergence depends entirely on the choice of g.</li>
+<li><b>Failure cases:</b> |g′|≥1 (e.g. g=2x), oscillation, overflow, g whose fixed point is not a root of f.</li>
+<li><b>Complexity:</b> one g and one f evaluation per iteration.</li></ul>`};
+
+/* onMethodChange(): shows only the parameters that the selected method needs. */
+function onMethodChange(){
+  const m=$('method').value,br=m==='bisection'||m==='falseposition';
+  $('brA').classList.toggle('hide',!br);$('brB').classList.toggle('hide',!br);
+  $('x0box').classList.toggle('hide',br);$('dfbox').classList.toggle('hide',m!=='newton');$('gbox').classList.toggle('hide',m!=='fixed');
+  $('theory').innerHTML=THEORY[m];
+}
+function readOptions(){return{eq:$('eq').value,a:$('a').value,b:$('b').value,x0:$('x0').value,g:$('g').value,df:$('df').value,tol:$('tol').value,maxIter:$('maxIter').value,crit:$('crit').value};}
+function fmt(v){if(!Number.isFinite(v))return'—';if(Number.isInteger(v)&&Math.abs(v)<1e6)return String(v);
+  return(v!==0&&(Math.abs(v)<1e-4||Math.abs(v)>=1e7))?v.toExponential(5):v.toFixed(8);}
+const fmtS=v=>Number.isFinite(v)?v.toPrecision(10):'—';
+
+
+/* detectVerifiedRationalRoot(): searches for a simple rational representation
+   near the numerical root, then verifies the candidate against the original
+   function. This is a numerical verification aid—not a general symbolic solver. */
+function detectVerifiedRationalRoot(f, root){
+  if(!Number.isFinite(root)) return null;
+  const maxDenominator = 100;
+  const residualTolerance = 1e-10;
+  let best = null;
+
+  for(let denominator=1; denominator<=maxDenominator; denominator++){
+    const numerator = Math.round(root*denominator);
+    const candidate = numerator/denominator;
+    if(Math.abs(candidate-root) > 1e-9*Math.max(1,Math.abs(root))) continue;
+
+    let residual;
+    try { residual = f(candidate); } catch(e) { continue; }
+    if(!Number.isFinite(residual)) continue;
+
+    const scale = Math.max(1, Math.abs(root));
+    if(Math.abs(residual) <= residualTolerance*scale){
+      let n=numerator, d=denominator;
+      const gcd=(a,b)=>b===0?Math.abs(a):gcd(b,a%b);
+      const divisor=gcd(n,d);
+      n/=divisor; d/=divisor;
+      best={value:candidate,numerator:n,denominator:d,residual:residual};
+      break; // first simplest verified representation
+    }
+  }
+  if(!best) return null;
+  best.label = best.denominator===1 ? String(best.numerator) : best.numerator+'/'+best.denominator;
+  return best;
+}
+
+/* renderSummary(): status banner and summary cards. */
+function renderSummary(r){
+  const cls=r.ok?'ok':(r.status==='MAXITER'?'warn':'err');
+  let h='<div class="msg '+cls+'">'+esc(STATUS_TEXT[r.status])+' — '+esc(r.message)+'</div>';
+  if(r.note)h+='<div class="msg warn">'+esc(r.note)+'</div>';
+  if(Number.isFinite(r.root)){
+    const rational = r.f ? detectVerifiedRationalRoot(r.f,r.root) : null;
+    h+='<div class="sum"><div><small>Computed root (numerical)</small><b>'+r.root.toPrecision(12)+'</b></div>'+
+      '<div><small>Verified exact-rational candidate</small><b>'+(rational ? esc(rational.label) : 'Not identified')+'</b>'+
+      '<small>'+(rational ? 'Candidate residual: '+fmtS(rational.residual)+'; verified against f(x).' : 'No simple rational candidate verified. The root may be irrational or require symbolic analysis.')+'</small></div>'+
+      '<div><small>f(root)</small><b>'+fmtS(r.froot)+'</b></div>'+
+      '<div><small>Iterations</small><b>'+r.iter+'</b></div><div><small>Final error</small><b>'+fmtS(r.err)+'</b></div><div><small>Final residual</small><b>'+fmtS(r.resid)+'</b></div>'+
+      '<div><small>Status</small><b>'+esc(STATUS_TEXT[r.status])+'</b></div><div><small>Execution time</small><b>'+r.ms.toFixed(2)+' ms</b></div></div>';
+  }
+  $('summary').innerHTML=h;
+}
+/* renderIterationTable(): builds the table dynamically from the result headers and rows. */
+function renderIterationTable(r){
+  if(!r.rows.length){$('tbl').innerHTML='<p class="note">No iterations were performed.</p>';return;}
+  $('tbl').innerHTML='<table><thead><tr>'+r.headers.map(h=>'<th scope="col">'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+
+   r.rows.map(row=>'<tr>'+row.map(fmt).map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+}
+/* exportResultsCSV(): downloads the iteration table with full numeric precision. */
+function exportResultsCSV(){
+  if(!last||!last.rows.length){alert('There is no iteration table to export. Solve an equation first.');return;}
+  const csv=[last.headers.join(',')].concat(last.rows.map(r=>r.map(v=>Number.isFinite(v)?String(v):'').join(','))).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='gnana_iterations_'+last.method+'.csv';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function niceTicks(lo,hi,n){
+  const raw=(hi-lo)/n,pw=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/pw,step=(f<1.5?1:f<3?2:f<7?5:10)*pw,t=[];
+  for(let v=Math.ceil(lo/step)*step;v<=hi+step*1e-9;v+=step)t.push(+v.toPrecision(12));return t;}
+const tickLbl=v=>(Math.abs(v)>=1e5||(v!==0&&Math.abs(v)<1e-3))?v.toExponential(1):String(+v.toPrecision(4));
+
+/* drawFunctionGraph(): SVG plot of f (and g, y=x for fixed point) with markers; curves are broken at undefined values / jumps. */
+function drawFunctionGraph(el,r,xmin,xmax){
+  const W=720,H=380,L=56,R=14,T=28,B=32,pw=W-L-R,ph=H-T-B,N=600;
+  const curves=[{fn:r.f,c:'#0b2447',name:'y = f(x)'}];
+  if(r.method==='fixed'&&r.g)curves.push({fn:r.g,c:'#b08d3c',name:'y = g(x)'},{fn:x=>x,c:'#777',name:'y = x',dash:'5 4'});
+  const xs=[...Array(N+1)].map((_,i)=>xmin+(xmax-xmin)*i/N);
+  curves.forEach(c=>c.ys=xs.map(x=>c.fn(x)));
+  const all=[].concat(...curves.map(c=>c.ys.filter(Number.isFinite))).sort((p,q)=>p-q);
+  if(!all.length){el.innerHTML='<text x="20" y="40" fill="#b3261e">f(x) is undefined on the whole plotting interval.</text>';return;}
+  let lo=Math.min(all[Math.floor(all.length*.03)],0),hi=Math.max(all[Math.floor(all.length*.97)],0);
+  if(hi-lo<1e-9){lo-=1;hi+=1;}const pad=(hi-lo)*.08;lo-=pad;hi+=pad;
+  const sx=x=>L+(x-xmin)/(xmax-xmin)*pw,sy=y=>Math.max(-1e4,Math.min(1e4,T+(hi-y)/(hi-lo)*ph));
+  let s='<defs><clipPath id="clp"><rect x="'+L+'" y="'+T+'" width="'+pw+'" height="'+ph+'"/></clipPath></defs>';
+  niceTicks(xmin,xmax,7).forEach(v=>s+='<line x1="'+sx(v)+'" x2="'+sx(v)+'" y1="'+T+'" y2="'+(T+ph)+'" stroke="#e3e6ec"/><text x="'+sx(v)+'" y="'+(H-12)+'" font-size="11" text-anchor="middle" fill="#0b2447">'+tickLbl(v)+'</text>');
+  niceTicks(lo,hi,6).forEach(v=>s+='<line y1="'+sy(v)+'" y2="'+sy(v)+'" x1="'+L+'" x2="'+(L+pw)+'" stroke="#e3e6ec"/><text x="'+(L-5)+'" y="'+(sy(v)+4)+'" font-size="11" text-anchor="end" fill="#0b2447">'+tickLbl(v)+'</text>');
+  s+='<rect x="'+L+'" y="'+T+'" width="'+pw+'" height="'+ph+'" fill="none" stroke="#9aa4b5"/><g clip-path="url(#clp)">';
+  s+='<line x1="'+L+'" x2="'+(L+pw)+'" y1="'+sy(0)+'" y2="'+sy(0)+'" stroke="#0b2447" stroke-width="1.5"/>';
+  if(xmin<=0&&xmax>=0)s+='<line x1="'+sx(0)+'" x2="'+sx(0)+'" y1="'+T+'" y2="'+(T+ph)+'" stroke="#0b2447" stroke-width="1.5"/>';
+  if(r.a!==undefined)s+='<rect x="'+sx(r.a)+'" y="'+T+'" width="'+Math.max(2,sx(r.b)-sx(r.a))+'" height="'+ph+'" fill="#b08d3c" opacity=".16"/>';
+  if(r.x0!==undefined)s+='<line x1="'+sx(r.x0)+'" x2="'+sx(r.x0)+'" y1="'+T+'" y2="'+(T+ph)+'" stroke="#b08d3c" stroke-dasharray="6 4" stroke-width="2"/>';
+  curves.forEach(c=>{let d='',pen=false,py=0;
+    c.ys.forEach((y,i)=>{if(!Number.isFinite(y)){pen=false;return;}if(pen&&Math.abs(y-py)>0.5*(hi-lo))pen=false;
+      d+=(pen?'L':'M')+sx(xs[i]).toFixed(1)+' '+sy(y).toFixed(1);pen=true;py=y;});
+    s+='<path d="'+d+'" fill="none" stroke="'+c.c+'" stroke-width="2"'+(c.dash?' stroke-dasharray="'+c.dash+'"':'')+'/>';});
+  if(r.method==='fixed'&&r.rows.length){
+    /* Standard cobweb starts at (x0,x0), then alternates vertical and horizontal segments. */
+    let pts=[[r.x0,r.x0]];
+    r.rows.slice(0,60).forEach(w=>{pts.push([w[1],w[2]],[w[2],w[2]]);});
+    s+='<polyline fill="none" stroke="#2e7d4f" stroke-width="1.5" points="'+pts.filter(q=>Number.isFinite(q[0])&&Number.isFinite(q[1])).map(q=>sx(q[0]).toFixed(1)+','+sy(q[1]).toFixed(1)).join(' ')+'"/>';}
+  if(Number.isFinite(r.root))s+='<circle cx="'+sx(r.root)+'" cy="'+sy(0)+'" r="6" fill="#c0392b" stroke="#fff" stroke-width="1.5"/>';
+  s+='</g>';
+  curves.forEach((c,i)=>s+='<line x1="'+(L+8+i*120)+'" x2="'+(L+30+i*120)+'" y1="14" y2="14" stroke="'+c.c+'" stroke-width="2"'+(c.dash?' stroke-dasharray="5 4"':'')+'/><text x="'+(L+34+i*120)+'" y="18" font-size="12" fill="#0b2447">'+c.name+'</text>');
+  if(Number.isFinite(r.root))s+='<text x="'+(W-R)+'" y="18" font-size="12" text-anchor="end" fill="#c0392b">root ≈ '+r.root.toPrecision(8)+'</text>';
+  el.innerHTML=s;
+}
+/* drawConvergence(): log10 of the residual against the iteration number. */
+function drawConvergence(el,r){
+  if(!r.rows.length){el.innerHTML='<text x="20" y="40" fill="#0b2447">No iteration history.</text>';return;}
+  const W=720,H=260,L=56,R=14,T=14,B=34,pw=W-L-R,ph=H-T-B,ri=r.headers.length-1;
+  const ys=r.rows.map(w=>Math.log10(Math.max(w[ri],1e-17))),n=r.rows.length;
+  let lo=Math.min(...ys),hi=Math.max(...ys);if(hi-lo<1){lo-=.5;hi+=.5;}const pad=(hi-lo)*.1;lo-=pad;hi+=pad;
+  const x1=1,x2=Math.max(n,2),sx=i=>L+(i-x1)/(x2-x1)*pw,sy=y=>T+(hi-y)/(hi-lo)*ph;
+  let s='<rect x="'+L+'" y="'+T+'" width="'+pw+'" height="'+ph+'" fill="none" stroke="#9aa4b5"/>';
+  niceTicks(lo,hi,5).forEach(v=>s+='<line x1="'+L+'" x2="'+(L+pw)+'" y1="'+sy(v)+'" y2="'+sy(v)+'" stroke="#e3e6ec"/><text x="'+(L-5)+'" y="'+(sy(v)+4)+'" font-size="11" text-anchor="end" fill="#0b2447">'+tickLbl(v)+'</text>');
+  niceTicks(x1,x2,8).forEach(v=>s+='<text x="'+sx(v)+'" y="'+(H-16)+'" font-size="11" text-anchor="middle" fill="#0b2447">'+tickLbl(v)+'</text>');
+  s+='<polyline fill="none" stroke="#0b2447" stroke-width="2" points="'+ys.map((y,i)=>sx(i+1).toFixed(1)+','+sy(y).toFixed(1)).join(' ')+'"/>';
+  ys.forEach((y,i)=>s+='<circle cx="'+sx(i+1)+'" cy="'+sy(y)+'" r="3" fill="#b08d3c"/>');
+  s+='<text x="'+(L+pw/2)+'" y="'+(H-3)+'" font-size="12" text-anchor="middle" fill="#0b2447">iteration n</text><text x="12" y="'+(T+ph/2)+'" font-size="12" fill="#0b2447" transform="rotate(-90 12 '+(T+ph/2)+')" text-anchor="middle">log10 |f(x)|</text>';
+  el.innerHTML=s;
+}
+/* autoRange(): chooses a plotting interval around the bracket / guess / root. */
+function autoRange(r){
+  let lo,hi;if(r.a!==undefined){lo=r.a;hi=r.b;}else{lo=hi=r.x0;}
+  if(Number.isFinite(r.root)){lo=Math.min(lo,r.root);hi=Math.max(hi,r.root);}
+  if(!Number.isFinite(lo)||!Number.isFinite(hi)){lo=-5;hi=5;}
+  const span=hi-lo,pad=span<1?1.5:.25*span;$('xmin').value=+(lo-pad).toPrecision(5);$('xmax').value=+(hi+pad).toPrecision(5);
+}
+/* drawAll(): validates the plotting range and redraws both graphs. */
+function drawAll(){
+  if(!last||!last.f){$('graph').innerHTML='';$('conv').innerHTML='';return;}
+  const a=Number($('xmin').value),b=Number($('xmax').value);
+  if($('xmin').value===''||$('xmax').value===''||!Number.isFinite(a)||!Number.isFinite(b)||a>=b||Math.abs(a)>1e12||Math.abs(b)>1e12){
+    $('graph').innerHTML='<text x="20" y="40" fill="#b3261e">Plot range invalid: x min must be a number smaller than x max.</text>';return;}
+  drawFunctionGraph($('graph'),last,a,b);drawConvergence($('conv'),last);
+}
+function onSolve(){last=solve($('method').value,readOptions());renderSummary(last);renderIterationTable(last);if(last.f)autoRange(last);drawAll();}
+/* resetApplication(): restores all defaults and clears outputs. */
+function resetApplication(){
+  ['eq','df','g','xmin','xmax'].forEach(i=>$(i).value='');
+  $('a').value=1;$('b').value=2;$('x0').value=1.5;$('tol').value='1e-6';$('maxIter').value=100;$('crit').value='abs';$('method').value='bisection';
+  last=null;$('summary').innerHTML='Press <b>Solve</b> to compute.';$('tbl').innerHTML='';$('graph').innerHTML='';$('conv').innerHTML='';$('testOut').innerHTML='';onMethodChange();
+}
+function loadExample(){
+  const e=EXAMPLES[$('example').value];$('eq').value=e.eq;$('a').value=e.a;$('b').value=e.b;$('x0').value=e.x0;$('g').value=e.g;
+  $('exnote').innerHTML='Example loaded: bracket ['+e.a+', '+e.b+'], x₀ = '+e.x0+', g(x) = '+esc(e.g)+'. Numerical methods return an <b>approximation</b> to a root, not a closed-form solution.';
+}
+function showTests(){
+  const T=runSelfTests();
+  $('testOut').innerHTML='<table><thead><tr><th>#</th><th>Input</th><th>Expected</th><th>Actual</th><th>Result</th></tr></thead><tbody>'+
+   T.map(t=>'<tr><td>'+t.n+'</td><td class="pf">'+esc(t.input)+'</td><td class="pf">'+esc(t.expected)+'</td><td class="pf">'+esc(t.actual)+'</td><td class="pf"><b>'+(t.pass?'PASS':'FAIL')+'</b></td></tr>').join('')+'</tbody></table>';
+}
+EXAMPLES.forEach((e,i)=>$('example').add(new Option(e.n,i)));
+$('method').addEventListener('change',onMethodChange);
+$('btnSolve').addEventListener('click',onSolve);$('btnReset').addEventListener('click',resetApplication);
+$('btnEx').addEventListener('click',loadExample);$('btnCsv').addEventListener('click',exportResultsCSV);
+$('btnPrint').addEventListener('click',()=>window.print());$('btnPlot').addEventListener('click',drawAll);
+$('btnZoom').addEventListener('click',()=>{if(last&&last.f){autoRange(last);drawAll();}});$('btnTest').addEventListener('click',showTests);
+document.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();onSolve();}}));
+onMethodChange();
+</script>
+<script>
+/* Voice input, root interval scan, and offline rule-based tutor. */
+let gnanaRecognition=null, gnanaAnswer='', gnanaListening=false;
+const $g=id=>document.getElementById(id);
+function voiceStatus(s,kind='note'){
+ const el=$g('voiceStatus');
+ el.className='msg '+(kind==='error'?'err':kind==='success'?'ok':kind==='warn'?'warn':'');
+ el.textContent=s;
+}
+function voiceErrorHelp(code){
+ const tips={
+  'not-allowed':'Microphone permission was denied or blocked. Allow microphone access in browser/site settings, then try again.',
+  'service-not-allowed':'The browser speech service is blocked or unavailable. Try Chrome/Edge and check browser settings.',
+  'audio-capture':'No usable microphone was found. Check the microphone, its connection, and operating-system permissions.',
+  'network':'The speech service could not connect. Check internet access and try again; voice recognition may be online-dependent.',
+  'no-speech':'No speech was detected. Tap Speak equation, wait for Listening…, then speak clearly near the microphone.',
+  'aborted':'Listening was cancelled.',
+  'language-not-supported':'This browser speech service does not support the selected language. Try another English option.',
+  'bad-grammar':'The browser speech service could not process the speech request. Try again or type the equation.'
+ };
+ return tips[code]||('Speech recognition failed ('+code+'). Check browser support, microphone permission and internet access, then try again.');
+}
+function spokenToEquation(raw){
+ // Normalize speech transcripts before converting them to mathematical notation.
+ let t=String(raw||'').toLowerCase().trim();
+
+ // Convert spoken number words to numeric strings. These are used for powers
+ // and for ordinary constants elsewhere in the spoken equation.
+ const numberWords={
+  'zero':'0','one':'1','two':'2','three':'3','four':'4','five':'5',
+  'six':'6','seven':'7','eight':'8','nine':'9','ten':'10',
+  'eleven':'11','twelve':'12','thirteen':'13','fourteen':'14',
+  'fifteen':'15','sixteen':'16','seventeen':'17','eighteen':'18',
+  'nineteen':'19','twenty':'20'
+ };
+ const numberPattern='(?:'+Object.keys(numberWords).join('|')+'|\\d+(?:\\.\\d+)?)';
+
+ // Handle fractional exponent phrases before general number-word conversion.
+ // Examples: "x to the power of one half" -> "x^(1/2)".
+ t=t.replace(/\b([a-z])\s+(?:(?:raised|raise)\s+)?to\s+the\s+power\s+of\s+(?:one\s+half|a\s+half|half)\b/g,
+             '$1^(1/2)');
+ t=t.replace(/\b([a-z])\s+(?:power|exponent)\s+(?:one\s+half|a\s+half|half)\b/g,
+             '$1^(1/2)');
+
+ // General spoken powers: "x to the power of four", "x power 4",
+ // "x raised to minus two", "x exponent ten", etc.
+ const powerPattern=new RegExp(
+  '\\b([a-z])\\s+(?:(?:raised|raise)\\s+to\\s+(?:the\\s+)?(?:power\\s+of\\s+)?)?' +
+  '(?:to\\s+(?:the\\s+)?power\\s+of\\s+|to\\s+power\\s+of\\s+|power\\s+of\\s+|power\\s+|exponent\\s+)' +
+  '(minus\\s+)?('+numberPattern+')\\b','g');
+ t=t.replace(powerPattern,(match,variable,minus,exponent)=>{
+  const exp=numberWords[exponent]||exponent;
+  return variable+'^'+(minus?'-':'')+exp;
+ });
+
+ // Common equation and operation phrases.
+ const rules=[
+  [/\b(the equation is|please solve|solve|equation)\b/g,''],
+  [/\bto the power of\b/g,'^'],[/\bsquared\b/g,'^2'],[/\bcubed\b/g,'^3'],
+  [/\bopen parenthesis\b/g,'('],[/\bclose parenthesis\b/g,')'],
+  [/\bplus\b/g,'+'],[/\bminus\b/g,'-'],[/\b(multiplied by|times)\b/g,'*'],[/\bdivided by\b/g,'/'],
+  [/\b(equals|equal to|is equal to)\b/g,'='],
+  [/\bsquare root of\b/g,'sqrt('],[/\bnatural log of\b/g,'ln('],[/\blog of\b/g,'log('],
+  [/\b([a-z])\s+to the square\b/g,'$1^2'],
+  [/\b([a-z])\s+(square|squared)\b/g,'$1^2'],
+  [/\bsine\b/g,'sin'],[/\bcosine\b/g,'cos'],[/\btangent\b/g,'tan'],
+  [/\bnegative\b/g,'-'],[/\bdecimal point\b/g,'.']
+ ];
+ rules.forEach(([re,v])=>t=t.replace(re,v));
+
+ // Replace number words only after exponent phrases have been captured.
+ Object.keys(numberWords).sort((a,b)=>b.length-a.length).forEach(word=>{
+  t=t.replace(new RegExp('\\b'+word+'\\b','g'),numberWords[word]);
+ });
+ return t.replace(/\s+/g,'').replace(/[^a-z0-9.+*/^()=\-]/g,'').slice(0,200);
+}
+function startGnanaVoice(){
+ if(gnanaListening){voiceStatus('Already listening. Finish speaking or press Stop listening.','warn');return;}
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){
+  voiceStatus('Voice input is not supported by this browser. Try a current version of Chrome or Edge, or type the equation.','error');
+  return;
+ }
+ if(!window.isSecureContext && location.protocol!=='file:'){
+  voiceStatus('This page is not in a secure context. Microphone access usually requires HTTPS or localhost. Open a secure copy or type the equation.','error');
+  return;
+ }
+ try{
+  if(gnanaRecognition){try{gnanaRecognition.abort();}catch(_){}}
+  const rec=new SR();gnanaRecognition=rec;
+  rec.lang=$g('voiceLang').value||'en-IN';
+  rec.interimResults=false;rec.maxAlternatives=3;rec.continuous=false;
+  rec.onstart=()=>{gnanaListening=true;$g('voiceEq').disabled=true;voiceStatus('Listening in '+rec.lang+'… Speak the full equation clearly (for example, “x square plus three x equals four”), then pause.','warn');};
+  rec.onaudiostart=()=>{if(gnanaListening)voiceStatus('Microphone active. Speak now…','warn');};
+  rec.onnomatch=()=>voiceStatus('Speech was heard but could not be recognized as a clear phrase. Try again slowly, or type the equation.','warn');
+  rec.onerror=e=>{
+   gnanaListening=false;$g('voiceEq').disabled=false;
+   voiceStatus(voiceErrorHelp(e.error),'error');
+  };
+  rec.onresult=e=>{
+   const result=e.results&&e.results[0]&&e.results[0][0];
+   if(!result){voiceStatus('No speech transcript was returned. Please try again or type the equation.','error');return;}
+   const heard=result.transcript||'',eq=spokenToEquation(heard);
+   $g('eq').value=eq;
+   if(eq){
+    voiceStatus('Recognized: “'+heard+'”. Converted to: '+eq+'. Review and correct it before pressing Solve.','success');
+   }else{
+    voiceStatus('Heard: “'+heard+'”, but could not convert it into an equation. Try saying “x cubed minus x minus two equals zero”, or type it.','warn');
+   }
+  };
+  rec.onend=()=>{
+   gnanaListening=false;$g('voiceEq').disabled=false;
+   const status=$g('voiceStatus').textContent;
+   if(status.includes('Listening')||status.includes('Microphone active')){
+    voiceStatus('Listening ended. If no equation appeared, try again or type it.','warn');
+   }
+  };
+  rec.start();
+ }catch(e){
+  gnanaListening=false;$g('voiceEq').disabled=false;
+  voiceStatus('Could not start speech recognition: '+(e&&e.message?e.message:'browser error')+'. Check microphone permission and try again.','error');
+ }
+}
+function stopGnanaVoice(){
+ if(gnanaRecognition){
+  try{gnanaRecognition.abort();}catch(_){try{gnanaRecognition.stop();}catch(__){}}
+ }
+ gnanaListening=false;$g('voiceEq').disabled=false;
+ voiceStatus('Voice input stopped. You can try again or type the equation.','note');
+}
+function scanGnanaIntervals(){
+ try{
+  const f=parseEquation($g('eq').value).f,a=Number($g('scanA').value),b=Number($g('scanB').value),n=Number($g('scanN').value);
+  if(!Number.isFinite(a)||!Number.isFinite(b)||a>=b)throw Error('Enter finite bounds with lower bound smaller than upper bound.');
+  if(!Number.isInteger(n)||n<10||n>5000)throw Error('Subintervals must be an integer from 10 to 5000.');
+  const dx=(b-a)/n,found=[];let x0=a,y0=f(x0);
+  if(Number.isFinite(y0)&&Math.abs(y0)<1e-10)found.push({a:x0,b:x0,exact:true});
+  for(let i=1;i<=n;i++){const x1=a+i*dx,y1=f(x1);if(Number.isFinite(y1)&&Math.abs(y1)<1e-10)found.push({a:x1,b:x1,exact:true});else if(Number.isFinite(y0)&&Number.isFinite(y1)&&Math.sign(y0)!==Math.sign(y1))found.push({a:x0,b:x1,exact:false});x0=x1;y0=y1;}
+  const uniq=[];found.forEach(v=>{if(!uniq.some(u=>Math.abs(u.a-v.a)<1e-8&&Math.abs(u.b-v.b)<1e-8))uniq.push(v);});
+  if(!uniq.length){$g('scanOut').innerHTML='<div class="msg warn">No sign-change intervals or near-zero sampled points found. This does not prove that no root exists.</div>';return;}
+  $g('scanOut').innerHTML='<p><b>Found '+uniq.length+' candidate interval(s).</b> Select one to load it into Bisection.</p><table><thead><tr><th>#</th><th>Candidate interval</th><th>f(a)</th><th>f(b)</th><th>Action</th></tr></thead><tbody>'+uniq.map((v,i)=>'<tr><td>'+(i+1)+'</td><td>['+v.a.toPrecision(8)+', '+v.b.toPrecision(8)+']'+(v.exact?' (sample near zero)':'')+'</td><td>'+Number(f(v.a)).toExponential(3)+'</td><td>'+Number(f(v.b)).toExponential(3)+'</td><td><button type="button" data-gnana-interval="'+i+'">Use interval</button></td></tr>').join('')+'</tbody></table><p class="note">Sign change is a candidate only if the function is continuous. Discontinuities can mislead, and roots that touch the axis may be missed.</p>';
+  $g('scanOut').querySelectorAll('[data-gnana-interval]').forEach(btn=>btn.addEventListener('click',()=>{const v=uniq[Number(btn.dataset.gnanaInterval)];$g('a').value=v.a;$g('b').value=v.b;$g('method').value='bisection';onMethodChange();$g('h-m').scrollIntoView({behavior:'smooth',block:'start'});}));
+ }catch(e){$g('scanOut').innerHTML='<div class="msg err">'+String(e.message).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>';}
+}
+function askGnanaBot(){
+ const q=$g('botQuestion').value.toLowerCase().trim();let a='I can explain Bisection, False Position, Newton–Raphson, Fixed-Point Iteration, tolerance, residuals, and root intervals.';
+ if(!q)a='Please type a numerical-method question.';
+ else if(q.includes('bisection')||q.includes('bracket'))a='Bisection needs a continuous function on [a,b] and opposite signs at the endpoints (unless an endpoint is already a root). It halves the bracket repeatedly. It is reliable but often slower than Newton–Raphson.';
+ else if(q.includes('false position')||q.includes('regula'))a='False Position (Regula Falsi) estimates a root using the secant line through the bracket endpoints while preserving the sign-changing bracket. One endpoint can sometimes remain fixed for many iterations.';
+ else if(q.includes('newton')||q.includes('raphson'))a='Newton–Raphson uses x(n+1)=x(n)−f(x(n))/f′(x(n)). It can be fast near a simple root, but may fail with a zero or very small derivative or a poor initial guess.';
+ else if(q.includes('fixed')||q.includes('g(x)'))a='Fixed-point iteration uses x(n+1)=g(x(n)). Local convergence is expected when |g′(α)|<1 near the fixed point. Check the original residual |f(x)|: a fixed point of g is not automatically a root of f.';
+ else if(q.includes('tolerance')||q.includes('residual')||q.includes('error'))a='Tolerance is a stopping threshold. Step error measures change between iterates; residual |f(x)| measures how closely the result satisfies the equation. A small step alone can be misleading, so inspect both.';
+ else if(q.includes('sign change')||q.includes('interval')||q.includes('root'))a='The interval finder samples f(x). Opposite signs at adjacent finite samples produce a candidate interval. Continuity matters: a discontinuity may cause a false candidate, and even-multiplicity roots may not change sign.';
+ else if(q.includes('voice')||q.includes('microphone'))a='Press Speak equation (English), allow microphone access, and say an equation such as “x cubed minus x minus two equals zero”. Review the conversion before solving. Browser speech recognition may need internet.';
+ else if(q.includes('hello')||q==='hi')a='Hello! I am GNANA SOLVER BOT. Enter or speak an equation, find candidate root intervals, and select a numerical method.';
+ gnanaAnswer=a;$g('botAnswer').textContent=a;
+}
+function readGnanaAnswer(){
+ if(!gnanaAnswer)return;
+ if(!('speechSynthesis'in window)){voiceStatus('Speech output is not supported by this browser.','error');return;}
+ window.speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(gnanaAnswer);u.lang=$g('voiceLang').value||'en-IN';
+ u.onerror=e=>voiceStatus('Speech output error: '+(e.error||'unknown error')+'. Try another browser voice or use the written answer.','error');
+ window.speechSynthesis.speak(u);
+}
+$g('voiceEq').addEventListener('click',startGnanaVoice);
+$g('voiceStop').addEventListener('click',stopGnanaVoice);
+$g('btnScan').addEventListener('click',scanGnanaIntervals);
+$g('btnAsk').addEventListener('click',askGnanaBot);
+$g('btnSpeakAnswer').addEventListener('click',readGnanaAnswer);
+$g('botQuestion').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();askGnanaBot();}});
+</script>
+</body>
+</html>

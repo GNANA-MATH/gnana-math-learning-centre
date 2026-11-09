@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GNANA Indian Income Tax AI Agent</title>
+<style>
+  :root { --navy:#142b4a; --gold:#b68b35; --ink:#243247; --muted:#64748b; --paper:#f5f7fb; --line:#dbe3ee; --green:#e8f5ed; --amber:#fff5dc; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  header { background:var(--navy); color:white; padding:28px 18px; border-bottom:5px solid var(--gold); }
+  .wrap { max-width:1100px; margin:auto; padding:0 16px; }
+  h1 { margin:0 0 6px; font-size:clamp(1.5rem,4vw,2.2rem); }
+  header p { margin:0; opacity:.9; }
+  main { padding:22px 0 48px; }
+  .notice { padding:14px 16px; border-radius:12px; background:var(--amber); border:1px solid #f0d58b; margin-bottom:18px; }
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .card { background:white; border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 3px 12px #142b4a0a; min-width:0; }
+  .card h2 { font-size:1.15rem; color:var(--navy); margin:0 0 14px; }
+  .full { grid-column:1/-1; }
+  label { display:block; font-weight:650; font-size:.92rem; margin:11px 0 5px; }
+  input,select,textarea { width:100%; padding:10px 11px; border:1px solid #c8d3e1; border-radius:9px; background:white; color:var(--ink); font:inherit; }
+  input:focus,select:focus,textarea:focus { outline:2px solid #b68b3580; border-color:var(--gold); }
+  .two { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  button { border:0; border-radius:10px; padding:11px 15px; font:inherit; font-weight:700; cursor:pointer; }
+  .primary { background:var(--navy); color:white; }
+  .secondary { background:#edf2f8; color:var(--navy); border:1px solid var(--line); }
+  .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .result { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:14px 0; }
+  .metric { background:#f4f7fb; border:1px solid var(--line); border-radius:12px; padding:13px; }
+  .metric small { display:block; color:var(--muted); }
+  .metric strong { display:block; color:var(--navy); font-size:1.25rem; overflow-wrap:anywhere; }
+  .good { background:var(--green); border:1px solid #b6dfc5; border-radius:10px; padding:12px; }
+  .warn { background:var(--amber); border:1px solid #f0d58b; border-radius:10px; padding:12px; }
+  .muted { color:var(--muted); font-size:.9rem; }
+  a { color:#1757a6; overflow-wrap:anywhere; }
+  ul { padding-left:22px; }
+  .pill { display:inline-block; padding:3px 9px; border-radius:20px; background:#edf2f8; font-size:.8rem; font-weight:700; }
+  #chatLog { min-height:100px; max-height:320px; overflow:auto; border:1px solid var(--line); background:#f8fafc; border-radius:10px; padding:12px; white-space:pre-wrap; }
+  .msg { margin:0 0 12px; }
+  .msg b { color:var(--navy); }
+  footer { padding:22px 0; background:#e9eef5; font-size:.88rem; }
+  @media(max-width:760px) { .grid,.two { grid-template-columns:1fr; } .result { grid-template-columns:1fr; } .full { grid-column:auto; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>GNANA Indian Income Tax AI Agent</h1>
+    <p>Tax estimation • Regime comparison • Pension guidance • ITR preparation • Official-source links</p>
+  </div>
+</header>
+<main class="wrap">
+  <div class="notice">
+    <strong>Important tax-year selector:</strong> FY 2025–26 is governed by the Income-tax Act, 1961 and is reported as AY 2026–27. Income earned from 1 April 2026 is Tax Year 2026–27 under the Income-tax Act, 2025. Do not mix the two frameworks.
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1. Taxpayer and tax period</h2>
+      <label for="period">Tax period</label>
+      <select id="period">
+        <option value="ay2627">FY 2025–26 / AY 2026–27 — Act 1961</option>
+        <option value="ty2627">FY 2026–27 / Tax Year 2026–27 — Act 2025</option>
+      </select>
+      <div class="two">
+        <div><label for="age">Age at end of tax period</label>
+          <select id="age"><option value="under60">Below 60</option><option value="60to79">60–79</option><option value="80plus">80 or above</option></select>
+        </div>
+        <div><label for="resident">Residential status</label>
+          <select id="resident"><option value="resident">Resident in India</option><option value="nonresident">Non-resident / not sure</option></select>
+        </div>
+      </div>
+      <div class="two">
+        <div><label for="salary">Salary / taxable pension before standard deduction (₹)</label><input id="salary" type="number" min="0" value="1200000"></div>
+        <div><label for="interest">Bank / deposit interest (₹)</label><input id="interest" type="number" min="0" value="50000"></div>
+        <div><label for="rent">Net taxable rental / other ordinary income (₹)</label><input id="rent" type="number" min="0" value="0"></div>
+        <div><label for="other">Other ordinary income (₹)</label><input id="other" type="number" min="0" value="0"></div>
+      </div>
+      <p class="muted">Enter income after applying the appropriate income-head rules, except salary/pension, where the standard deduction is applied by this estimator. Do not enter capital gains or other special-rate income here.</p>
+    </section>
+
+    <section class="card">
+      <h2>2. Deductions for old-regime estimate</h2>
+      <p class="muted">Enter only amounts you believe are eligible. The tool applies common caps, but does not establish legal eligibility.</p>
+      <div class="two">
+        <div><label for="d80c">Section 80C / eligible savings (₹)</label><input id="d80c" type="number" min="0" value="150000"></div>
+        <div><label for="d80d">Section 80D health insurance (₹)</label><input id="d80d" type="number" min="0" value="25000"></div>
+        <div><label for="nps">Eligible additional NPS contribution (₹)</label><input id="nps" type="number" min="0" value="50000"></div>
+        <div><label for="home">Eligible self-occupied home-loan interest (₹)</label><input id="home" type="number" min="0" value="0"></div>
+        <div><label for="otherDed">Other eligible old-regime deductions (₹)</label><input id="otherDed" type="number" min="0" value="0"></div>
+        <div><label for="tds">TDS / advance tax already paid (₹)</label><input id="tds" type="number" min="0" value="0"></div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="calculate">Calculate and compare</button>
+        <button class="secondary" id="reset">Reset example</button>
+      </div>
+    </section>
+
+    <section class="card full" id="results" aria-live="polite">
+      <h2>3. Estimated tax comparison</h2>
+      <p>Choose “Calculate and compare” to generate an estimate.</p>
+    </section>
+
+    <section class="card">
+      <h2>4. Pensioner guidance</h2>
+      <ul>
+        <li>Government and private pension may be taxed under different rules depending on the pension type.</li>
+        <li>For this estimator, regular taxable pension is entered with salary. The applicable standard deduction is then estimated.</li>
+        <li>Bank-interest deductions for senior citizens are not automatically added; check the conditions and applicable regime before claiming them.</li>
+        <li>Family pension is not identical to regular pension. It may require separate treatment and should not be included as salary without checking.</li>
+      </ul>
+      <div class="warn">If you receive family pension, commuted pension, arrears, foreign pension, or pension plus capital gains/business income, obtain a case-specific calculation before relying on the estimate.</div>
+    </section>
+
+    <section class="card">
+      <h2>5. ITR preparation checklist</h2>
+      <ul>
+        <li>PAN and Aadhaar details, as applicable</li>
+        <li>Form 16 / pension certificate and salary or pension statements</li>
+        <li>Annual Information Statement (AIS), Taxpayer Information Summary (TIS), and Form 26AS</li>
+        <li>Bank interest certificates and bank account details</li>
+        <li>Proof for deductions and eligible investments</li>
+        <li>Rental income, property-loan interest, capital gains, and other income records</li>
+        <li>Previous return and tax-payment challans, if relevant</li>
+      </ul>
+      <p class="muted">This is a preparation checklist, not an ITR filing system. It does not submit a return or log in to your tax account.</p>
+    </section>
+
+    <section class="card full">
+      <h2>6. Official-source verification</h2>
+      <p>Use these Government of India sources to verify current rates, forms, and rules. The links open official pages; this standalone file does not scrape or automatically certify live legal content.</p>
+      <ul>
+        <li><a href="https://www.incometax.gov.in/" target="_blank" rel="noopener">Income Tax e-Filing Portal</a> — return filing and taxpayer services.</li>
+        <li><a href="https://www.incometaxindia.gov.in/w/tax-rates-and-computation" target="_blank" rel="noopener">Tax Rates and Computation</a> — official rate tables and computation notes.</li>
+        <li><a href="https://www.incometaxindia.gov.in/en/income-tax-act-202511" target="_blank" rel="noopener">Income-tax Act, 2025, Rules and transition resources</a>.</li>
+        <li><a href="https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-and-tax-estimator-um" target="_blank" rel="noopener">Official Income and Tax Estimator user manual</a>.</li>
+        <li><a href="https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/objective-and-scope-new-act" target="_blank" rel="noopener">Official FAQ: scope and transition to the 2025 Act</a>.</li>
+      </ul>
+      <button class="secondary" id="verify">Show verification checklist</button>
+      <div id="verifyOutput" class="muted" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card full">
+      <h2>7. Tax question helper (offline rule-based starter)</h2>
+      <p class="muted">This first version uses predefined guidance, not a generative AI model. It does not send your financial information to a server.</p>
+      <div id="chatLog" aria-live="polite"><div class="msg"><b>GNANA Agent:</b> Ask about tax period selection, pension, deductions, ITR documents, or official verification.</div></div>
+      <label for="question">Your question</label>
+      <textarea id="question" rows="3" placeholder="Example: Which tax law applies to income earned in FY 2026–27?"></textarea>
+      <div class="actions"><button class="primary" id="ask">Ask GNANA Agent</button><button class="secondary" id="clearChat">Clear conversation</button></div>
+    </section>
+  </div>
+</main>
+<footer>
+  <div class="wrap">
+    <strong>Disclaimer:</strong> This is an educational starter estimator, not a substitute for the Income Tax Department’s official calculator or a qualified tax professional. It estimates ordinary slab-rate income only. It does not fully calculate surcharge, capital gains/special-rate tax, AMT, marginal relief in all cases, business/professional income rules, loss set-off, foreign income, or every deduction/exemption. Verify the output against official rules before filing.
+  </div>
+</footer>
+<script>
+"use strict";
+
+/* ---------- Small utilities ---------- */
+
+// Read a numeric input safely. Empty, negative, or invalid values become zero.
+function numberValue(id) {
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+// Format Indian rupee amounts without decimal paise for readability.
+function rupees(value) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency", currency: "INR", maximumFractionDigits: 0
+  }).format(Math.max(0, Math.round(value)));
+}
+
+// Round a tax amount to the nearest rupee for this indicative estimate.
+function roundTax(value) {
+  return Math.round(Math.max(0, value));
+}
+
+/* ---------- Slab-rate engine ---------- */
+
+// Apply progressive slab rates. Each rate applies only to the portion inside
+// its bracket, not to the entire taxable income.
+function progressiveTax(income, slabs) {
+  let tax = 0;
+  let lower = 0;
+  for (const slab of slabs) {
+    const upper = slab.limit;
+    const taxableInThisSlab = Math.max(0, Math.min(income, upper) - lower);
+    tax += taxableInThisSlab * slab.rate;
+    lower = upper;
+    if (income <= upper) break;
+  }
+  return tax;
+}
+
+// These rates are used for the common individual slab-rate calculation.
+// The new-regime slabs shown are the AY 2026–27 / TY 2026–27 slabs published
+// by the Income Tax Department. Special-rate income is deliberately excluded.
+function calculateNewRegime(taxableIncome, resident) {
+  const slabs = [
+    {limit: 400000, rate: 0},
+    {limit: 800000, rate: 0.05},
+    {limit: 1200000, rate: 0.10},
+    {limit: 1600000, rate: 0.15},
+    {limit: 2000000, rate: 0.20},
+    {limit: 2400000, rate: 0.25},
+    {limit: Infinity, rate: 0.30}
+  ];
+  let tax = progressiveTax(taxableIncome, slabs);
+
+  // Resident individual rebate for the new regime: maximum ₹60,000 up to
+  // ₹12 lakh total income, with a basic marginal-relief safeguard immediately
+  // above the threshold. This simplified estimator does not model special-rate
+  // income or every marginal-relief/surcharge interaction.
+  let rebate = 0;
+  if (resident && taxableIncome <= 1200000) {
+    rebate = Math.min(tax, 60000);
+  } else if (resident && taxableIncome > 1200000 && taxableIncome <= 1275000) {
+    // Indicative marginal relief: tax after rebate cannot exceed income above
+    // ₹12 lakh. Use only for ordinary slab income and verify complex cases.
+    rebate = Math.max(0, tax - (taxableIncome - 1200000));
+  }
+  tax = Math.max(0, tax - rebate);
+  const cess = tax * 0.04;
+  return {baseTax: roundTax(tax), rebate: roundTax(rebate), cess: roundTax(cess),
+          total: roundTax(tax + cess), taxableIncome};
+}
+
+// Old-regime basic exemption depends on age, for resident individuals.
+// This estimator uses the standard slab rates and common deductions only.
+// AY 2026–27 uses the same ordinary old-regime slab thresholds for individuals.
+function calculateOldRegime(taxableIncome, age, resident) {
+  let basicExemption = 250000;
+  if (resident && age === "60to79") basicExemption = 300000;
+  if (resident && age === "80plus") basicExemption = 500000;
+
+  const slabs = [
+    {limit: basicExemption, rate: 0},
+    {limit: 500000, rate: 0.05},
+    {limit: 1000000, rate: 0.20},
+    {limit: Infinity, rate: 0.30}
+  ];
+  let tax = progressiveTax(taxableIncome, slabs);
+
+  // Section 87A old-regime resident-individual rebate, simplified for
+  // ordinary income: up to ₹5 lakh total income, maximum ₹12,500.
+  let rebate = 0;
+  if (resident && taxableIncome <= 500000) rebate = Math.min(tax, 12500);
+  tax = Math.max(0, tax - rebate);
+  const cess = tax * 0.04;
+  return {baseTax: roundTax(tax), rebate: roundTax(rebate), cess: roundTax(cess),
+          total: roundTax(tax + cess), taxableIncome};
+}
+
+/* ---------- Estimate and compare ---------- */
+
+// Calculate standard deduction, eligible common old-regime deductions, tax,
+// cess, and the approximate balance after tax already paid.
+function calculate() {
+  const period = document.getElementById("period").value;
+  const age = document.getElementById("age").value;
+  const resident = document.getElementById("resident").value === "resident";
+  const salary = numberValue("salary");
+  const interest = numberValue("interest");
+  const rent = numberValue("rent");
+  const other = numberValue("other");
+  const tds = numberValue("tds");
+
+  // Standard deduction used in this simple salary/pension estimate:
+  // ₹75,000 under the new regime and ₹50,000 under the old regime.
+  // Actual eligibility depends on the nature of income and applicable rules.
+  const standardNew = Math.min(salary, 75000);
+  const standardOld = Math.min(salary, 50000);
+  const grossOrdinaryIncome = salary + interest + rent + other;
+  const newTaxable = Math.max(0, grossOrdinaryIncome - standardNew);
+
+  // Common old-regime deductions are capped here at typical statutory limits.
+  // The user remains responsible for checking eligibility and sub-limits.
+  const d80c = Math.min(numberValue("d80c"), 150000);
+  const d80d = Math.min(numberValue("d80d"), 100000); // broad ceiling; actual limit depends on age/covered persons
+  const nps = Math.min(numberValue("nps"), 50000);
+  const home = Math.min(numberValue("home"), 200000); // only if applicable conditions are met
+  const otherDed = numberValue("otherDed");
+  const oldDeductions = d80c + d80d + nps + home + otherDed;
+  const oldTaxable = Math.max(0, grossOrdinaryIncome - standardOld - oldDeductions);
+
+  const newResult = calculateNewRegime(newTaxable, resident);
+  const oldResult = calculateOldRegime(oldTaxable, age, resident);
+  const best = newResult.total <= oldResult.total ? "New regime" : "Old regime";
+  const balanceNew = newResult.total - tds;
+  const balanceOld = oldResult.total - tds;
+
+  const warnings = [];
+  if (!resident) warnings.push("Non-resident tax treatment is not fully modelled; rebate and age-based exemption rules may differ. Treat both results as indicative only.");
+  if (grossOrdinaryIncome > 5000000) warnings.push("Income exceeds ₹50 lakh: surcharge and possible marginal relief are not calculated. The displayed total may materially understate tax.");
+  if (grossOrdinaryIncome > 0 && (interest + rent + other) > 0) warnings.push("Other income may have separate deductions, loss set-off, or special rules. Check each income head.");
+  if (period === "ty2627") warnings.push("Selected Tax Year 2026–27: use the Income-tax Act, 2025 and Income-tax Rules, 2026. Confirm the latest Finance Act and notified forms.");
+  else warnings.push("Selected AY 2026–27: use the Income-tax Act, 1961 as amended for this assessment year. The 2025 Act does not replace the governing rules for this income period.");
+  warnings.push("Capital gains, lottery/crypto and other special-rate income, surcharge, AMT, complex marginal relief, and all deduction eligibility tests are outside this starter calculation.");
+
+  document.getElementById("results").innerHTML = `
+    <h2>3. Estimated tax comparison</h2>
+    <p class="muted">Period: ${period === "ay2627" ? "FY 2025–26 / AY 2026–27 (Act 1961)" : "FY 2026–27 / Tax Year 2026–27 (Act 2025)"}</p>
+    <div class="result">
+      <div class="metric"><small>New regime taxable income</small><strong>${rupees(newResult.taxableIncome)}</strong></div>
+      <div class="metric"><small>New regime estimated tax + cess</small><strong>${rupees(newResult.total)}</strong><small>Balance after TDS: ${rupees(balanceNew)}</small></div>
+      <div class="metric"><small>Old regime estimated tax + cess</small><strong>${rupees(oldResult.total)}</strong><small>Balance after TDS: ${rupees(balanceOld)}</small></div>
+    </div>
+    <div class="good"><strong>Lower estimated tax:</strong> ${best}. Difference: ${rupees(Math.abs(newResult.total-oldResult.total))}.</div>
+    <p><strong>New regime:</strong> taxable income ${rupees(newResult.taxableIncome)}, rebate estimated ${rupees(newResult.rebate)}, cess ${rupees(newResult.cess)}.</p>
+    <p><strong>Old regime:</strong> taxable income ${rupees(oldResult.taxableIncome)}, deductions entered and capped ${rupees(oldDeductions)}, rebate estimated ${rupees(oldResult.rebate)}, cess ${rupees(oldResult.cess)}.</p>
+    <div class="warn"><strong>Read before relying on this result</strong><ul>${warnings.map(w => `<li>${w}</li>`).join("")}</ul></div>`;
+}
+
+// Restore the sample figures so the user can rerun the built-in demonstration.
+function resetExample() {
+  const defaults = {period:"ay2627",age:"under60",resident:"resident",salary:1200000,
+    interest:50000,rent:0,other:0,d80c:150000,d80d:25000,nps:50000,home:0,otherDed:0,tds:0};
+  for (const [id, value] of Object.entries(defaults)) document.getElementById(id).value = value;
+  document.getElementById("results").innerHTML = "<h2>3. Estimated tax comparison</h2><p>Choose “Calculate and compare” to generate an estimate.</p>";
+}
+
+/* ---------- Official verification checklist ---------- */
+
+// This deliberately does not attempt cross-origin scraping: official websites
+// often block browser fetches with CORS, and a failed fetch is not proof that
+// a law or site is unavailable. The links above are the source-verification path.
+function showVerificationChecklist() {
+  const date = new Date().toLocaleDateString("en-IN", {year:"numeric",month:"long",day:"numeric"});
+  document.getElementById("verifyOutput").innerHTML =
+    `<p><strong>Checklist opened ${date}:</strong></p>
+     <ol>
+       <li>Confirm the selected period and governing Act.</li>
+       <li>Check the official tax-rate page and relevant Finance Act.</li>
+       <li>For Tax Year 2026–27, check the 2025 Act, Rules 2026, notifications, and updated forms.</li>
+       <li>For AY 2026–27, use the 1961 Act framework and applicable amendments.</li>
+       <li>Compare this estimate with the official Income and Tax Estimator before filing.</li>
+     </ol>
+     <p><strong>Connection status:</strong> This page has not automatically verified the contents of official websites. Open the official links above to check the current source documents.</p>`;
+}
+
+/* ---------- Rule-based question helper ---------- */
+
+// Provide safe, predefined explanations for common topics. Unknown questions
+// are directed to official sources rather than answered with invented law.
+function answerQuestion(question) {
+  const q = question.toLowerCase();
+  if (q.includes("2026") && (q.includes("act") || q.includes("law") || q.includes("tax year"))) {
+    return "Income earned from 1 April 2026 is generally handled as Tax Year 2026–27 under the Income-tax Act, 2025. Income earned during FY 2025–26 remains governed by the Income-tax Act, 1961 and is reported as AY 2026–27. Use the official transition FAQ linked above.";
+  }
+  if (q.includes("pension")) {
+    return "Regular taxable pension is generally entered with salary for this starter estimate. Family pension, commuted pension, arrears, and foreign pension can have different treatment. Check the official rules and the pension documents before filing.";
+  }
+  if (q.includes("deduction") || q.includes("80c") || q.includes("80d") || q.includes("nps")) {
+    return "Deductions depend on the selected regime, taxpayer facts, payment type, and statutory caps. Many common deductions are unavailable under the new regime. Enter only eligible amounts and verify the current official deduction rules before claiming them.";
+  }
+  if (q.includes("itr") || q.includes("form 16") || q.includes("documents")) {
+    return "Prepare Form 16 or pension statements, AIS, TIS, Form 26AS, bank-interest certificates, deduction proofs, bank details, and records for rent/capital gains/other income. Choose the ITR form based on all income sources and eligibility; this page does not file a return.";
+  }
+  if (q.includes("old") || q.includes("new") || q.includes("regime")) {
+    return "Compare both regimes using the calculator, but verify deduction eligibility and any special-rate income. The new regime is generally the default for eligible taxpayers; opting out rules differ for taxpayers with business or professional income.";
+  }
+  if (q.includes("official") || q.includes("verify") || q.includes("source")) {
+    return "Open the official Tax Rates and Computation page, the Income-tax Act, 2025 resources, and the e-Filing portal links in Section 6. This local starter does not scrape pages or certify that its built-in rules are the latest.";
+  }
+  return "I do not have a verified rule for that question in this starter. Please check the official links in Section 6 or consult a qualified tax professional. Avoid entering PAN, Aadhaar, passwords, OTPs, or bank-account credentials into this demo.";
+}
+
+// Add the question and answer to the visible conversation log.
+function askAgent() {
+  const input = document.getElementById("question");
+  const question = input.value.trim();
+  if (!question) return;
+  const log = document.getElementById("chatLog");
+  const user = document.createElement("div");
+  user.className = "msg";
+  const userLabel = document.createElement("b");
+  userLabel.textContent = "You: ";
+  user.appendChild(userLabel);
+  user.appendChild(document.createTextNode(question));
+  const answer = document.createElement("div");
+  answer.className = "msg";
+  const answerLabel = document.createElement("b");
+  answerLabel.textContent = "GNANA Agent: ";
+  answer.appendChild(answerLabel);
+  answer.appendChild(document.createTextNode(answerQuestion(question)));
+  log.append(user, answer);
+  log.scrollTop = log.scrollHeight;
+  input.value = "";
+}
+
+// Connect controls to functions once the page has loaded.
+document.getElementById("calculate").addEventListener("click", calculate);
+document.getElementById("reset").addEventListener("click", resetExample);
+document.getElementById("verify").addEventListener("click", showVerificationChecklist);
+document.getElementById("ask").addEventListener("click", askAgent);
+document.getElementById("clearChat").addEventListener("click", () => {
+  document.getElementById("chatLog").innerHTML = '<div class="msg"><b>GNANA Agent:</b> Ask about tax period selection, pension, deductions, ITR documents, or official verification.</div>';
+});
+document.getElementById("question").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); askAgent(); }
+});
+</script>
+</body>
+</html>

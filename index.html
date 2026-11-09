@@ -21,12 +21,28 @@
         <a href="#top">Home</a>
         <a href="#mathematics">Mathematics</a>
         <a href="#engineering">Engineering Mathematics</a>
-        <a href="#research">Research</a>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-toggle" type="button" aria-expanded="false" aria-controls="research-subnav">Research <span aria-hidden="true">⌄</span></button>
+          <div class="nav-submenu" id="research-subnav" hidden>
+            <a href="#research-toolkit">Research Prompt Toolkit</a>
+            <a href="#publications-title">Research Preprints</a>
+          </div>
+        </div>
         <a href="#ai">AI &amp; Mathematics</a>
-        <a href="#lab">Interactive Lab</a>
+        <a href="#quiz-competition">Quiz</a>
         <a href="#temple">Temple Engineering</a>
         <a href="#videos">Videos</a>
         <a href="#resources">Resources</a>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-toggle" type="button" aria-expanded="false" aria-controls="teaching-resources-subnav">Teaching Resources <span aria-hidden="true">⌄</span></button>
+          <div class="nav-submenu" id="teaching-resources-subnav" hidden>
+            <a href="#isttpapgsr-framework">01 – ISTTPAPGSR Framework</a>
+            <a href="#lesson-plans">02 – Lesson Plans</a>
+            <a href="#teaching-resources-library">03 – Teaching Resources</a>
+            <a href="#classroom-activities">04 – Classroom Activities</a>
+            <a href="#private-teacher-resources">05 – Private Teacher Resources</a>
+          </div>
+        </div>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
@@ -41,7 +57,7 @@
         <p class="eyebrow">MATHEMATICS <span>•</span> ENGINEERING <span>•</span> RESEARCH <span>•</span> AI</p>
         <h1 id="hero-title">Mathematics helps us<br><em>see how the world works.</em></h1>
         <p class="hero-intro">Exploring mathematics through teaching, modelling, computation, engineering applications and emerging AI technologies.</p>
-        <div class="hero-actions"><a class="button button-light" href="#mathematics">Explore mathematics <span aria-hidden="true">↗</span></a><a class="text-link" href="#lab">Enter the interactive lab <span aria-hidden="true">→</span></a></div>
+        <div class="hero-actions"><a class="button button-light" href="#mathematics">Explore mathematics <span aria-hidden="true">↗</span></a></div>
       </div>
       <div class="hero-art">
         <svg viewBox="0 0 520 450" role="img" aria-labelledby="hero-visual-title hero-visual-desc">
@@ -65,8 +81,7 @@
       <div class="feature-grid">
         <a class="feature-card card-math" href="#mathematics"><span class="card-index">01 / LEARN</span><span class="card-symbol" aria-hidden="true">∫</span><h3>Learn mathematics</h3><p>Build foundations and see how core ideas connect.</p><span class="card-topics">Engineering Mathematics · Calculus · Differential Equations · Linear Algebra · Numerical Methods · Probability</span><span class="card-arrow" aria-hidden="true">↗</span></a>
         <a class="feature-card card-research" href="#research"><span class="card-index">02 / INVESTIGATE</span><span class="card-symbol" aria-hidden="true">⌬</span><h3>Explore research</h3><p>Mathematical models help us describe complex systems.</p><span class="card-topics">Modelling · Computation · Microfluidics · Digital Twins · Scientific Computing</span><span class="card-arrow" aria-hidden="true">↗</span></a>
-        <a class="feature-card card-lab" href="#lab"><span class="card-index">03 / EXPERIMENT</span><span class="card-symbol" aria-hidden="true">⌁</span><h3>Interactive mathematics</h3><p>Don't just read the mathematics. Experiment with it.</p><span class="card-topics">Calculators · Visualizations · Simulations · Graphs · Experiments</span><span class="card-arrow" aria-hidden="true">↗</span></a>
-        <a class="feature-card card-ai" href="#ai"><span class="card-index">04 / VERIFY</span><span class="card-symbol" aria-hidden="true">◈</span><h3>Mathematics + AI</h3><p>Explore how to use AI thoughtfully—and check its reasoning.</p><span class="card-topics">AI-assisted learning · GNANA-AI · Reasoning · Scientific Computing · Verification</span><span class="card-arrow" aria-hidden="true">↗</span></a>
+        <a class="feature-card card-ai" href="#ai"><span class="card-index">03 / VERIFY</span><span class="card-symbol" aria-hidden="true">◈</span><h3>Mathematics + AI</h3><p>Explore how to use AI thoughtfully—and check its reasoning.</p><span class="card-topics">AI-assisted learning · GNANA-AI · Reasoning · Scientific Computing · Verification</span><span class="card-arrow" aria-hidden="true">↗</span></a>
       </div>
     </section>
 
@@ -77,8 +92,8 @@
         <article class="topic-card"><span class="topic-mark">02</span><h3>Differential Equations</h3><p>Ordinary and partial differential equations, from models to numerical solutions.</p><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
         <article class="topic-card"><span class="topic-mark">03</span><h3>Linear Algebra</h3><p>Matrices, vector spaces, transformations and eigenvalues.</p><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
         <article class="topic-card"><span class="topic-mark">04</span><h3>Complex Variables</h3><p>Functions of a complex variable and their applications.</p><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
-        <article class="topic-card"><span class="topic-mark">05</span><h3>Transforms</h3><p>Fourier and Laplace transforms for signals and systems.</p><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
-        <article class="topic-card"><span class="topic-mark">06</span><h3>Probability &amp; Statistics</h3><p>Models for uncertainty, data and inference.</p><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
+        <article class="topic-card"><span class="topic-mark">05</span><h3>Transforms</h3><p>Fourier and Laplace transforms for signals and systems.</p><a class="topic-ebook-link" href="https://drive.google.com/file/d/1ciWEU-vDuMAfAuEl61vmyurzVpFUwf_T/view?usp=drive_link" target="_blank" rel="noopener noreferrer">Read E-book <span aria-hidden="true">↗</span></a><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
+        <article class="topic-card"><span class="topic-mark">06</span><h3>Probability &amp; Statistics</h3><p>Models for uncertainty, data and inference.</p><a class="topic-ebook-link" href="https://drive.google.com/file/d/1sx3coIn3AdXN9AXHdNWTQGK-BK5mTnau/view?usp=drive_link" target="_blank" rel="noopener noreferrer">Read E-book <span aria-hidden="true">↗</span></a><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
         <article class="topic-card"><span class="topic-mark">07</span><h3>Numerical Methods</h3><p>Approximation, error analysis and computational solutions.</p><span class="coming">LEARNING PATH IN DEVELOPMENT</span></article>
       </div>
       <p class="learning-sequence"><span>CONCEPT</span> → <span>FORMULA</span> → <span>VISUALIZATION</span> → <span>EXAMPLE</span> → <span>APPLICATION</span> → <span>EXPERIMENT</span></p>
@@ -105,46 +120,72 @@
       </div>
     </section>
 
-    <section class="lab-section" id="lab">
-      <div class="lab-heading section-heading"><div><p class="eyebrow">INTERACTIVE MATHEMATICS LAB</p><h2>Don't just read the mathematics.<br><em>Experiment with it.</em></h2></div><p>Change a value, observe what moves, and connect the result to its mathematical model.</p></div>
-      <div class="demo-grid">
-        <article class="demo-card">
-          <div class="demo-meta"><span>DEMO 01</span><span>FUNCTIONS</span></div><h3>Function plotter</h3><p class="demo-intro">Compare familiar functions on the same coordinate grid.</p>
-          <label class="control-label" for="function-select">Choose a function</label><select id="function-select"><option value="sin">y = sin(x)</option><option value="cos">y = cos(x)</option><option value="parabola">y = x² − 1</option></select>
-          <figure class="plot-frame"><svg id="function-plot" viewBox="0 0 520 280" role="img" aria-label="Graph of y equals sine of x"><defs><pattern id="plot-grid" width="32" height="28" patternUnits="userSpaceOnUse"><path d="M 32 0 L 0 0 0 28" fill="none" stroke="#dce3e9" stroke-width="1"/></pattern></defs><rect width="520" height="280" fill="url(#plot-grid)"/><g class="plot-axis"><path d="M20 140H500M260 12V268"/><path d="M500 140l-8-4v8zM260 12l-4 8h8z"/></g><path id="function-path" class="function-path" d=""/><circle id="function-point" r="5" cx="260" cy="140"/></svg><figcaption>Horizontal axis: x · Vertical axis: y</figcaption></figure>
-          <div class="equation-readout" id="function-equation" aria-live="polite">y = sin(x)</div><p class="interpretation">The curve shows how output changes as x varies across the selected interval.</p>
-        </article>
-
-        <article class="demo-card">
-          <div class="demo-meta"><span>DEMO 02</span><span>NUMERICAL METHODS</span></div><h3>Newton–Raphson visualizer</h3><p class="demo-intro">Find a root of <span class="math-inline">f(x) = x² − 2</span> by repeating a tangent-based estimate.</p>
-          <label class="control-label" for="newton-start">Starting estimate <output id="newton-start-value">1.80</output></label><input id="newton-start" type="range" min="0.6" max="3" step="0.05" value="1.8">
-          <figure class="plot-frame"><svg id="newton-plot" viewBox="0 0 520 280" role="img" aria-label="Newton-Raphson tangent steps approaching the root of x squared minus two"><defs><pattern id="newton-grid" width="32" height="28" patternUnits="userSpaceOnUse"><path d="M 32 0 L 0 0 0 28" fill="none" stroke="#dce3e9" stroke-width="1"/></pattern></defs><rect width="520" height="280" fill="url(#newton-grid)"/><g class="plot-axis"><path d="M20 182H500M260 16V264"/></g><path id="newton-function" class="function-path" d=""/><g id="newton-steps"></g></svg><figcaption>Gold lines show tangent estimates moving toward a root.</figcaption></figure>
-          <div class="equation-readout">xₙ₊₁ = xₙ − f(xₙ) / f′(xₙ)</div><p id="newton-result" class="interpretation" aria-live="polite">After five iterations, the estimate approaches √2.</p>
-        </article>
-
-        <article class="demo-card temple-demo" id="temple-calculator">
-          <div class="demo-meta"><span>DEMO 03</span><span>ENGINEERING MODEL</span></div><h3>Inclined-plane calculator</h3><p class="demo-intro">Estimate the force in a simplified stone-on-ramp model.</p>
-          <div class="input-grid">
-            <label>Stone mass (kg)<input id="stone-mass" type="number" min="1" max="1000000" step="100" value="5000"></label>
-            <label>Height h (m)<input id="ramp-height" type="number" min="0.1" max="100" step="0.1" value="3"></label>
-            <label>Ramp length L (m)<input id="ramp-length" type="number" min="0.2" max="200" step="0.1" value="20"></label>
-            <label>Friction coefficient μ<input id="friction" type="number" min="0" max="2" step="0.01" value="0.2"></label>
-          </div>
-          <figure class="ramp-figure"><svg viewBox="0 0 500 210" role="img" aria-labelledby="ramp-title ramp-desc"><title id="ramp-title">Stone on an inclined ramp</title><desc id="ramp-desc">A stone rests on a ramp with height h and ramp length L labelled.</desc><path d="M62 174H438M102 174L398 64" class="ramp-line"/><path d="M102 174V64H398" class="ramp-guide"/><g class="stone-block"><path d="M253 80l67-25 43 24-68 25z"/><path d="M253 80v44l42 25v-45z"/><path d="M295 104l68-25v45l-68 25z"/></g><text x="77" y="122">h</text><text x="165" y="137" transform="rotate(-20 165 137)">L</text><path d="M102 154a21 21 0 0 1 19 13" class="ramp-angle"/><text x="124" y="164">θ</text><path d="M304 89l-13 5" class="force-arrow"/><text x="324" y="104">F</text></svg></figure>
-          <div class="result-grid" aria-live="polite"><div><span>WEIGHT</span><strong id="weight-output">—</strong></div><div><span>RAMP ANGLE</span><strong id="angle-output">—</strong></div><div><span>IDEAL FORCE</span><strong id="ideal-output">—</strong></div><div><span>WITH FRICTION</span><strong id="friction-output">—</strong></div><div class="result-wide"><span>APPROXIMATE TONNES-FORCE</span><strong id="tonne-output">—</strong></div></div>
-          <p id="ramp-error" class="input-error" role="status"></p>
-          <p class="equation-readout">F = mg(sin θ + μ cos θ)</p>
-          <p class="disclaimer">Simplified engineering model for educational purposes. Actual historical methods and friction conditions depend on materials, geometry, equipment and site conditions.</p>
-        </article>
+    <section class="temple-section section" id="temple" aria-labelledby="temple-title">
+      <div class="section-heading"><div><p class="eyebrow eyebrow-dark">MATHEMATICS BEHIND TEMPLE ENGINEERING</p><h2 id="temple-title">Questions about monumental construction.</h2></div><p>Explore the forces and structures behind monumental building. Engineering models help explain principles; they do not establish a particular historical method.</p></div>
+      <figure class="temple-composite-visual"><img src="assets/thanjavur-big-temple-composite.jpg" alt="Composite image showing the Thanjavur Big Temple beside a conceptual engineering diagram of its form and possible structural features." width="2816" height="1536" loading="lazy"><figcaption>Thanjavur Big Temple with a conceptual engineering illustration; the diagram is not historical evidence for the construction methods shown.</figcaption></figure>
+      <div class="evidence-key" aria-label="Evidence and model classifications"><span><b class="key-dot evidence"></b>Documented evidence</span><span><b class="key-dot interpretation"></b>Archaeological interpretation</span><span><b class="key-dot reconstruction"></b>Engineering reconstruction</span><span><b class="key-dot model"></b>Simplified model</span></div>
+      <div class="temple-topic-grid" aria-label="Temple engineering topics">
+        <article><span class="temple-card-mark" aria-hidden="true">↗</span><h3>Moving Massive Stones</h3><p>Ramps, rollers, sledges, friction, and force.</p><a class="temple-card-link" href="#temple-moving-stones">Explore <span aria-hidden="true">↓</span></a></article>
+        <article><span class="temple-card-mark" aria-hidden="true">τ</span><h3>Raising Temple Pillars</h3><p>Supports, levers, controlled rotation, and torque.</p><a class="temple-card-link" href="#temple-raising-pillars">Explore <span aria-hidden="true">↓</span></a></article>
+        <article><span class="temple-card-mark" aria-hidden="true">σ</span><h3>Structural Loads</h3><p>Compression, load transfer, foundations, and arches.</p><a class="temple-card-link" href="#temple-structural-loads">Explore <span aria-hidden="true">↓</span></a></article>
       </div>
-    </section>
+      <div class="formula-band temple-formula-band" aria-label="Temple engineering formulas and brief explanations">
+        <div class="temple-formula"><span class="temple-equation" role="math" aria-label="W equals m g">W = mg</span><p>Weight: mass × gravity.</p></div>
+        <div class="temple-formula"><span class="temple-equation" role="math" aria-label="F sub f equals mu N">F<sub>f</sub> = μN</span><p>Dry-sliding friction model.</p></div>
+        <div class="temple-formula"><span class="temple-equation" role="math" aria-label="Tau equals r F">τ = rF</span><p>Torque for perpendicular force.</p></div>
+        <div class="temple-formula"><span class="temple-equation" role="math" aria-label="Sigma equals F divided by A">σ = F/A</span><p>Average normal stress.</p></div>
+        <div class="temple-formula"><span class="temple-equation" role="math" aria-label="p equals W divided by A">p = W/A</span><p>Average pressure over area.</p></div>
+      </div>
+      <p class="model-label temple-compact-note">Evidence, interpretation, reconstruction, and simplified models are distinct; formulas alone do not verify historical methods.</p>
 
-    <section class="temple-section section" id="temple">
-      <div class="section-heading"><div><p class="eyebrow eyebrow-dark">MATHEMATICS BEHIND TEMPLE ENGINEERING</p><h2>Questions about monumental construction.</h2></div><p>How can mathematics and engineering help us understand ancient construction? Models here are educational reconstructions, not claims about a specific historical method.</p></div>
-      <div class="evidence-key"><span><b class="key-dot evidence"></b>Documented historical evidence</span><span><b class="key-dot interpretation"></b>Archaeological interpretation</span><span><b class="key-dot reconstruction"></b>Engineering reconstruction</span><span><b class="key-dot model"></b>Simplified educational model</span></div>
-      <div class="temple-topic-grid"><article><span>01</span><h3>Moving massive stones</h3><p>Inclined planes, ramps, rollers and friction.</p></article><article><span>02</span><h3>Raising pillars</h3><p>Levers, controlled rotation and torque.</p></article><article><span>03</span><h3>Structural loads</h3><p>Load paths, arches and foundation pressure.</p></article></div>
-      <div class="formula-band"><span>W = mg</span><span>F<sub>f</sub> = μN</span><span>τ = rF</span><span>σ = F/A</span><span>p = W/A</span></div>
-      <p class="model-label">The calculator above is a simplified educational model. It does not establish how any particular temple was constructed.</p>
+      <section class="temple-detail" id="temple-moving-stones" aria-labelledby="temple-moving-title">
+        <div class="temple-detail-heading"><span class="temple-detail-number">A / TRANSPORT</span><div><h3 id="temple-moving-title">Moving Massive Stones</h3><p>How does a ramp change the force needed to move a heavy block?</p></div></div>
+        <div class="temple-principle-card"><p>For a block on a straight ramp, the ideal uphill force is the component of its weight along the slope:</p><p class="temple-equation-block" role="math" aria-label="F ideal equals m g sine theta; sine theta equals h over L">F<sub>ideal</sub> = mg sin θ &nbsp; · &nbsp; sin θ = h/L</p><details class="temple-advanced"><summary>Advanced Mathematical Explanation</summary><div><p>Substituting the ramp geometry gives F<sub>ideal</sub> = mgh/L. This ideal model excludes friction and assumes steady motion. Real transport can involve rolling or sliding resistance, uneven ground, ropes, and human or animal power; the calculator below estimates sliding friction for a simplified ramp.</p></div></details></div>
+        <details class="temple-calculator" aria-labelledby="temple-calculator-title">
+          <summary id="temple-calculator-title">Open inclined-plane calculator</summary>
+          <div class="temple-calculator-content"><p class="temple-calculator-intro">Sliding block, straight ramp, constant-speed uphill motion.</p>
+            <div class="temple-calculator-layout">
+              <div class="temple-input-grid">
+                <label for="temple-mass">Stone mass <span>(kg)</span><input id="temple-mass" type="number" min="0.001" step="any" value="5000" inputmode="decimal"></label>
+                <label for="temple-ramp-height">Ramp height h <span>(m)</span><input id="temple-ramp-height" type="number" min="0.001" step="any" value="3" inputmode="decimal"></label>
+                <label for="temple-ramp-length">Ramp length L <span>(m)</span><input id="temple-ramp-length" type="number" min="0.001" step="any" value="20" inputmode="decimal"></label>
+                <label for="temple-friction">Friction coefficient μ<input id="temple-friction" type="number" min="0" step="any" value="0.2" inputmode="decimal"></label>
+              </div>
+              <figure class="temple-ramp-figure"><svg viewBox="0 0 420 250" role="img" aria-labelledby="temple-ramp-title temple-ramp-desc"><title id="temple-ramp-title">Block on an inclined plane</title><desc id="temple-ramp-desc">A block rests on a ramp of length L and height h; theta is the angle to horizontal.</desc><path d="M46 210H382M76 210L350 72M76 210V72H350" class="temple-ramp-line"/><path d="M110 193l35-18 32 16-35 18zM110 193v28l32 18v-29zM142 210l35-19v29l-35 19z" class="temple-ramp-block"/><path d="M95 210a24 24 0 0 1 21-22" class="temple-ramp-angle"/><text x="116" y="205">θ</text><text x="57" y="144">h</text><text x="191" y="166" transform="rotate(-27 191 166)">L</text><path d="M145 172l57-29M202 143l-12 1 5 10z" class="temple-ramp-force"/><text x="207" y="140">pull</text></svg><figcaption>Idealized ramp geometry.</figcaption></figure>
+            </div>
+            <div class="temple-result-grid" aria-label="Calculated values" aria-live="polite"><div><span>WEIGHT</span><strong id="temple-weight-output">—</strong></div><div><span>RAMP ANGLE</span><strong id="temple-angle-output">—</strong></div><div><span>IDEAL FORCE</span><strong id="temple-ideal-output">—</strong></div><div><span>WITH FRICTION</span><strong id="temple-friction-output">—</strong></div><div class="temple-result-wide"><span>TONNES-FORCE EQUIVALENT</span><strong id="temple-tonne-output">—</strong></div></div>
+            <p id="temple-calculator-error" class="temple-calculator-error" role="status" aria-live="polite"></p>
+            <p class="temple-calculator-equation" role="math" aria-label="F equals m g times sine theta plus mu cosine theta; theta equals arcsine h over L">F = mg(sin θ + μ cos θ); &nbsp; θ = arcsin(h/L)</p>
+            <p class="temple-model-note">g = 9.80665 m/s². Excludes acceleration, rolling resistance, and equipment losses; 1 tonne-force = 1000 kg × g.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="temple-detail" id="temple-raising-pillars" aria-labelledby="temple-raising-title">
+        <div class="temple-detail-heading"><span class="temple-detail-number">B / ERECTION</span><div><h3 id="temple-raising-title">Raising Temple Pillars</h3><p>How might a heavy stone pillar be raised and aligned?</p></div></div>
+        <div class="temple-pillar-layout">
+          <div class="temple-pillar-summary">
+            <p>A conceptual engineering reconstruction combines a prepared foundation, temporary supports, and controlled lifting. It is an analytical model, not a verified method for every temple.</p>
+            <ol class="temple-pillar-stages" aria-label="Three conceptual stages">
+              <li><b>Prepare</b><span>Prepare the base and position supports.</span></li>
+              <li><b>Raise</b><span>Lift incrementally; control rotation with ropes or levers.</span></li>
+              <li><b>Align</b><span>Guide the pillar onto its base and check its position.</span></li>
+            </ol>
+            <p class="temple-equation-block" role="math" aria-label="Gravitational torque tau sub g equals m g r sine theta">τ<sub>g</sub> = mgr sin θ</p>
+            <p class="temple-model-note">With θ measured from vertical, gravitational torque falls toward zero as the pillar approaches vertical.</p>
+          </div>
+          <figure class="temple-pillar-visual"><img src="assets/temple-pillar-erection-infographic.png" alt="Conceptual engineering illustration of a stone pillar supported and raised incrementally with ropes, then rotated toward vertical and aligned on its base." width="1536" height="1024" loading="lazy"><figcaption>Conceptual reconstruction for learning; this illustration does not verify a historical method used at any particular temple. <a href="assets/temple-pillar-erection-infographic.png" download>Download infographic</a></figcaption></figure>
+        </div>
+        <details class="temple-advanced">
+          <summary>Advanced Mathematical Explanation</summary>
+          <div><p>Model the pillar as a rigid body pivoting about a temporary support. If its centre of mass is distance <em>r</em> from the pivot, its weight <em>mg</em> acts vertically and has moment arm <em>r</em> sin θ when θ is measured from vertical. Thus the gravitational torque magnitude is τ<sub>g</sub> = mgr sin θ: it is greatest when the pillar is horizontal (θ = 90°) and approaches zero as it becomes vertical (θ → 0).</p><p>This simplified model omits changing contact points, support reactions, rope geometry, impacts, and material limits. Actual forces depend on the chosen lifting arrangement.</p></div>
+        </details>
+      </section>
+
+      <section class="temple-detail" id="temple-structural-loads" aria-labelledby="temple-structural-title">
+        <div class="temple-detail-heading"><span class="temple-detail-number">C / STRUCTURES</span><div><h3 id="temple-structural-title">Structural Loads</h3><p>Stone structures remain stable when loads pass safely through their supports.</p></div></div>
+        <div class="temple-principle-card"><p>Compression transfers loads through stone members to the foundations; arches guide forces along a line of thrust.</p><p class="temple-equation-block" role="math" aria-label="Average normal stress sigma equals F divided by A; average pressure p equals W divided by A">σ = F/A &nbsp; · &nbsp; p = W/A</p><p class="temple-model-note">Stability depends on geometry, loading, material, and support conditions.</p><details class="temple-advanced"><summary>Advanced Mathematical Explanation</summary><div><p>σ = F/A is average normal stress over a loaded area, while p = W/A is average pressure from weight over a supporting area. These averages do not describe local stress concentrations; a full structural assessment also considers material behavior, joint contact, geometry, and boundary conditions.</p></div></details></div>
+      </section>
     </section>
 
     <section class="research-section" id="research">
@@ -167,10 +208,111 @@
       </div>
     </section>
 
-    <section class="ai-section section" id="ai">
-      <div class="section-heading"><div><p class="eyebrow eyebrow-dark">AI &amp; MATHEMATICS</p><h2>Reason carefully.<br>Verify each step.</h2></div><p>AI can help generate explanations and ideas. Mathematical claims still need independent checking.</p></div>
-      <div class="ai-topics"><span>AI-assisted mathematics education</span><span>Mathematical reasoning</span><span>Scientific computing with AI</span><span>AI agents &amp; GNANA-AI</span><span>Prompt engineering</span><span>AI-generated explanations</span><span>AI + numerical methods</span><span>Hallucination detection</span></div>
-      <ol class="verification-flow" aria-label="How to verify an AI mathematical answer"><li><span>01</span>AI answer</li><li><span>02</span>Check assumptions</li><li><span>03</span>Check definitions</li><li><span>04</span>Check algebra</li><li><span>05</span>Check numerical calculation</li><li><span>06</span>Check units</li><li><span>07</span>Independent verification</li><li class="validated"><span>08</span>Validated answer</li></ol>
+    <section class="ai-section section" id="ai" aria-labelledby="ai-title">
+      <div class="section-heading ai-section-heading">
+        <div><p class="eyebrow eyebrow-dark">MATHEMATICS × ARTIFICIAL INTELLIGENCE</p><h2 id="ai-title">Reason carefully.<br>Verify each step.</h2></div>
+        <p>Artificial Intelligence can support mathematical learning, problem solving, scientific computing, and research. Explore how mathematical concepts connect with AI, while developing the ability to critically examine and verify computational results.</p>
+      </div>
+      <nav class="ai-section-nav" aria-label="AI and Mathematics subsections">
+        <a href="#ai-learning">AI-assisted learning</a><a href="#ai-mathematics-lab">GNANA AI Mathematics Lab</a><a href="#ai-research">AI in research</a><a href="#ai-meets-mathematics">AI meets mathematics</a><a href="#mathematical-verification">Verification toolkit</a>
+      </nav>
+
+      <section class="ai-subsection" id="ai-learning" aria-labelledby="ai-learning-title">
+        <div class="ai-subsection-heading"><p class="ai-section-index">01 / LEARN</p><div><h3 id="ai-learning-title">AI-Assisted Mathematical Learning</h3><p>Use AI as a study aid that can explain, question, and illustrate mathematical ideas. Keep the learner responsible for the reasoning and final verification.</p></div></div>
+        <div class="ai-topic-grid" role="list" aria-label="AI-assisted mathematics learning topics">
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">∑</span><h4>Mathematics education</h4><p>Use explanations and practice prompts to revisit concepts at an appropriate level.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">→</span><h4>Problem-solving support</h4><p>Ask for a sequence of steps, then identify which definitions and results justify each one.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">⌘</span><h4>Prompt engineering</h4><p>State the problem, known information, notation, and the kind of explanation you need.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">¶</span><h4>Generated explanations</h4><p>Compare an explanation with course definitions, a textbook, or an independent derivation.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">∴</span><h4>Mathematical reasoning</h4><p>Check whether each conclusion follows from the preceding assumptions and statements.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">▤</span><h4>Worked examples</h4><p>Use a worked example to study a method, then solve a related problem without copying it.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">✓</span><h4>Independent verification</h4><p>Rework the result and test it by substitution, estimation, a second method, or units.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">⌘</span><h4>AI agents and GNANA-AI</h4><p>Organize mathematical tasks into explicit steps and check each generated result. Approved GNANA applications are reserved for the lab below.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">!</span><h4>Hallucination detection</h4><p>Check unfamiliar formulas, unsupported steps, and citations against reliable mathematical sources.</p></article>
+        </div>
+        <h4 class="ai-minor-heading">A practical learning workflow</h4>
+        <ol class="ai-process-grid ai-learning-workflow">
+          <li><span>01</span><strong>Identify the problem</strong><p>Write down the question and what is known.</p></li>
+          <li><span>02</span><strong>Request a structured explanation</strong><p>Ask AI to show the method and intermediate steps.</p></li>
+          <li><span>03</span><strong>Examine assumptions</strong><p>Check the definitions, conditions, and notation used.</p></li>
+          <li><span>04</span><strong>Rework it independently</strong><p>Repeat the reasoning without relying on the generated answer.</p></li>
+          <li><span>05</span><strong>Verify the result</strong><p>Use a mathematical check appropriate to the problem.</p></li>
+        </ol>
+        <aside class="ai-example" aria-label="Illustrative algebra example">
+          <div><p class="eyebrow eyebrow-dark">ILLUSTRATIVE EXAMPLE</p><h4>Check a linear equation</h4><p>For <span class="math-inline">2x + 3 = 11</span>, an explanation gives <span class="math-inline">x = 4</span>. Rework the steps and substitute the result:</p></div>
+          <div class="ai-example-calculation"><code>2x + 3 = 11 → 2x = 8 → x = 4</code><code>2(4) + 3 = 11</code><p>The substitution satisfies the original equation.</p></div>
+        </aside>
+      </section>
+
+      <section class="ai-subsection" id="ai-mathematics-lab" aria-labelledby="ai-mathematics-lab-title">
+        <div class="ai-subsection-heading"><p class="ai-section-index">02 / EXPLORE</p><div><h3 id="ai-mathematics-lab-title">GNANA AI Mathematics Lab</h3><p>Explore standalone GNANA mathematical and educational applications designed to support learning, computation, visualization, and mathematical exploration.</p></div></div>
+        <div class="ai-bot-grid" role="list" aria-label="GNANA AI Mathematics and learning bots">
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">கு</span><span class="ai-bot-file">gnana_thiruvalluvar_ai_bot.html</span><h4>Thiruvalluvar AI Bot</h4><p>Search Thirukkural couplets and explore source-based responses in Tamil.</p><p class="ai-bot-features"><span>Tamil search</span><span>Source-based answers</span><span>Speech support</span></p><a class="ai-bot-launch" href="bots/gnana_thiruvalluvar_ai_bot.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">f(x)=0</span><span class="ai-bot-file">GNANA_SOLVER_BOT.html</span><h4>Numerical Equation Solver</h4><p>Explore numerical roots of algebraic and transcendental equations.</p><p class="ai-bot-features"><span>Root finding</span><span>Equation input</span><span>Voice option</span></p><a class="ai-bot-launch" href="bots/GNANA_SOLVER_BOT.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">↗</span><span class="ai-bot-file">city_wind_weather_interactive.html</span><h4>City Wind &amp; Weather</h4><p>Explore local weather forecasts and visualize wind conditions by city.</p><p class="ai-bot-features"><span>Hourly forecast</span><span>Wind map</span><span>Open-Meteo data</span></p><a class="ai-bot-launch" href="bots/city_wind_weather_interactive.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">y=f(x)</span><span class="ai-bot-file">GNANA_GRAPH_BOT.html</span><h4>Graph Bot</h4><p>Plot functions and curves across two-dimensional and three-dimensional views.</p><p class="ai-bot-features"><span>Cartesian</span><span>Parametric &amp; polar</span><span>3D graphs</span></p><a class="ai-bot-launch" href="bots/GNANA_GRAPH_BOT.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">? ∴</span><span class="ai-bot-file">GNANA_Math_Quiz_Bot.html</span><h4>Mathematics Quiz Bot</h4><p>Generate activities from the Engineering Mathematics Quiz Handbook.</p><p class="ai-bot-features"><span>Quiz sheets</span><span>Treasure Hunt</span><span>Handbook reader</span></p><a class="ai-bot-launch" href="bots/GNANA_Math_Quiz_Bot.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">x̄  σ</span><span class="ai-bot-file">GNANA_STATISTICS_BOT_V2.html</span><h4>Statistics Bot V2</h4><p>Analyze datasets with descriptive statistics and distribution tools.</p><p class="ai-bot-features"><span>CSV input</span><span>Summary statistics</span><span>Distributions</span></p><a class="ai-bot-launch" href="bots/GNANA_STATISTICS_BOT_V2.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">[A]</span><span class="ai-bot-file">GNANA_MATRIX_BOT.html</span><h4>Matrix Bot</h4><p>Compute matrix operations and explore core linear algebra problems.</p><p class="ai-bot-features"><span>Determinants</span><span>Linear systems</span><span>Eigen analysis</span></p><a class="ai-bot-launch" href="bots/GNANA_MATRIX_BOT.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">∫</span><span class="ai-bot-file">GNANA_CALCULUS_BOT_V1.0.html</span><h4>Calculus Bot V1.0</h4><p>Study calculus topics with interactive computation and visualization.</p><p class="ai-bot-features"><span>Limits &amp; derivatives</span><span>Integration</span><span>Differential equations</span></p><a class="ai-bot-launch" href="bots/GNANA_CALCULUS_BOT_V1.0.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">π</span><span class="ai-bot-file">GNANA_FORMULA_BOT_V2.1.html</span><h4>Formula Bot V2.1</h4><p>Browse a searchable reference of mathematics and engineering formulas.</p><p class="ai-bot-features"><span>Formula search</span><span>Favorites</span><span>Conditions</span></p><a class="ai-bot-launch" href="bots/GNANA_FORMULA_BOT_V2.1.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">₹</span><span class="ai-bot-file">GNANA_Indian_Income_Tax_AI_Agent.html</span><h4>Indian Income Tax AI Agent</h4><p>Estimate and compare Indian income tax scenarios across tax periods.</p><p class="ai-bot-features"><span>Regime comparison</span><span>Tax-year guidance</span><span>Official sources</span></p><a class="ai-bot-launch" href="bots/GNANA_Indian_Income_Tax_AI_Agent.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+          <article class="ai-bot-card" role="listitem"><span class="ai-bot-icon" aria-hidden="true">Rx</span><span class="ai-bot-file">GNANA_MEDICINE_INFO_BOT_V1_2.html</span><h4>Medicine Information Bot</h4><p>Consult a limited educational reference for medicine information and comparisons.</p><p class="ai-bot-features"><span>Search</span><span>Formulation compare</span><span>Safety sources</span></p><a class="ai-bot-launch" href="bots/GNANA_MEDICINE_INFO_BOT_V1_2.html" target="_blank" rel="noopener noreferrer">Launch Bot <span aria-hidden="true">↗</span></a></article>
+        </div>
+        <p class="ai-bot-note">Standalone applications open in a new tab. Some tools load supporting libraries or live data from external services and need an internet connection. Each tool’s own scope and limitations apply.</p>
+      </section>
+
+      <section class="ai-subsection" id="ai-research" aria-labelledby="ai-research-title">
+        <div class="ai-subsection-heading"><p class="ai-section-index">03 / INVESTIGATE</p><div><h3 id="ai-research-title">AI in Mathematical Research</h3><p>Computational tools can support parts of a research workflow. Mathematical claims, numerical results, interpretations, and references still require independent examination.</p></div></div>
+        <div class="ai-topic-grid" role="list" aria-label="AI-supported mathematical research topics">
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">⌕</span><h4>Literature exploration</h4><p>Use search and language tools to explore terminology and candidate sources; confirm every source directly.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">𝑓</span><h4>Mathematical modelling</h4><p>Compare possible formulations, variables, assumptions, and boundary conditions.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">∑</span><h4>Scientific computing</h4><p>Use computational methods to explore models and organize reproducible calculations.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">Δ</span><h4>Numerical methods</h4><p>Examine discretization, convergence, stability, and error for a chosen method.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">⟳</span><h4>Computational experiments</h4><p>Vary parameters systematically and record the setup, data, and observed outcomes.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">?</span><h4>Hypothesis exploration</h4><p>Use computation to investigate a conjecture, while distinguishing evidence from proof.</p></article>
+          <article class="ai-topic-card" role="listitem"><span aria-hidden="true">✓</span><h4>Interpretation and validation</h4><p>Check outputs against the mathematical model, known limits, and independent calculations.</p></article>
+        </div>
+        <h4 class="ai-minor-heading">A reproducible research workflow</h4>
+        <ol class="ai-process-grid ai-research-workflow">
+          <li><span>01</span><strong>Define the problem</strong><p>State the research question and scope.</p></li>
+          <li><span>02</span><strong>Formulate mathematically</strong><p>Specify variables, assumptions, and equations.</p></li>
+          <li><span>03</span><strong>Choose computational approaches</strong><p>Explain why each method fits the formulation.</p></li>
+          <li><span>04</span><strong>Run numerical experiments</strong><p>Record parameters, inputs, and computational settings.</p></li>
+          <li><span>05</span><strong>Examine results critically</strong><p>Check scale, sensitivity, and plausible alternatives.</p></li>
+          <li><span>06</span><strong>Validate mathematically</strong><p>Use analysis, benchmarks, or an independent method.</p></li>
+          <li><span>07</span><strong>Document reproducibly</strong><p>Record procedures, sources, code, and limitations.</p></li>
+        </ol>
+        <p class="ai-caution">AI-generated research claims, derivations, numerical results, and references are suggestions to verify—not evidence by themselves.</p>
+      </section>
+
+      <section class="ai-subsection" id="ai-meets-mathematics" aria-labelledby="ai-meets-mathematics-title">
+        <div class="ai-subsection-heading"><p class="ai-section-index">04 / CONNECT</p><div><h3 id="ai-meets-mathematics-title">AI Meets Mathematics</h3><p>Mathematical structures help describe learning algorithms and the data they use. These connections are starting points for study, not a complete account of AI.</p></div></div>
+        <div class="ai-subject-grid">
+          <article class="ai-subject-card"><span class="ai-subject-mark">01 / STRUCTURE</span><h4>AI and Linear Algebra</h4><p class="ai-math-note">Vectors <span class="math-inline">x ∈ ℝⁿ</span>, matrices, and transformations</p><p>Matrix operations represent transformations and organize high-dimensional data; eigenvalues and eigenvectors describe important properties of some transformations.</p><p><strong>Application:</strong> representing feature data and studying linear models.</p></article>
+          <article class="ai-subject-card"><span class="ai-subject-mark">02 / CHANGE</span><h4>AI and Calculus</h4><p class="ai-math-note">Derivatives and gradients such as <span class="math-inline">∇<sub>θ</sub>L</span></p><p>Derivatives describe how an objective changes as parameters vary; gradient-based methods use this information in optimization.</p><p><strong>Application:</strong> examining parameter updates in a differentiable model.</p></article>
+          <article class="ai-subject-card"><span class="ai-subject-mark">03 / UNCERTAINTY</span><h4>AI and Probability &amp; Statistics</h4><p class="ai-math-note">Distributions, inference, and <span class="math-inline">P(y | x)</span></p><p>Probability and statistics provide tools for describing uncertainty, analyzing data, and drawing conclusions from samples.</p><p><strong>Application:</strong> comparing predictions with observed data and uncertainty estimates.</p></article>
+          <article class="ai-subject-card"><span class="ai-subject-mark">04 / DYNAMICS</span><h4>AI and Differential Equations</h4><p class="ai-math-note">A dynamical model such as <span class="math-inline">dy/dt = f(y,t)</span></p><p>Differential equations describe evolving systems; computation can help explore numerical solutions and parameterized models.</p><p><strong>Application:</strong> studying a model of change over time and checking its numerical behavior.</p></article>
+        </div>
+      </section>
+
+      <section class="ai-subsection ai-verification-section" id="mathematical-verification" aria-labelledby="mathematical-verification-title">
+        <div class="ai-subsection-heading"><p class="ai-section-index">05 / VERIFY</p><div><h3 id="mathematical-verification-title">From AI Answer to Verified Mathematics</h3><p>A plausible answer is not necessarily correct. Trace the reasoning, check the mathematics, and independently test the result.</p></div></div>
+        <ol class="verification-flow" aria-label="Eight stages for verifying an AI mathematical answer">
+          <li><span>01</span><strong>AI answer</strong><small>Record the claim or result to be checked.</small></li>
+          <li><span>02</span><strong>Check assumptions</strong><small>Identify conditions the solution relies on.</small></li>
+          <li><span>03</span><strong>Check definitions</strong><small>Confirm terms and notation are used correctly.</small></li>
+          <li><span>04</span><strong>Check algebra</strong><small>Rework transformations and calculations.</small></li>
+          <li><span>05</span><strong>Check numerical calculation</strong><small>Recalculate values and inspect precision.</small></li>
+          <li><span>06</span><strong>Check units</strong><small>Confirm quantities and dimensions are consistent.</small></li>
+          <li><span>07</span><strong>Independent verification</strong><small>Use substitution, a second method, or a trusted source.</small></li>
+          <li class="validated"><span>08</span><strong>Validated answer</strong><small>Accept only the part supported by the checks.</small></li>
+        </ol>
+        <div class="ai-verification-support">
+          <article class="ai-example ai-verification-example" aria-label="Illustrative unit-conversion verification example"><div><p class="eyebrow eyebrow-dark">CHECK THE CLAIM</p><h4>Convert 72 kilometres per hour to metres per second</h4><p>A result of <span class="math-inline">20 m/s</span> can be checked by converting both units independently.</p></div><div class="ai-example-calculation"><code>72 km/h × (1000 m / 1 km) × (1 h / 3600 s)</code><code>= 20 m/s</code><p>The kilometres and hours cancel, leaving metres per second.</p></div></article>
+          <aside class="ai-checklist"><h4>Verification checklist</h4><ul><li>Are the assumptions and definitions stated?</li><li>Can I reproduce the algebra or derivation?</li><li>Do an independent calculation and units check agree?</li><li>Are sources and computational steps traceable?</li><li>Have I recorded uncertainty or limitations?</li></ul></aside>
+        </div>
+      </section>
     </section>
 
     <section class="library-section section" id="videos">
@@ -188,9 +330,59 @@
 
     <section class="resources-section" id="resources">
       <div class="resources-inner section"><div class="section-heading"><div><p class="eyebrow">LEARNING RESOURCES</p><h2>A library for learning and practice.</h2></div><p>Explore selected workshop and research materials alongside the learning library.</p></div>
+        <section class="teaching-resources" aria-labelledby="teaching-resources-title">
+          <div class="teaching-resources-heading"><p class="eyebrow">TEACHING METHODOLOGY</p><h3 id="teaching-resources-title">Teaching Resources</h3><p>Teaching-resource sections are mapped below. Verified Drive links or source files are still needed for materials that are not present in this local project.</p></div>
+          <div class="teaching-resource-list">
+            <article class="resource-feature teaching-resource-card" id="isttpapgsr-framework" aria-labelledby="isttpapgsr-title">
+              <span class="resource-feature-index">01 / FRAMEWORK</span><h4 id="isttpapgsr-title">01 – ISTTPAPGSR Framework</h4>
+              <p>Open the verified framework overview document in Google Drive. The file is currently restricted to its owner and authorized accounts.</p>
+              <a class="resource-action teaching-resource-action" href="https://drive.google.com/file/d/1JWaXSU6pRgAwesGlx_sDzpgebbPk9vF5/view" target="_blank" rel="noopener noreferrer">Open Framework Overview (DOCX) <span aria-hidden="true">↗</span></a>
+              <p class="teaching-resource-status">GOOGLE DRIVE ACCESS REQUIRED · OWNER VIEW TESTED</p>
+            </article>
+            <article class="resource-feature teaching-resource-card" id="lesson-plans" aria-labelledby="lesson-plans-title">
+              <span class="resource-feature-index">02 / MODEL LESSONS</span><h4 id="lesson-plans-title">02 – Lesson Plans</h4>
+              <p>Two existing model Engineering Mathematics lesson plans are available in Google Drive. Access remains limited to authorized accounts.</p>
+              <div class="teaching-file-list">
+                <a class="resource-action" href="https://drive.google.com/file/d/1KOS5k5V_pZ8bsPB365XZ44fkwZu0w36L/view" target="_blank" rel="noopener noreferrer">Read Initial Value Problems Lesson Plan (PDF) <span aria-hidden="true">↗</span></a>
+                <a class="resource-action" href="https://drive.google.com/file/d/1G8IfVo6nrz8uJdQY0MsslgVVcuIwYq3G/view" target="_blank" rel="noopener noreferrer">Read Eigenvalues &amp; Eigenvectors Lesson Plan (PDF) <span aria-hidden="true">↗</span></a>
+              </div>
+              <p class="teaching-resource-status">GOOGLE DRIVE ACCESS REQUIRED · OWNER VIEW TESTED</p>
+            </article>
+            <article class="resource-feature teaching-resource-card" id="teaching-resources-library" aria-labelledby="teaching-resources-library-title">
+              <span class="resource-feature-index">03 / GENERATOR &amp; MATERIALS</span><h4 id="teaching-resources-library-title">03 – Teaching Resources</h4>
+              <p>Verified GNANA AI Lesson Plan Generator resources. Google Drive access is currently restricted to the owner and authorized accounts.</p>
+              <div class="teaching-file-list">
+                <a class="resource-action" href="https://drive.google.com/file/d/1hBgttPRZSWKb3lb7xujIXPAwRzEoHUUS/view" target="_blank" rel="noopener noreferrer">Open Python Source Code <span aria-hidden="true">↗</span></a>
+                <a class="resource-action" href="https://drive.google.com/file/d/1l6OejIPqdyx0heXM6F501JZkc3kXj1my/view" target="_blank" rel="noopener noreferrer">Open ISTTPAPGSR Master Prompt <span aria-hidden="true">↗</span></a>
+                <a class="resource-action" href="https://drive.google.com/file/d/1Io7j1TFXNrF1nx-_VgEe-Swe3--7NTe-/view" target="_blank" rel="noopener noreferrer">Open Fourier Transforms Sample Prompt (PDF) <span aria-hidden="true">↗</span></a>
+                <a class="resource-action" href="https://drive.google.com/file/d/1VZnBiEOz4akuRle3DiFBXJO3pWq2hB2-/view" target="_blank" rel="noopener noreferrer">Open Generated Fourier Transforms Lesson Plan (PDF) <span aria-hidden="true">↗</span></a>
+                <a class="resource-action" href="https://drive.google.com/file/d/1YjJCXEHnOfzuDkGhpmXUhaN2c7ulokAO/view" target="_blank" rel="noopener noreferrer">Open README / Setup and Usage Guide <span aria-hidden="true">↗</span></a>
+              </div>
+              <p class="teaching-resource-status">GOOGLE DRIVE ACCESS REQUIRED · OWNER VIEW TESTED</p>
+            </article>
+            <article class="resource-feature teaching-resource-card" id="classroom-activities" aria-labelledby="classroom-activities-title">
+              <span class="resource-feature-index">04 / PARTICIPANT MATERIALS</span><h4 id="classroom-activities-title">04 – Classroom Activities</h4>
+              <p>These six participant-review documents are separate from the existing interactive sample quizzes. The local copies are marked “NOT APPROVED FOR PUBLIC RELEASE,” so this static site does not expose them as downloads.</p>
+              <div class="participant-round-grid" role="list" aria-label="Six participant review documents">
+                <article class="participant-round" role="listitem"><h5>Round 1 – Rapid Fire</h5><code>01_Rapid_Fire_Participant_v2.docx</code><a class="resource-action" href="https://drive.google.com/file/d/1-R5ceGuh-2kfJGEM_zARI-HZYRBTg0Uf/view" target="_blank" rel="noopener noreferrer">Open Document (restricted) <span aria-hidden="true">↗</span></a><span>Drive currently says Private to you · review copy not approved for public release</span></article>
+                <article class="participant-round" role="listitem"><h5>Round 2 – Treasure Hunt</h5><code>02_Treasure_Hunt_Participant_v2.docx</code><a class="resource-action" href="https://drive.google.com/file/d/1ChfwtsitbJEzMuZl-25Wl0Rm6WS_o8Jx/view" target="_blank" rel="noopener noreferrer">Open Document (restricted) <span aria-hidden="true">↗</span></a><span>Drive currently says Private to you · review copy not approved for public release</span></article>
+                <article class="participant-round" role="listitem"><h5>Round 3 – Guess the Concept</h5><code>03_Guess_the_Concept_Participant_v2.docx</code><a class="resource-action" href="https://drive.google.com/file/d/1HYsLLyV_k-TK83kb1BA5eanKx2Nw8cYc/view" target="_blank" rel="noopener noreferrer">Open Document (restricted) <span aria-hidden="true">↗</span></a><span>Drive currently says Private to you · review copy not approved for public release</span></article>
+                <article class="participant-round" role="listitem"><h5>Round 4 – Maths Charades</h5><code>04_Maths_Charades_Participant_v2.docx</code><a class="resource-action" href="https://drive.google.com/file/d/1rQSQesH-38huxUKmzFAgAPverQKTyiIP/view" target="_blank" rel="noopener noreferrer">Open Document (restricted) <span aria-hidden="true">↗</span></a><span>Drive currently says Private to you · review copy not approved for public release</span></article>
+                <article class="participant-round" role="listitem"><h5>Round 5 – Relay Race</h5><code>05_Relay_Race_Participant_v2.docx</code><a class="resource-action" href="https://drive.google.com/file/d/1edPxNMWBq4prWQJqHlcgLW5qAH_JA40H/view" target="_blank" rel="noopener noreferrer">Open Document (restricted) <span aria-hidden="true">↗</span></a><span>Drive currently says Private to you · review copy not approved for public release</span></article>
+                <article class="participant-round" role="listitem"><h5>Round 6 – Missing Concept</h5><code>06_Missing_Concept_Participant_v2.docx</code><a class="resource-action" href="https://drive.google.com/file/d/1wSemF_agapryyvfoxasUTEibB2MfW1xf/view" target="_blank" rel="noopener noreferrer">Open Document (restricted) <span aria-hidden="true">↗</span></a><span>Drive currently says Private to you · review copy not approved for public release</span></article>
+              </div>
+              <p class="teaching-resource-status">INTERACTIVE SAMPLE QUIZZES REMAIN IN THE SEPARATE QUIZ SECTION BELOW</p>
+            </article>
+            <article class="resource-feature teaching-resource-card" id="private-teacher-resources" aria-labelledby="private-teacher-resources-title">
+              <span class="resource-feature-index">05 / RESTRICTED</span><h4 id="private-teacher-resources-title">05 – Private Teacher Resources</h4>
+              <p>Restricted materials are not displayed or linked here. This public static site has no authentication layer; the Google Drive folder remains private to its owner.</p>
+              <p class="teaching-resource-status">PRIVATE CONTENT AND FOLDER LINK NOT EXPOSED</p>
+            </article>
+          </div>
+        </section>
         <div class="featured-research-resources" aria-label="FSC-GAIM-PReDFA research resources">
           <article class="resource-feature"><span class="resource-feature-index">FSC-GAIM-PReDFA / WORKSHOP</span><h3>Workshop Slides</h3><p>Browse 23 images: 21 content slides, one title slide and one thanks slide.</p><a class="resource-action" href="https://drive.google.com/drive/folders/1qZpd8EMnaJevH_1Ttw9UDcRKsMGHhd_o" target="_blank" rel="noopener noreferrer">View Workshop Slides <span aria-hidden="true">↗</span></a></article>
-          <article class="resource-feature"><span class="resource-feature-index">FSC-GAIM-PReDFA / TOOLKIT</span><h3>Research Prompt Toolkit</h3><p>Four coordinated resources for literature discovery, paper preparation and research workflow development.</p><a class="resource-action" href="https://drive.google.com/drive/folders/1O66rHZLjUy0pVFK96_ekbtDeE4Rnf5Qk?usp=drive_link" target="_blank" rel="noopener noreferrer">Browse Toolkit Folder <span aria-hidden="true">↗</span></a>
+          <article class="resource-feature" id="research-toolkit"><span class="resource-feature-index">FSC-GAIM-PReDFA / TOOLKIT</span><h3>Research Prompt Toolkit</h3><p>Four coordinated resources for literature discovery, paper preparation and research workflow development.</p><a class="resource-action" href="https://drive.google.com/drive/folders/1O66rHZLjUy0pVFK96_ekbtDeE4Rnf5Qk?usp=drive_link" target="_blank" rel="noopener noreferrer">Browse Toolkit Folder <span aria-hidden="true">↗</span></a>
             <div class="toolkit-group-grid" aria-label="Research Prompt Toolkit files">
               <article class="toolkit-group"><span class="resource-feature-index">01 / LITERATURE DISCOVERY</span><h4>Research Prompt Library</h4><p>A research prompt library for supporting literature discovery and research development.</p><div class="toolkit-file"><code>Research_Prompt_Library.pdf</code><a class="resource-action" href="https://drive.google.com/file/d/1KNsWhk2zo1mFxMg2IFFFPz0smph3hyk3/view?usp=drive_link" target="_blank" rel="noopener noreferrer">Open Research Prompt Library (PDF) <span aria-hidden="true">↗</span></a></div></article>
               <article class="toolkit-group"><span class="resource-feature-index">02 / PAPER PREPARATION</span><h4>Research Paper Generation Prompt Book</h4><p>A 200-prompt resource for research and manuscript preparation.</p><div class="toolkit-file-list"><div class="toolkit-file"><code>Research_Paper_Generation_Prompt_Book_200.pdf</code><a class="resource-action" href="https://drive.google.com/file/d/1LvmI9lE72JTbOjtQoiu36uBL2Yqbn-ml/view?usp=drive_link" target="_blank" rel="noopener noreferrer">Read PDF <span aria-hidden="true">↗</span></a></div><div class="toolkit-file"><code>Research_Paper_Generation_Prompt_Book_200.docx</code><a class="resource-action" href="https://docs.google.com/document/d/1N4uIr4H1KrH97PrvzCS2G4z95lN2eUpC/edit?usp=drive_link&amp;ouid=103853228763219469349&amp;rtpof=true&amp;sd=true" target="_blank" rel="noopener noreferrer">Get Editable DOCX <span aria-hidden="true">↗</span></a></div></div></article>
@@ -253,7 +445,7 @@
   <footer class="site-footer">
     <div class="footer-identity"><a class="footer-brand" href="#top"><img src="branding/gnana-math-primary-dark.svg" alt="GNANA MATH — Mathematics • Engineering • Research • AI"></a></div>
     <div class="footer-person"><strong>Dr. V. Gnanaraj</strong><span>Retired Professor of Mathematics</span><span>Thiagarajar College of Engineering, Madurai</span></div>
-    <nav class="footer-links" aria-label="Footer navigation"><a href="#mathematics">Mathematics</a><a href="#engineering">Engineering Mathematics</a><a href="#research">Research</a><a href="#lab">Interactive Lab</a><a href="#ai">AI &amp; Mathematics</a><a href="#videos">Videos</a><a href="#resources">Resources</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+    <nav class="footer-links" aria-label="Footer navigation"><a href="#mathematics">Mathematics</a><a href="#engineering">Engineering Mathematics</a><a href="#research">Research</a><a href="#ai">AI &amp; Mathematics</a><a href="#videos">Videos</a><a href="#resources">Resources</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
     <div class="footer-bottom"><span>© 2026 GNANA MATH LEARNING CENTRE</span><a href="branding/preview.html">Brand identity preview</a><a href="https://gnanamath.wordpress.com/">Current WordPress site ↗</a></div>
   </footer>
   <script src="script.js"></script>

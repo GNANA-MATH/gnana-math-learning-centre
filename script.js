@@ -1,153 +1,164 @@
 const menuButton = document.querySelector('.menu-toggle');
 const primaryNav = document.querySelector('#primary-nav');
+const navDropdowns = [...document.querySelectorAll('.nav-dropdown')];
+
+const closeDropdown = (dropdown, { returnFocus = false } = {}) => {
+  const toggle = dropdown?.querySelector('.nav-dropdown-toggle');
+  const submenu = dropdown?.querySelector('.nav-submenu');
+  toggle?.setAttribute('aria-expanded', 'false');
+  if (submenu) submenu.hidden = true;
+  if (returnFocus) toggle?.focus();
+};
+
+const closeAllDropdowns = ({ returnFocusTo = null } = {}) => {
+  navDropdowns.forEach((dropdown) => closeDropdown(dropdown, {
+    returnFocus: dropdown === returnFocusTo,
+  }));
+};
+
+navDropdowns.forEach((dropdown) => {
+  const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+  const submenu = dropdown.querySelector('.nav-submenu');
+  toggle?.addEventListener('click', () => {
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    closeAllDropdowns();
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    if (submenu) submenu.hidden = isOpen;
+  });
+  dropdown.addEventListener('focusout', (event) => {
+    if (!dropdown.contains(event.relatedTarget)) closeDropdown(dropdown);
+  });
+});
 
 menuButton?.addEventListener('click', () => {
   const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+  if (isOpen) closeAllDropdowns();
   menuButton.setAttribute('aria-expanded', String(!isOpen));
   primaryNav?.classList.toggle('open', !isOpen);
 });
 
 primaryNav?.querySelectorAll('a').forEach((link) => {
   link.addEventListener('click', () => {
+    closeAllDropdowns();
     menuButton?.setAttribute('aria-expanded', 'false');
     primaryNav.classList.remove('open');
   });
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') {
+  const openDropdown = navDropdowns.find((dropdown) => dropdown.querySelector('.nav-dropdown-toggle')?.getAttribute('aria-expanded') === 'true');
+  if (event.key === 'Escape' && openDropdown) {
+    closeAllDropdowns({ returnFocusTo: openDropdown });
+  } else if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') {
     menuButton.setAttribute('aria-expanded', 'false');
     primaryNav?.classList.remove('open');
     menuButton.focus();
   }
 });
 
-const svgNode = (name, attributes = {}) => {
-  const node = document.createElementNS('http://www.w3.org/2000/svg', name);
-  Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, value));
-  return node;
+document.addEventListener('click', (event) => {
+  if (!event.target.closest?.('.nav-dropdown')) closeAllDropdowns();
+});
+
+const navAnchorTargets = [...(primaryNav?.querySelectorAll('a[href^="#"]') ?? [])]
+  .map((link) => ({ link, target: document.getElementById(decodeURIComponent(link.hash.slice(1))) }))
+  .filter(({ target }) => target);
+
+const updateActiveNavigation = () => {
+  if (!navAnchorTargets.length) return;
+  const headerBottom = document.querySelector('.site-header')?.getBoundingClientRect().bottom ?? 0;
+  const visibleTargets = navAnchorTargets
+    .map((item) => ({ ...item, top: item.target.getBoundingClientRect().top, bottom: item.target.getBoundingClientRect().bottom }))
+    .filter(({ bottom }) => bottom > headerBottom + 8)
+    .sort((a, b) => {
+      const aHasPassed = a.top <= headerBottom + 24;
+      const bHasPassed = b.top <= headerBottom + 24;
+      if (aHasPassed !== bHasPassed) return aHasPassed ? -1 : 1;
+      return aHasPassed ? b.top - a.top : a.top - b.top;
+    });
+  const current = visibleTargets[0]?.link;
+  navAnchorTargets.forEach(({ link }) => {
+    if (link === current) link.setAttribute('aria-current', 'location');
+    else link.removeAttribute('aria-current');
+    const dropdown = link.closest('.nav-dropdown');
+    if (dropdown) dropdown.querySelector('.nav-dropdown-toggle')?.classList.toggle('is-active', [...dropdown.querySelectorAll('a')].some((item) => item === current));
+  });
 };
 
-const functionSelect = document.querySelector('#function-select');
-const functionPath = document.querySelector('#function-path');
-const functionPoint = document.querySelector('#function-point');
-const functionPlot = document.querySelector('#function-plot');
-const functionEquation = document.querySelector('#function-equation');
+let navUpdatePending = false;
+const scheduleNavigationUpdate = () => {
+  if (navUpdatePending) return;
+  navUpdatePending = true;
+  window.requestAnimationFrame(() => {
+    navUpdatePending = false;
+    updateActiveNavigation();
+  });
+};
+window.addEventListener('scroll', scheduleNavigationUpdate, { passive: true });
+window.addEventListener('resize', scheduleNavigationUpdate);
+window.addEventListener('hashchange', scheduleNavigationUpdate);
+scheduleNavigationUpdate();
 
-function updateFunctionPlot() {
-  if (!functionSelect || !functionPath) return;
-  const key = functionSelect.value;
-  const functions = {
-    sin: { fn: Math.sin, equation: 'y = sin(x)' },
-    cos: { fn: Math.cos, equation: 'y = cos(x)' },
-    parabola: { fn: (x) => x * x - 1, equation: 'y = x² − 1' },
-  };
-  const selected = functions[key] ?? functions.sin;
-  const xMin = -8;
-  const xMax = 8;
-  const yMin = -2.2;
-  const yMax = 2.2;
-  const px = (x) => 20 + ((x - xMin) / (xMax - xMin)) * 480;
-  const py = (y) => 12 + ((yMax - y) / (yMax - yMin)) * 256;
-  const points = [];
-  for (let i = 0; i <= 320; i += 1) {
-    const x = xMin + (i / 320) * (xMax - xMin);
-    const y = selected.fn(x);
-    points.push(`${i ? 'L' : 'M'}${px(x).toFixed(2)} ${py(y).toFixed(2)}`);
-  }
-  functionPath.setAttribute('d', points.join(' '));
-  functionPath.setAttribute('stroke', key === 'parabola' ? '#c58a32' : '#263b80');
-  if (functionPoint) {
-    const sampleX = 1.25;
-    functionPoint.setAttribute('cx', px(sampleX));
-    functionPoint.setAttribute('cy', py(selected.fn(sampleX)));
-    functionPoint.setAttribute('fill', key === 'parabola' ? '#c58a32' : '#263b80');
-  }
-  functionPlot?.setAttribute('aria-label', `Graph of ${selected.equation}`);
-  if (functionEquation) functionEquation.textContent = selected.equation;
-}
+const templeCalculatorInputs = {
+  mass: document.querySelector('#temple-mass'),
+  height: document.querySelector('#temple-ramp-height'),
+  length: document.querySelector('#temple-ramp-length'),
+  friction: document.querySelector('#temple-friction'),
+};
+const templeCalculatorError = document.querySelector('#temple-calculator-error');
+const templeNumberFormat = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 });
 
-function updateNewtonPlot() {
-  const slider = document.querySelector('#newton-start');
-  const path = document.querySelector('#newton-function');
-  const stepsGroup = document.querySelector('#newton-steps');
-  const valueOutput = document.querySelector('#newton-start-value');
-  const result = document.querySelector('#newton-result');
-  if (!slider || !path || !stepsGroup) return;
+function updateTempleCalculator() {
+  if (Object.values(templeCalculatorInputs).some((input) => !input)) return;
 
-  let x = Number(slider.value);
-  if (valueOutput) valueOutput.value = x.toFixed(2);
-  const xMin = -2.6;
-  const xMax = 2.6;
-  const yMin = -2.5;
-  const yMax = 5;
-  const px = (value) => 20 + ((value - xMin) / (xMax - xMin)) * 480;
-  const py = (value) => 12 + ((yMax - value) / (yMax - yMin)) * 256;
-  const graphPoints = [];
-  for (let i = 0; i <= 240; i += 1) {
-    const current = xMin + (i / 240) * (xMax - xMin);
-    graphPoints.push(`${i ? 'L' : 'M'}${px(current).toFixed(2)} ${py(current * current - 2).toFixed(2)}`);
-  }
-  path.setAttribute('d', graphPoints.join(' '));
-  stepsGroup.replaceChildren();
-  for (let i = 0; i < 5; i += 1) {
-    const fx = x * x - 2;
-    const next = x - fx / (2 * x);
-    const tangent = svgNode('line', {
-      x1: px(x), y1: py(fx), x2: px(next), y2: py(0),
-      class: 'newton-tangent',
-    });
-    const point = svgNode('circle', { cx: px(x), cy: py(fx), r: 4, class: 'newton-step-point' });
-    stepsGroup.append(tangent, point);
-    x = next;
-  }
-  stepsGroup.append(svgNode('circle', { cx: px(x), cy: py(0), r: 5, class: 'newton-root-point' }));
-  if (result) result.textContent = `Five iterations give x ≈ ${x.toFixed(8)}. The positive root is √2 ≈ ${Math.sqrt(2).toFixed(8)}.`;
-}
-
-const numberFormat = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 });
-const formatN = (value) => `${numberFormat.format(value)} N`;
-
-function updateRampCalculator() {
-  const mass = Number(document.querySelector('#stone-mass')?.value);
-  const height = Number(document.querySelector('#ramp-height')?.value);
-  const length = Number(document.querySelector('#ramp-length')?.value);
-  const friction = Number(document.querySelector('#friction')?.value);
-  const error = document.querySelector('#ramp-error');
-  const outputIds = ['weight-output', 'angle-output', 'ideal-output', 'friction-output', 'tonne-output'];
-  const outputs = Object.fromEntries(outputIds.map((id) => [id, document.getElementById(id)]));
-
+  const values = Object.fromEntries(Object.entries(templeCalculatorInputs).map(([name, input]) => [name, Number(input.value)]));
   let message = '';
-  if (![mass, height, length, friction].every(Number.isFinite) || mass <= 0 || height <= 0 || length <= 0 || friction < 0) {
-    message = 'Enter positive mass, height and ramp length values, and a non-negative friction coefficient.';
-  } else if (height > length) {
-    message = 'The height must not exceed the ramp length.';
+  if (!Object.values(values).every(Number.isFinite)) {
+    message = 'Enter finite numeric values for all four inputs.';
+  } else if (values.mass <= 0) {
+    message = 'Stone mass must be greater than zero.';
+  } else if (values.height <= 0 || values.length <= 0) {
+    message = 'Ramp height and ramp length must both be greater than zero.';
+  } else if (values.height > values.length) {
+    message = 'Ramp height must not exceed ramp length.';
+  } else if (values.friction < 0) {
+    message = 'The friction coefficient must be zero or greater.';
   }
 
-  if (error) error.textContent = message;
+  Object.entries(templeCalculatorInputs).forEach(([name, input]) => {
+    const value = values[name];
+    const invalid = !Number.isFinite(value)
+      || (name === 'mass' && value <= 0)
+      || ((name === 'height' || name === 'length') && value <= 0)
+      || (name === 'friction' && value < 0)
+      || (name === 'height' && Number.isFinite(values.length) && value > values.length);
+    input.setAttribute('aria-invalid', String(invalid));
+  });
+
+  if (templeCalculatorError) templeCalculatorError.textContent = message;
+  const outputIds = ['temple-weight-output', 'temple-angle-output', 'temple-ideal-output', 'temple-friction-output', 'temple-tonne-output'];
+  const outputs = outputIds.map((id) => document.getElementById(id));
   if (message) {
-    Object.values(outputs).forEach((output) => { if (output) output.textContent = '—'; });
+    outputs.forEach((output) => { if (output) output.textContent = '—'; });
     return;
   }
 
   const g = 9.80665;
-  const theta = Math.asin(height / length);
-  const weight = mass * g;
+  const theta = Math.asin(values.height / values.length);
+  const weight = values.mass * g;
   const idealForce = weight * Math.sin(theta);
-  const frictionForce = weight * (Math.sin(theta) + friction * Math.cos(theta));
-  if (outputs['weight-output']) outputs['weight-output'].textContent = formatN(weight);
-  if (outputs['angle-output']) outputs['angle-output'].textContent = `${(theta * 180 / Math.PI).toFixed(2)}°`;
-  if (outputs['ideal-output']) outputs['ideal-output'].textContent = formatN(idealForce);
-  if (outputs['friction-output']) outputs['friction-output'].textContent = formatN(frictionForce);
-  if (outputs['tonne-output']) outputs['tonne-output'].textContent = `${(frictionForce / 9806.65).toFixed(3)} tonnes-force`;
+  const frictionForce = values.friction * weight * Math.cos(theta);
+  const uphillPull = idealForce + frictionForce;
+  const formatForce = (force) => `${templeNumberFormat.format(force)} N`;
+  const results = [
+    formatForce(weight),
+    `${templeNumberFormat.format(theta * 180 / Math.PI)}°`,
+    formatForce(idealForce),
+    formatForce(uphillPull),
+    `${templeNumberFormat.format(uphillPull / (1000 * g))} tonnes-force`,
+  ];
+  outputs.forEach((output, index) => { if (output) output.textContent = results[index]; });
 }
 
-functionSelect?.addEventListener('change', updateFunctionPlot);
-document.querySelector('#newton-start')?.addEventListener('input', updateNewtonPlot);
-['stone-mass', 'ramp-height', 'ramp-length', 'friction'].forEach((id) => {
-  document.querySelector(`#${id}`)?.addEventListener('input', updateRampCalculator);
-});
-
-updateFunctionPlot();
-updateNewtonPlot();
-updateRampCalculator();
+Object.values(templeCalculatorInputs).forEach((input) => input?.addEventListener('input', updateTempleCalculator));
+updateTempleCalculator();

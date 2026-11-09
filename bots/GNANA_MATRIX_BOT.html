@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GNANA MATRIX BOT V1.0 — Interactive Matrix Mathematics Laboratory</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root{
+  --navy:#142746; --blue:#2456a6; --teal:#087f8c; --gold:#f3b63f;
+  --ink:#202b3b; --muted:#68758a; --paper:#f4f7fb; --line:#dce4ef;
+  --red:#b83b4b; --green:#1f8a4c; --light:#eaf1f8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.hero{background:linear-gradient(125deg,#142746,#2456a6 65%,#087f8c);color:#fff;padding:18px clamp(14px,3vw,36px)}
+.brand{font-size:11px;letter-spacing:2.5px;color:#f8d77a;font-weight:800}
+.hero h1{margin:4px 0;font-size:clamp(20px,3.2vw,28px)}
+.hero p{margin:3px 0 0;color:#e7efff;max-width:920px;font-size:14px}
+.tabs{display:flex;gap:5px;max-width:1400px;margin:12px auto 0;padding:0 16px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:9px 9px 0 0;font-weight:700;cursor:pointer;color:var(--ink);font-size:13px}
+.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.layout{max-width:1400px;margin:0 auto;padding:0 16px 28px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 4px 18px #18355c08;margin-bottom:14px}
+h2{margin:0 0 10px;color:var(--navy);font-size:18px}
+h3{margin:0 0 8px;color:var(--navy);font-size:15px}
+label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:2px}
+input,select,textarea{width:100%;padding:8px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font:inherit}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:10px}
+.btn{border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;font:inherit}
+.btn:hover{filter:brightness(1.08)}
+.btn.s{background:var(--light);color:#233c60}
+.btn.g{background:var(--gold);color:#3c2a00}
+.btn.ok{background:var(--green)}
+.btn.no{background:var(--red)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bar{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+.card{border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:10px;padding:14px;margin:10px 0;background:#fbfcfe}
+.tag{display:inline-block;background:var(--gold);color:#3c2a00;border-radius:99px;padding:2px 9px;font-size:11px;font-weight:800;margin-bottom:5px}
+.note{font-size:12px;color:var(--muted);margin:5px 0}
+.warn{background:#fff9e8;border-left:4px solid var(--gold);padding:9px 11px;border-radius:7px;font-size:13px;margin:8px 0}
+.err{background:#fdecee;border-left:4px solid var(--red);padding:9px 11px;border-radius:7px;font-size:13px;margin:8px 0;color:#7a1f2b}
+.okmsg{background:#e9f7ef;border-left:4px solid var(--green);padding:9px 11px;border-radius:7px;font-size:13px;margin:8px 0;color:#14633a}
+.matrix-grid{display:inline-grid;gap:4px;vertical-align:middle;margin:6px 0}
+.matrix-grid input{width:62px;padding:6px 4px;text-align:center;font-family:ui-monospace,Consolas,monospace;font-size:14px}
+.mj{overflow-x:auto;padding:6px 0}
+.step{border:1px dashed var(--muted);border-radius:8px;padding:10px 12px;margin:8px 0;background:#fafbfd}
+.step b{color:var(--blue)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:820px){.two-col{grid-template-columns:1fr}.tabs button{font-size:12px;padding:7px 10px}}
+.hidden{display:none!important}
+#out{min-height:40px}
+.vis-box{height:320px;margin-top:10px}
+.learn-item{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fbfcfe}
+.learn-item h4{margin:0 0 6px;color:var(--teal)}
+footer{text-align:center;padding:18px;color:var(--muted);font-size:12px}
+.mono{font-family:ui-monospace,Consolas,monospace}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="brand">V • G • R / GNANA MATH LEARNING CENTRE</div>
+  <h1>GNANA MATRIX BOT V1.0</h1>
+  <p>Explore Matrices. Solve Problems. Understand Mathematics. — Interactive browser-based matrix computation laboratory for Engineering Mathematics.</p>
+</header>
+
+<nav class="tabs" id="nav">
+  <button data-m="home" class="on">Home</button>
+  <button data-m="input">Matrix Input</button>
+  <button data-m="basic">Basic Ops</button>
+  <button data-m="detinv">Det &amp; Inverse</button>
+  <button data-m="rank">Rank &amp; Reduction</button>
+  <button data-m="system">Linear Systems</button>
+  <button data-m="eigen">Eigen</button>
+  <button data-m="decomp">Decomposition</button>
+  <button data-m="vis">Visualization</button>
+  <button data-m="learn">Learning Corner</button>
+  <button data-m="report">Report</button>
+</nav>
+
+<div class="layout">
+
+<!-- ========== HOME ========== -->
+<section id="m_home" class="panel">
+  <h2>Welcome to the Interactive Matrix Laboratory</h2>
+  <p>GNANA MATRIX BOT V1.0 is a fully offline, browser-based tool for Engineering Mathematics. All computations run locally using Math.js. No login, no API keys, no data leaves your device.</p>
+  <div class="row" style="margin-top:14px">
+    <div class="card"><b>Matrix Input Lab</b><br><span class="note">Create, paste, randomise or load sample matrices A and B.</span></div>
+    <div class="card"><b>Basic Operations</b><br><span class="note">Add, subtract, multiply, transpose, power, norms, equality.</span></div>
+    <div class="card"><b>Determinant &amp; Inverse</b><br><span class="note">det, inverse, adjoint, cofactor with verification.</span></div>
+    <div class="card"><b>Rank &amp; Reduction</b><br><span class="note">Rank, REF, RREF with step-by-step row operations.</span></div>
+    <div class="card"><b>Linear Systems</b><br><span class="note">Solve AX = B by several classical methods.</span></div>
+    <div class="card"><b>Eigenvalues</b><br><span class="note">λ, eigenvectors, characteristic polynomial, verification.</span></div>
+    <div class="card"><b>Decomposition</b><br><span class="note">LU, QR, Cholesky, SVD (where supported).</span></div>
+    <div class="card"><b>Visualization</b><br><span class="note">Interactive heatmaps of matrix entries.</span></div>
+  </div>
+  <div class="warn" style="margin-top:12px">Tolerance used for numerical comparisons: ε = 10<sup>−10</sup>. Floating-point results may differ slightly from exact symbolic values. Always verify critical calculations by hand or with independent software.</div>
+</section>
+
+<!-- ========== MATRIX INPUT ========== -->
+<section id="m_input" class="panel hidden">
+  <h2>Module 1 — Matrix Input Lab</h2>
+  <div class="row">
+    <div><label>Matrix A — Rows</label><input type="number" id="ar" min="1" max="10" value="3"></div>
+    <div><label>Matrix A — Cols</label><input type="number" id="ac" min="1" max="10" value="3"></div>
+    <div><label>Matrix B — Rows</label><input type="number" id="br" min="1" max="10" value="3"></div>
+    <div><label>Matrix B — Cols</label><input type="number" id="bc" min="1" max="10" value="3"></div>
+  </div>
+  <div class="bar">
+    <button class="btn" id="btnBuild">Build Input Grids</button>
+    <button class="btn s" id="btnSample">Load Sample 3×3</button>
+    <button class="btn s" id="btnRandom">Random (−9…9)</button>
+    <button class="btn s" id="btnClear">Clear Both</button>
+    <button class="btn g" id="btnPasteA">Paste CSV → A</button>
+  </div>
+  <div class="two-col">
+    <div>
+      <h3>Matrix A</h3>
+      <div id="gridA"></div>
+      <div class="mj" id="texA"></div>
+    </div>
+    <div>
+      <h3>Matrix B</h3>
+      <div id="gridB"></div>
+      <div class="mj" id="texB"></div>
+    </div>
+  </div>
+  <div class="note">You can also paste CSV-style data (numbers separated by commas or spaces, one row per line) into the prompt when using “Paste CSV → A”.</div>
+</section>
+
+<!-- ========== BASIC OPS ========== -->
+<section id="m_basic" class="panel hidden">
+  <h2>Module 2 — Basic Matrix Operations</h2>
+  <div class="bar">
+    <button class="btn" data-op="add">A + B</button>
+    <button class="btn" data-op="sub">A − B</button>
+    <button class="btn" data-op="mul">A × B</button>
+    <button class="btn" data-op="emul">A ⊙ B (Hadamard)</button>
+    <button class="btn" data-op="trans">Aᵀ</button>
+    <button class="btn" data-op="trace">tr(A)</button>
+    <button class="btn" data-op="pow">Aⁿ</button>
+    <button class="btn" data-op="eq">A = B ?</button>
+    <button class="btn" data-op="norm">Norms of A</button>
+    <button class="btn s" data-op="scalar">k · A</button>
+  </div>
+  <div class="row" style="max-width:280px">
+    <div><label>Scalar k (for k·A)</label><input type="number" id="scalarK" value="2" step="any"></div>
+    <div><label>Power n (for Aⁿ)</label><input type="number" id="powN" value="2" min="0" max="12"></div>
+  </div>
+  <div id="basicOut"></div>
+</section>
+
+<!-- ========== DET & INV ========== -->
+<section id="m_detinv" class="panel hidden">
+  <h2>Module 3 — Determinant &amp; Inverse</h2>
+  <div class="bar">
+    <button class="btn" id="btnDet">Determinant det(A)</button>
+    <button class="btn" id="btnInv">Inverse A⁻¹</button>
+    <button class="btn" id="btnAdj">Adjoint / Cofactor</button>
+    <button class="btn s" id="btnVerifyInv">Verify A A⁻¹ = I</button>
+  </div>
+  <div id="detOut"></div>
+</section>
+
+<!-- ========== RANK ========== -->
+<section id="m_rank" class="panel hidden">
+  <h2>Module 4 — Rank &amp; Matrix Reduction</h2>
+  <div class="bar">
+    <button class="btn" id="btnRank">Compute Rank</button>
+    <button class="btn" id="btnREF">Row Echelon Form</button>
+    <button class="btn" id="btnRREF">Reduced Row Echelon Form</button>
+  </div>
+  <div id="rankOut"></div>
+  <div id="stepsBox" class="hidden">
+    <h3>Row Operation Steps</h3>
+    <div class="bar">
+      <button class="btn s" id="stepPrev">◀ Previous</button>
+      <span id="stepInfo" class="note" style="align-self:center"></span>
+      <button class="btn s" id="stepNext">Next ▶</button>
+    </div>
+    <div id="stepView"></div>
+  </div>
+</section>
+
+<!-- ========== LINEAR SYSTEMS ========== -->
+<section id="m_system" class="panel hidden">
+  <h2>Module 5 — System of Linear Equations AX = B</h2>
+  <p class="note">Enter coefficient matrix A and right-hand side B (column vector or matrix). B must have the same number of rows as A.</p>
+  <div class="bar">
+    <button class="btn" id="btnSolveGE">Gaussian Elimination</button>
+    <button class="btn" id="btnSolveGJ">Gauss-Jordan</button>
+    <button class="btn" id="btnSolveInv">Inverse Method</button>
+    <button class="btn" id="btnSolveLU">LU Method</button>
+    <button class="btn s" id="btnCramer">Cramer's Rule (square)</button>
+  </div>
+  <div id="sysOut"></div>
+</section>
+
+<!-- ========== EIGEN ========== -->
+<section id="m_eigen" class="panel hidden">
+  <h2>Module 6 — Eigenvalues &amp; Eigenvectors</h2>
+  <div class="bar">
+    <button class="btn" id="btnEigen">Compute Eigenvalues / Vectors</button>
+    <button class="btn s" id="btnCharPoly">Characteristic Polynomial (≤4×4)</button>
+  </div>
+  <div id="eigenOut"></div>
+</section>
+
+<!-- ========== DECOMPOSITION ========== -->
+<section id="m_decomp" class="panel hidden">
+  <h2>Module 7 — Matrix Decomposition</h2>
+  <div class="bar">
+    <button class="btn" id="btnLU">LU Decomposition</button>
+    <button class="btn" id="btnQR">QR Decomposition</button>
+    <button class="btn" id="btnChol">Cholesky (SPD)</button>
+    <button class="btn" id="btnSVD">SVD</button>
+  </div>
+  <div id="decompOut"></div>
+</section>
+
+<!-- ========== VISUALIZATION ========== -->
+<section id="m_vis" class="panel hidden">
+  <h2>Module 8 — Matrix Visualization</h2>
+  <div class="bar">
+    <button class="btn" id="btnHeatA">Heatmap of A</button>
+    <button class="btn" id="btnHeatB">Heatmap of B</button>
+  </div>
+  <div id="visInfo" class="note"></div>
+  <div id="visPlot" class="vis-box"></div>
+</section>
+
+<!-- ========== LEARNING ========== -->
+<section id="m_learn" class="panel hidden">
+  <h2>Module 9 — Matrix Learning Corner</h2>
+  <div id="learnContent"></div>
+</section>
+
+<!-- ========== REPORT ========== -->
+<section id="m_report" class="panel hidden">
+  <h2>Module 10 — Report &amp; Export</h2>
+  <div class="bar">
+    <button class="btn" id="btnCopy">Copy Last Result</button>
+    <button class="btn s" id="btnTxt">Download TXT Report</button>
+    <button class="btn s" id="btnCSV">Download A as CSV</button>
+    <button class="btn g" id="btnPrint">Print Report</button>
+  </div>
+  <div id="reportPreview" class="card mono" style="white-space:pre-wrap;font-size:13px;max-height:420px;overflow:auto"></div>
+</section>
+
+</div>
+
+<footer>
+  GNANA MATRIX BOT V1.0 · GNANA MATH LEARNING CENTRE · V • G • R · Mathematics · Engineering · Research<br>
+  All computations performed in-browser. Mathematical correctness is the highest priority.
+</footer>
+
+<script>
+/* ============================================================
+   GNANA MATRIX BOT V1.0
+   Interactive Matrix Mathematics Laboratory
+   Developer: GNANA MATH LEARNING CENTRE / V • G • R
+   ============================================================ */
+
+const EPS = 1e-10;
+let lastReport = "";
+let stepHistory = [];
+let stepIdx = 0;
+
+/* ---------- Utility helpers ---------- */
+const $ = id => document.getElementById(id);
+const clamp = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
+
+function typeset(el){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise([el]).catch(()=>{});
+  }
+}
+
+function matToTex(M, name){
+  if(!M || !M.length) return "";
+  const rows = M.map(r => r.map(x => formatNum(x)).join(" & ")).join(" \\\\ ");
+  const body = `\\begin{bmatrix}${rows}\\end{bmatrix}`;
+  return name ? `${name}=${body}` : body;
+}
+
+function formatNum(x){
+  if(typeof x !== "number" || !isFinite(x)) return String(x);
+  if(Math.abs(x) < EPS) return "0";
+  const r = Math.round(x);
+  if(Math.abs(x - r) < EPS) return String(r);
+  return parseFloat(x.toPrecision(8)).toString();
+}
+
+function matrixFromGrid(prefix){
+  const r = parseInt($(prefix==="A"?"ar":"br").value)||1;
+  const c = parseInt($(prefix==="A"?"ac":"bc").value)||1;
+  const M = [];
+  for(let i=0;i<r;i++){
+    const row = [];
+    for(let j=0;j<c;j++){
+      const el = document.getElementById(`${prefix}_${i}_${j}`);
+      let v = el ? parseFloat(el.value) : 0;
+      if(isNaN(v)) v = 0;
+      row.push(v);
+    }
+    M.push(row);
+  }
+  return M;
+}
+
+function setGrid(prefix, M){
+  const r = M.length, c = M[0].length;
+  $(prefix==="A"?"ar":"br").value = r;
+  $(prefix==="A"?"ac":"bc").value = c;
+  buildGrid(prefix);
+  for(let i=0;i<r;i++)
+    for(let j=0;j<c;j++){
+      const el = document.getElementById(`${prefix}_${i}_${j}`);
+      if(el) el.value = formatNum(M[i][j]);
+    }
+  updateTex(prefix);
+}
+
+function buildGrid(prefix){
+  const r = clamp(parseInt($(prefix==="A"?"ar":"br").value)||1,1,10);
+  const c = clamp(parseInt($(prefix==="A"?"ac":"bc").value)||1,1,10);
+  $(prefix==="A"?"ar":"br").value = r;
+  $(prefix==="A"?"ac":"bc").value = c;
+  const host = $(prefix==="A"?"gridA":"gridB");
+  host.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.className = "matrix-grid";
+  grid.style.gridTemplateColumns = `repeat(${c}, auto)`;
+  for(let i=0;i<r;i++)
+    for(let j=0;j<c;j++){
+      const inp = document.createElement("input");
+      inp.type = "number";
+      inp.step = "any";
+      inp.id = `${prefix}_${i}_${j}`;
+      inp.value = "0";
+      inp.addEventListener("input", ()=>updateTex(prefix));
+      grid.appendChild(inp);
+    }
+  host.appendChild(grid);
+  updateTex(prefix);
+}
+
+function updateTex(prefix){
+  const M = matrixFromGrid(prefix);
+  const el = $(prefix==="A"?"texA":"texB");
+  el.innerHTML = "$$" + matToTex(M, prefix) + "$$";
+  typeset(el);
+}
+
+function showResult(hostId, html, reportText){
+  const host = $(hostId);
+  host.innerHTML = html;
+  typeset(host);
+  if(reportText) lastReport = reportText;
+  updateReportPreview();
+}
+
+function errBox(msg){ return `<div class="err">⚠ ${msg}</div>`; }
+function okBox(msg){ return `<div class="okmsg">✓ ${msg}</div>`; }
+
+function dimsOk(A,B,op){
+  const ra=A.length, ca=A[0].length, rb=B.length, cb=B[0].length;
+  if(op==="add"||op==="sub"||op==="emul"||op==="eq"){
+    if(ra!==rb||ca!==cb) return `Dimension mismatch: A is ${ra}×${ca}, B is ${rb}×${cb}.`;
+  }
+  if(op==="mul"){
+    if(ca!==rb) return `Cannot multiply: columns of A (${ca}) ≠ rows of B (${rb}).`;
+  }
+  return null;
+}
+
+function isSquare(M){ return M.length===M[0].length; }
+
+/* ---------- Navigation ---------- */
+document.querySelectorAll("#nav button").forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll("#nav button").forEach(b=>b.classList.remove("on"));
+    btn.classList.add("on");
+    document.querySelectorAll("[id^=m_]").forEach(s=>s.classList.add("hidden"));
+    $("m_"+btn.dataset.m).classList.remove("hidden");
+  };
+});
+
+/* ---------- Input Lab ---------- */
+$("btnBuild").onclick = ()=>{ buildGrid("A"); buildGrid("B"); };
+$("btnSample").onclick = ()=>{
+  setGrid("A",[[1,2,3],[4,5,6],[7,8,9]]);
+  setGrid("B",[[9,8,7],[6,5,4],[3,2,1]]);
+};
+$("btnRandom").onclick = ()=>{
+  const ra=parseInt($("ar").value)||3, ca=parseInt($("ac").value)||3;
+  const rb=parseInt($("br").value)||3, bc=parseInt($("bc").value)||3;
+  const rnd=(r,c)=>Array.from({length:r},()=>Array.from({length:c},()=>Math.floor(Math.random()*19)-9));
+  setGrid("A",rnd(ra,ca)); setGrid("B",rnd(rb,bc));
+};
+$("btnClear").onclick = ()=>{
+  buildGrid("A"); buildGrid("B");
+};
+$("btnPasteA").onclick = ()=>{
+  const txt = prompt("Paste CSV / space-separated matrix (one row per line):");
+  if(!txt) return;
+  try{
+    const rows = txt.trim().split(/\n/).map(l=>l.trim().split(/[\s,;]+/).map(Number));
+    if(rows.some(r=>r.some(isNaN))) throw new Error("Non-numeric data");
+    setGrid("A",rows);
+  }catch(e){ alert("Could not parse matrix: "+e.message); }
+};
+
+/* ---------- Basic Operations ---------- */
+document.querySelectorAll("[data-op]").forEach(btn=>{
+  btn.onclick = ()=>runBasic(btn.dataset.op);
+});
+
+function runBasic(op){
+  const A = matrixFromGrid("A"), B = matrixFromGrid("B");
+  let html = "", report = `GNANA MATRIX BOT V1.0\nOperation: ${op}\nDate: ${new Date().toLocaleString()}\n\n`;
+  try{
+    if(op==="add"||op==="sub"||op==="mul"||op==="emul"||op==="eq"){
+      const e = dimsOk(A,B,op); if(e){ showResult("basicOut",errBox(e)); return; }
+    }
+    let R, expr, steps="";
+    if(op==="add"){
+      R = math.add(A,B); expr="A+B";
+      steps = "Step 1: Confirm dimensions match.\nStep 2: Add corresponding entries a<sub>ij</sub> + b<sub>ij</sub>.";
+    }else if(op==="sub"){
+      R = math.subtract(A,B); expr="A−B";
+      steps = "Step 1: Confirm dimensions match.\nStep 2: Subtract corresponding entries.";
+    }else if(op==="mul"){
+      R = math.multiply(A,B); expr="AB";
+      steps = "Step 1: Check columns(A) = rows(B).\nStep 2: Each entry (AB)<sub>ij</sub> = row i of A · column j of B.";
+    }else if(op==="emul"){
+      R = math.dotMultiply(A,B); expr="A⊙B (Hadamard)";
+      steps = "Element-wise product: (A⊙B)<sub>ij</sub> = a<sub>ij</sub>·b<sub>ij</sub>.";
+    }else if(op==="trans"){
+      R = math.transpose(A); expr="Aᵀ";
+      steps = "Interchange rows and columns: (Aᵀ)<sub>ij</sub> = a<sub>ji</sub>.";
+    }else if(op==="trace"){
+      if(!isSquare(A)){ showResult("basicOut",errBox("Trace requires a square matrix.")); return; }
+      const t = math.trace(A); expr="tr(A)";
+      html = `<div class="card"><span class="tag">Trace</span>
+        <div class="mj">$$${matToTex(A,"A")}$$</div>
+        <p><b>tr(A) = ${formatNum(t)}</b></p>
+        <p class="note">Trace is the sum of the main-diagonal entries.</p></div>`;
+      report += `tr(A) = ${t}\n`;
+      showResult("basicOut",html,report); return;
+    }else if(op==="pow"){
+      if(!isSquare(A)){ showResult("basicOut",errBox("Matrix power requires a square matrix.")); return; }
+      const n = clamp(parseInt($("powN").value)||0,0,12);
+      R = math.pow(A,n); expr=`A^{${n}}`;
+      steps = `Computed by successive multiplication (n = ${n}).`;
+    }else if(op==="eq"){
+      const eq = math.deepEqual(A,B) || math.max(math.abs(math.subtract(A,B))) < EPS;
+      html = `<div class="card"><span class="tag">Equality</span>
+        <p>A and B are ${eq?"<b style='color:var(--green)'>equal</b>":"<b style='color:var(--red)'>not equal</b>"} (within ε = 10<sup>−10</sup>).</p></div>`;
+      report += `A == B ? ${eq}\n`;
+      showResult("basicOut",html,report); return;
+    }else if(op==="norm"){
+      const n1 = math.norm(A,1), n2 = math.norm(A,2), nF = math.norm(A,"fro"), nInf = math.norm(A,Infinity);
+      html = `<div class="card"><span class="tag">Matrix Norms</span>
+        <div class="mj">$$${matToTex(A,"A")}$$</div>
+        <p>‖A‖<sub>1</sub> (max column sum) = <b>${formatNum(n1)}</b><br>
+           ‖A‖<sub>2</sub> (spectral) ≈ <b>${formatNum(n2)}</b><br>
+           ‖A‖<sub>F</sub> (Frobenius) = <b>${formatNum(nF)}</b><br>
+           ‖A‖<sub>∞</sub> (max row sum) = <b>${formatNum(nInf)}</b></p></div>`;
+      report += `1-norm=${n1}, 2-norm≈${n2}, Frobenius=${nF}, Inf-norm=${nInf}\n`;
+      showResult("basicOut",html,report); return;
+    }else if(op==="scalar"){
+      const k = parseFloat($("scalarK").value)||0;
+      R = math.multiply(k,A); expr=`${k}A`;
+      steps = `Multiply every entry by the scalar k = ${k}.`;
+    }
+
+    html = `<div class="card"><span class="tag">${expr}</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      ${B && (op==="add"||op==="sub"||op==="mul"||op==="emul")?`<div class="mj">$$${matToTex(B,"B")}$$</div>`:""}
+      <p class="note">${steps}</p>
+      <h3>Result</h3>
+      <div class="mj">$$${matToTex(R, "R")}$$</div>
+      <p class="note">Size: ${R.length} × ${R[0].length}</p></div>`;
+    report += `Expression: ${expr}\nResult:\n${R.map(r=>r.map(formatNum).join("\t")).join("\n")}\n`;
+    showResult("basicOut",html,report);
+  }catch(e){
+    showResult("basicOut",errBox(e.message||String(e)));
+  }
+}
+
+/* ---------- Determinant & Inverse ---------- */
+$("btnDet").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A)){ showResult("detOut",errBox("Determinant is defined only for square matrices.")); return; }
+  try{
+    const d = math.det(A);
+    const html = `<div class="card"><span class="tag">Determinant</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <p><b>det(A) = ${formatNum(d)}</b></p>
+      <p class="note">Computed via LU decomposition with partial pivoting (Math.js). For 2×2: ad−bc; for larger matrices the same principle is applied recursively / via factorization.</p>
+      ${Math.abs(d)<EPS?`<div class="warn">Matrix is numerically singular (det ≈ 0).</div>`:""}
+    </div>`;
+    showResult("detOut",html,`det(A)=${d}\n`);
+  }catch(e){ showResult("detOut",errBox(e.message)); }
+};
+
+$("btnInv").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A)){ showResult("detOut",errBox("Inverse requires a square matrix.")); return; }
+  try{
+    const d = math.det(A);
+    if(Math.abs(d)<EPS){
+      showResult("detOut",errBox("Matrix is singular (det ≈ 0). Inverse does not exist."));
+      return;
+    }
+    const Inv = math.inv(A);
+    const html = `<div class="card"><span class="tag">Inverse</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <p>det(A) = ${formatNum(d)} ≠ 0 → nonsingular.</p>
+      <h3>A⁻¹</h3>
+      <div class="mj">$$${matToTex(Inv,"A^{-1}")}$$</div>
+      <p class="note">Verification: compute A A⁻¹ and A⁻¹ A; both should be approximately I.</p>
+    </div>`;
+    showResult("detOut",html,`Inverse of A:\n${Inv.map(r=>r.map(formatNum).join("\t")).join("\n")}\n`);
+  }catch(e){ showResult("detOut",errBox(e.message)); }
+};
+
+$("btnAdj").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A)){ showResult("detOut",errBox("Adjoint requires a square matrix.")); return; }
+  try{
+    const n = A.length;
+    const C = [];
+    for(let i=0;i<n;i++){
+      const row=[];
+      for(let j=0;j<n;j++){
+        const minor = A.filter((_,r)=>r!==i).map(r=>r.filter((_,c)=>c!==j));
+        const sign = ((i+j)%2===0)?1:-1;
+        row.push(sign * math.det(minor));
+      }
+      C.push(row);
+    }
+    const Adj = math.transpose(C);
+    const html = `<div class="card"><span class="tag">Cofactor & Adjoint</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <h3>Cofactor matrix C</h3>
+      <div class="mj">$$${matToTex(C,"C")}$$</div>
+      <h3>Adjoint = Cᵀ</h3>
+      <div class="mj">$$${matToTex(Adj,"\\operatorname{adj}(A)")}$$</div>
+      <p class="note">A · adj(A) = det(A)·I. If det≠0 then A⁻¹ = (1/det(A))·adj(A).</p>
+    </div>`;
+    showResult("detOut",html,`Adjoint:\n${Adj.map(r=>r.map(formatNum).join("\t")).join("\n")}\n`);
+  }catch(e){ showResult("detOut",errBox(e.message)); }
+};
+
+$("btnVerifyInv").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A)){ showResult("detOut",errBox("Square matrix required.")); return; }
+  try{
+    const d = math.det(A);
+    if(Math.abs(d)<EPS){ showResult("detOut",errBox("Singular matrix — inverse does not exist.")); return; }
+    const Inv = math.inv(A);
+    const P1 = math.multiply(A,Inv);
+    const P2 = math.multiply(Inv,A);
+    const I = math.identity(A.length).toArray();
+    const e1 = math.max(math.abs(math.subtract(P1,I)));
+    const e2 = math.max(math.abs(math.subtract(P2,I)));
+    const html = `<div class="card"><span class="tag">Verification</span>
+      <div class="mj">$$AA^{-1}\\approx$$ ${matToTex(P1)}</div>
+      <div class="mj">$$A^{-1}A\\approx$$ ${matToTex(P2)}</div>
+      <p>Max |AA⁻¹ − I| ≈ ${e1.toExponential(3)}<br>
+         Max |A⁻¹A − I| ≈ ${e2.toExponential(3)}</p>
+      ${e1<1e-8&&e2<1e-8?okBox("Verification successful within numerical tolerance."):`<div class="warn">Residual is larger than expected; check conditioning of A.</div>`}
+    </div>`;
+    showResult("detOut",html);
+  }catch(e){ showResult("detOut",errBox(e.message)); }
+};
+
+/* ---------- Rank & Reduction ---------- */
+function rrefWithSteps(M){
+  const A = M.map(r=>r.slice());
+  const rows = A.length, cols = A[0].length;
+  const steps = [{op:"Start", mat:A.map(r=>r.slice())}];
+  let lead = 0;
+  for(let r=0;r<rows && lead<cols;r++){
+    let i = r;
+    while(i<rows && Math.abs(A[i][lead])<EPS) i++;
+    if(i===rows){ lead++; r--; continue; }
+    if(i!==r){
+      [A[i],A[r]] = [A[r],A[i]];
+      steps.push({op:`R_${r+1} ↔ R_${i+1}`, mat:A.map(x=>x.slice())});
+    }
+    const piv = A[r][lead];
+    if(Math.abs(piv-1)>EPS){
+      for(let j=0;j<cols;j++) A[r][j] /= piv;
+      steps.push({op:`R_${r+1} → (1/${formatNum(piv)}) R_${r+1}`, mat:A.map(x=>x.slice())});
+    }
+    for(let i=0;i<rows;i++){
+      if(i===r) continue;
+      const f = A[i][lead];
+      if(Math.abs(f)<EPS) continue;
+      for(let j=0;j<cols;j++) A[i][j] -= f*A[r][j];
+      steps.push({op:`R_${i+1} → R_${i+1} − (${formatNum(f)}) R_${r+1}`, mat:A.map(x=>x.slice())});
+    }
+    lead++;
+  }
+  return {R:A, steps};
+}
+
+function rankOf(M){
+  const {R} = rrefWithSteps(M);
+  let rank = 0;
+  for(const row of R) if(row.some(x=>Math.abs(x)>EPS)) rank++;
+  return rank;
+}
+
+$("btnRank").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  const r = rankOf(A);
+  const html = `<div class="card"><span class="tag">Rank</span>
+    <div class="mj">$$${matToTex(A,"A")}$$</div>
+    <p><b>rank(A) = ${r}</b></p>
+    <p class="note">Numerical rank obtained from RREF with tolerance ε = 10<sup>−10</sup>. This may differ from exact algebraic rank for ill-conditioned matrices.</p>
+  </div>`;
+  showResult("rankOut",html,`rank(A)=${r}\n`);
+  $("stepsBox").classList.add("hidden");
+};
+
+$("btnREF").onclick = $("btnRREF").onclick = function(){
+  const A = matrixFromGrid("A");
+  const {R, steps} = rrefWithSteps(A);
+  stepHistory = steps;
+  stepIdx = 0;
+  $("stepsBox").classList.remove("hidden");
+  renderStep();
+  const html = `<div class="card"><span class="tag">RREF</span>
+    <div class="mj">$$${matToTex(A,"A")}$$</div>
+    <h3>Reduced Row Echelon Form</h3>
+    <div class="mj">$$${matToTex(R,"R")}$$</div>
+    <p class="note">Use the Next / Previous buttons below to walk through each elementary row operation.</p>
+  </div>`;
+  showResult("rankOut",html);
+};
+
+function renderStep(){
+  if(!stepHistory.length) return;
+  const s = stepHistory[stepIdx];
+  $("stepInfo").textContent = `Step ${stepIdx+1} of ${stepHistory.length}`;
+  $("stepView").innerHTML = `<div class="step"><b>${s.op}</b><div class="mj">$$${matToTex(s.mat)}$$</div></div>`;
+  typeset($("stepView"));
+  $("stepPrev").disabled = stepIdx===0;
+  $("stepNext").disabled = stepIdx===stepHistory.length-1;
+}
+$("stepPrev").onclick = ()=>{ if(stepIdx>0){ stepIdx--; renderStep(); } };
+$("stepNext").onclick = ()=>{ if(stepIdx<stepHistory.length-1){ stepIdx++; renderStep(); } };
+
+/* ---------- Linear Systems ---------- */
+function solveSystem(method){
+  const A = matrixFromGrid("A");
+  const B = matrixFromGrid("B");
+  if(A.length !== B.length){
+    showResult("sysOut",errBox(`Rows of A (${A.length}) must equal rows of B (${B.length}).`));
+    return;
+  }
+  try{
+    let X, info="";
+    if(method==="inv"){
+      if(!isSquare(A)){ showResult("sysOut",errBox("Inverse method needs square A.")); return; }
+      if(Math.abs(math.det(A))<EPS){ showResult("sysOut",errBox("A is singular — inverse method fails.")); return; }
+      X = math.multiply(math.inv(A), B);
+      info = "Computed X = A⁻¹ B.";
+    }else if(method==="lu"){
+      if(!isSquare(A)){ showResult("sysOut",errBox("LU method needs square A.")); return; }
+      X = math.lusolve(A, B);
+      info = "Solved via LU factorization with partial pivoting.";
+    }else if(method==="ge"||method==="gj"){
+      // Augment and RREF
+      const Aug = A.map((row,i)=>row.concat(B[i]));
+      const {R} = rrefWithSteps(Aug);
+      const n = A[0].length;
+      const m = B[0].length;
+      // Check consistency & uniqueness
+      let consistent = true, free = false;
+      for(let i=0;i<R.length;i++){
+        const left = R[i].slice(0,n);
+        const right = R[i].slice(n);
+        if(left.every(x=>Math.abs(x)<EPS) && right.some(x=>Math.abs(x)>EPS)) consistent=false;
+        if(left.every(x=>Math.abs(x)<EPS) && right.every(x=>Math.abs(x)<EPS)) free=true;
+      }
+      if(!consistent){
+        showResult("sysOut",`<div class="card"><span class="tag">No solution</span>
+          <p>The system is inconsistent (row of the form [0 … 0 | c] with c≠0 appears in RREF).</p>
+          <div class="mj">$$${matToTex(R,"\\text{RREF}[A|B]")}$$</div></div>`);
+        return;
+      }
+      // Extract particular solution (set free vars = 0)
+      X = Array.from({length:n},()=>Array(m).fill(0));
+      for(let i=0;i<Math.min(R.length,n);i++){
+        let piv=-1;
+        for(let j=0;j<n;j++) if(Math.abs(R[i][j])>EPS){ piv=j; break; }
+        if(piv>=0) for(let k=0;k<m;k++) X[piv][k] = R[i][n+k];
+      }
+      info = free ? "Infinitely many solutions (free variables present). Showing one particular solution (free vars = 0)."
+                  : "Unique solution obtained from RREF of the augmented matrix.";
+    }else if(method==="cramer"){
+      if(!isSquare(A) || B[0].length!==1){ showResult("sysOut",errBox("Cramer's rule needs square A and a single RHS column.")); return; }
+      const d = math.det(A);
+      if(Math.abs(d)<EPS){ showResult("sysOut",errBox("det(A)≈0 — Cramer's rule does not apply.")); return; }
+      const n = A.length;
+      X = Array.from({length:n},()=>[0]);
+      for(let j=0;j<n;j++){
+        const Aj = A.map((row,i)=>row.map((v,k)=>k===j?B[i][0]:v));
+        X[j][0] = math.det(Aj)/d;
+      }
+      info = "Cramer's rule: xⱼ = det(Aⱼ)/det(A).";
+    }
+
+    // Verification
+    const AX = math.multiply(A,X);
+    const resid = math.max(math.abs(math.subtract(AX,B)));
+    const html = `<div class="card"><span class="tag">Solution (${method})</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <div class="mj">$$${matToTex(B,"B")}$$</div>
+      <p>${info}</p>
+      <h3>Solution X</h3>
+      <div class="mj">$$${matToTex(X,"X")}$$</div>
+      <p class="note">Residual ‖AX − B‖<sub>∞</sub> ≈ ${resid.toExponential(3)}</p>
+      ${resid<1e-8?okBox("Verification by substitution successful."):`<div class="warn">Residual is non-negligible; matrix may be ill-conditioned.</div>`}
+    </div>`;
+    showResult("sysOut",html,`Solution X:\n${X.map(r=>r.map(formatNum).join("\t")).join("\n")}\n`);
+  }catch(e){ showResult("sysOut",errBox(e.message||String(e))); }
+}
+
+$("btnSolveGE").onclick = ()=>solveSystem("ge");
+$("btnSolveGJ").onclick = ()=>solveSystem("gj");
+$("btnSolveInv").onclick = ()=>solveSystem("inv");
+$("btnSolveLU").onclick  = ()=>solveSystem("lu");
+$("btnCramer").onclick   = ()=>solveSystem("cramer");
+
+/* ---------- Eigen ---------- */
+$("btnEigen").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A)){ showResult("eigenOut",errBox("Eigenvalues require a square matrix.")); return; }
+  try{
+    const eigs = math.eigs(A);
+    // Math.js ≥13 uses .eigenvectors; older versions used .vectors
+    const vals = eigs.values;
+    const vecs = eigs.eigenvectors !== undefined ? eigs.eigenvectors : eigs.vectors;
+    let html = `<div class="card"><span class="tag">Eigenvalues & Eigenvectors</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <h3>Eigenvalues λ</h3><ul>`;
+    let vArr = Array.isArray(vals) ? vals : (vals.toArray ? vals.toArray() : [vals]);
+    vArr.forEach((λ,i)=>{
+      let re, im = 0;
+      if(λ && typeof λ === "object" && ("re" in λ || "im" in λ)){
+        re = λ.re; im = λ.im || 0;
+      } else {
+        re = λ;
+      }
+      html += `<li>λ<sub>${i+1}</sub> = ${formatNum(re)}${Math.abs(im)>EPS?` ${im>=0?"+":"−"} ${formatNum(Math.abs(im))}i`:""}</li>`;
+    });
+    html += `</ul>`;
+
+    // Handle eigenvectors – Math.js may return a matrix or an array of vectors
+    let V = null;
+    if(vecs){
+      if(vecs.toArray) V = vecs.toArray();
+      else if(Array.isArray(vecs)){
+        // Could be array of column vectors or already a 2-D matrix
+        if(Array.isArray(vecs[0]) && typeof vecs[0][0] !== "object"){
+          V = vecs; // already matrix form
+        } else if(vecs[0] && vecs[0].vector){
+          // array of {value, vector} objects (some Math.js builds)
+          V = vecs.map(obj=>{
+            const v = obj.vector;
+            return Array.isArray(v) ? v : (v.toArray ? v.toArray() : v);
+          });
+          // transpose so columns are eigenvectors
+          if(V.length && Array.isArray(V[0])){
+            const n = V[0].length;
+            const mat = Array.from({length:n},(_,i)=>V.map(col=>col[i]));
+            V = mat;
+          }
+        } else {
+          V = vecs;
+        }
+      }
+    }
+
+    if(V && V.length){
+      // Ensure V is a proper 2-D numeric matrix for display
+      const clean = (x)=>{
+        if(x && typeof x==="object" && "re" in x) return x.re; // show real part
+        return typeof x==="number" ? x : 0;
+      };
+      const Vnum = V.map(row=>{
+        if(Array.isArray(row)) return row.map(clean);
+        return [clean(row)];
+      });
+      html += `<h3>Eigenvectors (columns of V)</h3><div class="mj">$$${matToTex(Vnum,"V")}$$</div>`;
+
+      // Verification for the first real eigenpair
+      try{
+        const λ0raw = vArr[0];
+        const λ0 = (λ0raw && typeof λ0raw==="object" && "re" in λ0raw) ? λ0raw.re : λ0raw;
+        if(typeof λ0 === "number" && Math.abs(λ0raw?.im||0)<EPS){
+          const v0 = Vnum.map(row=>[row[0]]);
+          const Av = math.multiply(A, v0);
+          const lv = math.multiply(λ0, v0);
+          const diff = math.max(math.abs(math.subtract(Av, lv)));
+          html += `<p class="note">Verification for first eigenpair: ‖Av − λv‖ ≈ ${diff.toExponential(3)}</p>`;
+        }
+      }catch(_){}
+    } else {
+      html += `<p class="note">Eigenvectors were not returned by the library for this matrix (common for complex or defective cases).</p>`;
+    }
+
+    html += `<p class="note">Numerical eigenvalues may differ slightly from exact values due to floating-point arithmetic. Complex eigenvalues appear for non-symmetric matrices.</p></div>`;
+    showResult("eigenOut",html, `Eigenvalues: ${vArr.map(λ=>{
+      if(λ&&typeof λ==="object") return `${λ.re}${λ.im?`+${λ.im}i`:""}`;
+      return λ;
+    }).join(", ")}\n`);
+  }catch(e){ showResult("eigenOut",errBox(e.message||String(e))); }
+};
+
+$("btnCharPoly").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A) || A.length>4){ showResult("eigenOut",errBox("Characteristic polynomial display is limited to n ≤ 4.")); return; }
+  try{
+    // Build monic characteristic polynomial coefficients via eigenvalues
+    const eigs = math.eigs(A);
+    const vals = (Array.isArray(eigs.values)?eigs.values:eigs.values.toArray()).map(λ=>typeof λ==="object"?math.complex(λ.re,λ.im):λ);
+    // p(λ) = ∏(λ − λi)
+    let coeffs = [1]; // monic
+    for(const λ of vals){
+      const next = Array(coeffs.length+1).fill(0);
+      for(let i=0;i<coeffs.length;i++){
+        next[i] = math.add(next[i]||0, coeffs[i]);
+        next[i+1] = math.subtract(next[i+1]||0, math.multiply(coeffs[i],λ));
+      }
+      coeffs = next.map(c=>typeof c==="object"?c.re:c); // keep real part for display
+    }
+    // Display
+    let poly = "";
+    const n = coeffs.length-1;
+    for(let i=0;i<coeffs.length;i++){
+      const c = coeffs[i];
+      if(Math.abs(c)<EPS) continue;
+      const p = n-i;
+      const term = p===0 ? formatNum(c) : (p===1?`${formatNum(c)}\\lambda`:`${formatNum(c)}\\lambda^{${p}}`);
+      poly += (poly && c>=0?" + ":"") + term;
+    }
+    const html = `<div class="card"><span class="tag">Characteristic Polynomial</span>
+      <div class="mj">$$p(\\lambda)=\\det(A-\\lambda I)\\approx ${poly}$$</div>
+      <p class="note">Coefficients obtained from the product of (λ − λᵢ). For exact symbolic polynomials a computer-algebra system is preferable.</p>
+    </div>`;
+    showResult("eigenOut",html);
+  }catch(e){ showResult("eigenOut",errBox(e.message)); }
+};
+
+/* ---------- Decomposition ---------- */
+$("btnLU").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A)){ showResult("decompOut",errBox("LU requires a square matrix.")); return; }
+  try{
+    const lu = math.lup(A);
+    const L = lu.L.toArray ? lu.L.toArray() : lu.L;
+    const U = lu.U.toArray ? lu.U.toArray() : lu.U;
+    const P = lu.P ? (lu.P.toArray?lu.P.toArray():lu.P) : null;
+    let html = `<div class="card"><span class="tag">LU Decomposition</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <h3>L (unit lower triangular)</h3><div class="mj">$$${matToTex(L,"L")}$$</div>
+      <h3>U (upper triangular)</h3><div class="mj">$$${matToTex(U,"U")}$$</div>`;
+    if(P) html += `<p class="note">Permutation matrix P is also returned (PA = LU).</p>`;
+    // reconstruction
+    const recon = math.multiply(L,U);
+    const err = math.max(math.abs(math.subtract(recon,A)));
+    html += `<p class="note">‖LU − A‖<sub>∞</sub> ≈ ${err.toExponential(3)} (without permutation). With pivoting the identity is PA = LU.</p></div>`;
+    showResult("decompOut",html);
+  }catch(e){ showResult("decompOut",errBox(e.message||"LU failed (matrix may require pivoting or be singular).")); }
+};
+
+$("btnQR").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  try{
+    const qr = math.qr(A);
+    const Q = qr.Q.toArray?qr.Q.toArray():qr.Q;
+    const R = qr.R.toArray?qr.R.toArray():qr.R;
+    const recon = math.multiply(Q,R);
+    const err = math.max(math.abs(math.subtract(recon,A)));
+    const html = `<div class="card"><span class="tag">QR Decomposition</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <h3>Q (orthogonal / unitary)</h3><div class="mj">$$${matToTex(Q,"Q")}$$</div>
+      <h3>R (upper triangular)</h3><div class="mj">$$${matToTex(R,"R")}$$</div>
+      <p class="note">‖QR − A‖<sub>∞</sub> ≈ ${err.toExponential(3)}</p>
+    </div>`;
+    showResult("decompOut",html);
+  }catch(e){ showResult("decompOut",errBox(e.message)); }
+};
+
+$("btnChol").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  if(!isSquare(A)){ showResult("decompOut",errBox("Cholesky requires a square matrix.")); return; }
+  try{
+    // Check symmetry
+    const AT = math.transpose(A);
+    if(math.max(math.abs(math.subtract(A,AT)))>1e-8){
+      showResult("decompOut",errBox("Matrix is not symmetric. Cholesky needs a symmetric positive-definite matrix."));
+      return;
+    }
+    const L = math.chol(A);
+    const Lm = L.toArray?L.toArray():L;
+    const recon = math.multiply(Lm, math.transpose(Lm));
+    const err = math.max(math.abs(math.subtract(recon,A)));
+    const html = `<div class="card"><span class="tag">Cholesky Decomposition</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <h3>L (lower triangular)</h3><div class="mj">$$${matToTex(Lm,"L")}$$</div>
+      <p>A = L Lᵀ</p>
+      <p class="note">‖L Lᵀ − A‖<sub>∞</sub> ≈ ${err.toExponential(3)}</p>
+    </div>`;
+    showResult("decompOut",html);
+  }catch(e){ showResult("decompOut",errBox("Cholesky failed: matrix is not positive-definite (or numerical issues). "+(e.message||""))); }
+};
+
+$("btnSVD").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  try{
+    const svd = math.svd(A);
+    const U = svd.U.toArray?svd.U.toArray():svd.U;
+    const S = svd.S; // vector of singular values
+    const V = svd.V.toArray?svd.V.toArray():svd.V;
+    const sArr = Array.isArray(S)?S:(S.toArray?S.toArray():[S]);
+    let html = `<div class="card"><span class="tag">Singular Value Decomposition</span>
+      <div class="mj">$$${matToTex(A,"A")}$$</div>
+      <h3>U</h3><div class="mj">$$${matToTex(U,"U")}$$</div>
+      <h3>Singular values σ</h3><p>${sArr.map((s,i)=>`σ<sub>${i+1}</sub> = ${formatNum(s)}`).join("<br>")}</p>
+      <h3>V</h3><div class="mj">$$${matToTex(V,"V")}$$</div>
+      <p class="note">A = U Σ Vᵀ (or V* for complex). Σ is diagonal with the singular values.</p>
+    </div>`;
+    showResult("decompOut",html);
+  }catch(e){ showResult("decompOut",errBox(e.message||"SVD not available for this matrix size / library build.")); }
+};
+
+/* ---------- Visualization ---------- */
+function heat(M, title){
+  if(!window.Plotly){ $("visInfo").textContent="Plotly failed to load."; return; }
+  const z = M;
+  const text = M.map(r=>r.map(formatNum));
+  const data = [{
+    z, type:"heatmap", colorscale:"RdBu", reversescale:true,
+    text, texttemplate:"%{text}", hoverongaps:false,
+    colorbar:{title:"value"}
+  }];
+  const layout = {
+    title, margin:{t:40,l:40,r:20,b:40},
+    xaxis:{title:"column", dtick:1},
+    yaxis:{title:"row", autorange:"reversed", dtick:1},
+    paper_bgcolor:"#fbfcfe", plot_bgcolor:"#fbfcfe"
+  };
+  Plotly.newPlot("visPlot", data, layout, {responsive:true, displayModeBar:false});
+  $("visInfo").textContent = `${title} — ${M.length}×${M[0].length}`;
+}
+$("btnHeatA").onclick = ()=>heat(matrixFromGrid("A"),"Matrix A");
+$("btnHeatB").onclick = ()=>heat(matrixFromGrid("B"),"Matrix B");
+
+/* ---------- Learning Corner ---------- */
+const LEARN = [
+  {t:"Definition of a Matrix", b:`A matrix is a rectangular array of numbers arranged in rows and columns. An m×n matrix has m rows and n columns. Matrices are the fundamental objects of linear algebra and appear throughout engineering, physics, computer science and data science.`},
+  {t:"Types of Matrices", b:`<b>Square</b> (m=n), <b>Diagonal</b> (off-diagonal zero), <b>Identity</b> I (1s on diagonal), <b>Symmetric</b> (A=Aᵀ), <b>Skew-symmetric</b> (A=−Aᵀ), <b>Orthogonal</b> (AᵀA=I), <b>Singular</b> (det=0), <b>Nonsingular</b> (invertible).`},
+  {t:"Matrix Operations", b:`Addition and scalar multiplication are entry-wise. Matrix multiplication (AB)<sub>ij</sub> is the dot product of row i of A with column j of B; it is associative and distributive but not commutative in general.`},
+  {t:"Determinant", b:`det(A) is a scalar associated with every square matrix. It equals the product of the eigenvalues (counting multiplicity). det(A)=0 ⇔ A is singular ⇔ columns (or rows) are linearly dependent.`},
+  {t:"Inverse", b:`If det(A)≠0 then there exists a unique matrix A⁻¹ such that AA⁻¹=A⁻¹A=I. The inverse can be computed via Gauss–Jordan elimination, LU, or the adjugate formula A⁻¹=(1/det(A)) adj(A).`},
+  {t:"Rank", b:`rank(A) is the maximum number of linearly independent rows (or columns). It equals the number of non-zero rows in any row-echelon form of A. For an m×n matrix, 0 ≤ rank ≤ min(m,n).`},
+  {t:"Eigenvalues & Eigenvectors", b:`A non-zero vector v is an eigenvector of A with eigenvalue λ if Av=λv. The eigenvalues are the roots of the characteristic polynomial p(λ)=det(A−λI)=0. Eigenvectors corresponding to distinct eigenvalues are linearly independent.`},
+  {t:"Matrix Decompositions", b:`<b>LU</b>: A=LU (with pivoting PA=LU). <b>QR</b>: A=QR with Q orthogonal, R upper-triangular. <b>Cholesky</b>: A=LLᵀ for symmetric positive-definite A. <b>SVD</b>: A=UΣVᵀ — the most general and numerically stable factorisation.`},
+  {t:"Applications in Engineering", b:`Finite-element stiffness matrices, circuit analysis (nodal admittance), control systems (state-space models), structural mechanics, electromagnetics, and optimisation all rely on matrix algebra.`},
+  {t:"Matrices in Computer Graphics", b:`Affine transformations (translation, rotation, scaling, shear) are represented by 3×3 or 4×4 matrices. Homogeneous coordinates allow composition of transforms by simple matrix multiplication.`},
+  {t:"Matrices in Data Science", b:`Data sets are matrices (samples × features). PCA is an eigendecomposition / SVD of the covariance matrix. Least-squares regression solves the normal equations AᵀAx=Aᵀb.`},
+  {t:"Systems of Linear Equations", b:`The equation AX=B may have a unique solution, infinitely many solutions, or no solution, according to the rank of A and the rank of the augmented matrix [A|B]. Gaussian elimination (or its variants) is the classical algorithm for solving such systems.`}
+];
+$("learnContent").innerHTML = LEARN.map(x=>`<div class="learn-item"><h4>${x.t}</h4><p>${x.b}</p></div>`).join("");
+
+/* ---------- Report / Export ---------- */
+function updateReportPreview(){
+  $("reportPreview").textContent = lastReport || "No computation yet. Run an operation and the report will appear here.";
+}
+$("btnCopy").onclick = ()=>{
+  if(!lastReport){ alert("Nothing to copy yet."); return; }
+  navigator.clipboard.writeText(lastReport).then(()=>alert("Copied to clipboard.")).catch(()=>alert("Clipboard access denied."));
+};
+$("btnTxt").onclick = ()=>{
+  const blob = new Blob([lastReport||"Empty report"],{type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "GNANA_Matrix_Report.txt";
+  a.click();
+};
+$("btnCSV").onclick = ()=>{
+  const A = matrixFromGrid("A");
+  const csv = A.map(r=>r.join(",")).join("\n");
+  const blob = new Blob([csv],{type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "matrix_A.csv";
+  a.click();
+};
+$("btnPrint").onclick = ()=>window.print();
+
+/* ---------- Startup ---------- */
+buildGrid("A");
+buildGrid("B");
+setGrid("A",[[1,2,3],[4,5,6],[7,8,9]]);
+setGrid("B",[[9,8,7],[6,5,4],[3,2,1]]);
+updateReportPreview();
+
+/* Graceful library failure messages */
+window.addEventListener("load",()=>{
+  if(typeof math==="undefined"){
+    document.body.insertAdjacentHTML("afterbegin",'<div class="err" style="margin:12px">Math.js failed to load. Check your internet connection (CDN required).</div>');
+  }
+});
+</script>
+</body>
+</html>

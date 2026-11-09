@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GNANA CALCULUS BOT V1.0 | GNANA MATH LEARNING CENTRE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/all.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+:root {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --muted: #5a6270;
+  --primary: #1e3a8a;
+  --primary-light: #3b82f6;
+  --accent: #0d9488;
+  --border: #e2e8f0;
+  --sidebar: #0f172a;
+  --sidebar-text: #e2e8f0;
+  --success: #059669;
+  --warning: #d97706;
+  --error: #dc2626;
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+}
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --primary: #60a5fa;
+  --primary-light: #93c5fd;
+  --accent: #2dd4bf;
+  --border: #334155;
+  --sidebar: #020617;
+  --sidebar-text: #cbd5e1;
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  display: flex;
+  min-height: 100vh;
+  transition: background 0.25s, color 0.25s;
+}
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: var(--sidebar);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+  transition: transform 0.3s;
+}
+.brand {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.brand h1 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+.brand .sub {
+  font-size: 0.7rem;
+  opacity: 0.75;
+  margin-top: 0.25rem;
+}
+.nav {
+  flex: 1;
+  padding: 0.75rem 0;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1.1rem;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--sidebar-text);
+  border-left: 3px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); }
+.nav-item.active {
+  background: rgba(59,130,246,0.18);
+  border-left-color: #3b82f6;
+  color: #fff;
+}
+.nav-item .icon { width: 1.25rem; text-align: center; opacity: 0.9; }
+.sidebar-footer {
+  padding: 1rem;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  text-align: center;
+}
+/* Main */
+.main {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow);
+}
+.topbar h2 { font-size: 1.15rem; font-weight: 600; }
+.topbar-actions { display: flex; gap: 0.6rem; align-items: center; }
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-light); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-outline:hover { background: var(--border); }
+.btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+.content {
+  padding: 1.5rem;
+  flex: 1;
+}
+.panel {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 1.35rem;
+  margin-bottom: 1.25rem;
+}
+.panel h3 {
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .menu-toggle { display: inline-flex !important; }
+}
+.menu-toggle { display: none; }
+label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: var(--muted);
+}
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  margin-bottom: 0.85rem;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+textarea { min-height: 70px; resize: vertical; font-family: 'Consolas', 'Monaco', monospace; }
+.form-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.form-row > * { flex: 1; min-width: 120px; }
+.result-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+.result-box .label { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
+.result-exact { color: var(--success); font-weight: 600; }
+.result-num { color: var(--primary); }
+.error-msg { color: var(--error); background: rgba(220,38,38,0.08); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; }
+.warning-msg { color: var(--warning); background: rgba(217,119,6,0.08); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; }
+.success-msg { color: var(--success); background: rgba(5,150,105,0.08); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; }
+.steps { margin-top: 0.75rem; padding-left: 1.1rem; font-size: 0.9rem; }
+.steps li { margin-bottom: 0.35rem; }
+.graph-container { width: 100%; height: 420px; margin-top: 1rem; border-radius: 10px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 0.75rem; }
+th, td { padding: 0.55rem 0.7rem; border: 1px solid var(--border); text-align: left; }
+th { background: var(--bg); font-weight: 600; }
+.home-hero {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%);
+  color: #fff;
+  border-radius: 14px;
+  margin-bottom: 1.5rem;
+}
+.home-hero h1 { font-size: 2rem; margin-bottom: 0.5rem; letter-spacing: 1px; }
+.home-hero p { opacity: 0.9; max-width: 640px; margin: 0 auto 1.25rem; }
+.module-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.module-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.15rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.module-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.module-card .icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.module-card h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+.module-card p { font-size: 0.78rem; color: var(--muted); }
+.formula-table td:first-child { font-family: 'Consolas', monospace; }
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(59,130,246,0.15);
+  color: var(--primary);
+  font-weight: 600;
+}
+.tab-bar { display: flex; gap: 0.35rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.tab-btn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.hidden { display: none !important; }
+.footer-note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.score-box { font-size: 1.1rem; font-weight: 600; color: var(--accent); }
+.practice-q { font-size: 1.05rem; margin: 1rem 0; }
+.option-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  cursor: pointer;
+  color: var(--text);
+}
+.option-btn:hover { border-color: var(--primary-light); }
+.option-btn.correct { border-color: var(--success); background: rgba(5,150,105,0.1); }
+.option-btn.wrong { border-color: var(--error); background: rgba(220,38,38,0.1); }
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <h1>GNANA CALCULUS BOT</h1>
+    <div class="sub">V1.0 · V • G • R</div>
+    <div class="sub" style="margin-top:0.15rem">GNANA MATH LEARNING CENTRE</div>
+  </div>
+  <nav class="nav" id="nav">
+    <div class="nav-item active" data-module="home"><span class="icon">⌂</span> Home</div>
+    <div class="nav-item" data-module="limits"><span class="icon">→</span> Limits & Continuity</div>
+    <div class="nav-item" data-module="diff"><span class="icon">d/dx</span> Differentiation</div>
+    <div class="nav-item" data-module="appdiff"><span class="icon">↗</span> Applications of Derivatives</div>
+    <div class="nav-item" data-module="integ"><span class="icon">∫</span> Integration</div>
+    <div class="nav-item" data-module="appinteg"><span class="icon">▣</span> Applications of Integration</div>
+    <div class="nav-item" data-module="de"><span class="icon">dy/dx</span> Differential Equations</div>
+    <div class="nav-item" data-module="multi"><span class="icon">∂</span> Multivariable Calculus</div>
+    <div class="nav-item" data-module="vector"><span class="icon">∇</span> Vector Calculus</div>
+    <div class="nav-item" data-module="graph"><span class="icon">📈</span> Interactive Graphing Lab</div>
+    <div class="nav-item" data-module="learn"><span class="icon">📚</span> Calculus Learning Corner</div>
+    <div class="nav-item" data-module="practice"><span class="icon">✎</span> Practice Lab</div>
+    <div class="nav-item" data-module="report"><span class="icon">📄</span> Report & Export</div>
+  </nav>
+  <div class="sidebar-footer">
+    MATHEMATICS · ENGINEERING · RESEARCH<br>
+    © GNANA MATH LEARNING CENTRE
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <button class="btn btn-outline menu-toggle" id="menuBtn">☰</button>
+      <h2 id="pageTitle">GNANA CALCULUS BOT</h2>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline btn-sm" id="themeBtn" title="Toggle theme">🌓 Theme</button>
+      <button class="btn btn-outline btn-sm" onclick="window.print()">🖨 Print</button>
+    </div>
+  </header>
+
+  <div class="content" id="content">
+    <!-- HOME -->
+    <section id="mod-home" class="module">
+      <div class="home-hero">
+        <h1>GNANA CALCULUS BOT</h1>
+        <p>Explore Limits, Derivatives, Integrals and Differential Equations Through Interactive Mathematics.</p>
+        <div style="font-size:0.85rem;opacity:0.85">V • GUIDANCE • RESEARCH · MATHEMATICS · ENGINEERING · RESEARCH</div>
+      </div>
+      <div class="panel">
+        <h3>Welcome to the Interactive Calculus Laboratory</h3>
+        <p style="margin-bottom:1rem;color:var(--muted)">A standalone engineering mathematics tool for undergraduate students, educators and independent learners. All computations run in your browser.</p>
+        <div class="module-cards">
+          <div class="module-card" data-goto="limits"><div class="icon">→</div><h4>Limits & Continuity</h4><p>Evaluate limits, one-sided limits, continuity and discontinuities.</p></div>
+          <div class="module-card" data-goto="diff"><div class="icon">d/dx</div><h4>Differentiation</h4><p>Symbolic derivatives, higher-order, partial and implicit forms.</p></div>
+          <div class="module-card" data-goto="appdiff"><div class="icon">↗</div><h4>Applications of Derivatives</h4><p>Tangents, critical points, maxima/minima, concavity.</p></div>
+          <div class="module-card" data-goto="integ"><div class="icon">∫</div><h4>Integration</h4><p>Indefinite & definite integrals, numerical rules.</p></div>
+          <div class="module-card" data-goto="appinteg"><div class="icon">▣</div><h4>Applications of Integration</h4><p>Area, volume, arc length.</p></div>
+          <div class="module-card" data-goto="de"><div class="icon">dy/dx</div><h4>Differential Equations</h4><p>First-order and linear constant-coefficient equations.</p></div>
+          <div class="module-card" data-goto="multi"><div class="icon">∂</div><h4>Multivariable Calculus</h4><p>Partial derivatives, gradient, Hessian, critical points.</p></div>
+          <div class="module-card" data-goto="vector"><div class="icon">∇</div><h4>Vector Calculus</h4><p>Gradient, divergence, curl, Laplacian.</p></div>
+          <div class="module-card" data-goto="graph"><div class="icon">📈</div><h4>Graphing Lab</h4><p>Interactive plots, tangent lines, shaded regions.</p></div>
+          <div class="module-card" data-goto="learn"><div class="icon">📚</div><h4>Learning Corner</h4><p>Formulas, theorems, common mistakes & applications.</p></div>
+          <div class="module-card" data-goto="practice"><div class="icon">✎</div><h4>Practice Lab</h4><p>Random problems with hints and score tracking.</p></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Quick Tips</h3>
+        <ul style="padding-left:1.2rem;color:var(--muted);font-size:0.9rem">
+          <li>Enter functions using standard notation: <code>x^2 + 3*x + sin(x)</code>, <code>exp(x)</code>, <code>ln(x)</code>, <code>sqrt(x)</code>.</li>
+          <li>Use <code>*</code> for multiplication. Parentheses are recommended for clarity.</li>
+          <li>Results distinguish exact symbolic answers from numerical approximations.</li>
+          <li>Unsupported cases show clear messages — never invented steps.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- LIMITS -->
+    <section id="mod-limits" class="module hidden">
+      <div class="panel">
+        <h3>Limits & Continuity</h3>
+        <div class="form-row">
+          <div><label>Function f(x)</label><input type="text" id="lim-f" placeholder="e.g. sin(x)/x" value="sin(x)/x"></div>
+          <div><label>Variable</label><input type="text" id="lim-var" value="x"></div>
+          <div><label>Point (or Infinity)</label><input type="text" id="lim-point" value="0" placeholder="0 or Infinity"></div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label>Direction</label>
+            <select id="lim-dir">
+              <option value="both">Two-sided</option>
+              <option value="left">Left-hand (−)</option>
+              <option value="right">Right-hand (+)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="computeLimit()">Evaluate Limit</button>
+        <button class="btn btn-outline" onclick="analyzeContinuity()">Continuity Analysis</button>
+        <div id="lim-result"></div>
+        <div id="lim-graph" class="graph-container"></div>
+      </div>
+    </section>
+
+    <!-- DIFFERENTIATION -->
+    <section id="mod-diff" class="module hidden">
+      <div class="panel">
+        <h3>Symbolic Differentiation</h3>
+        <div class="form-row">
+          <div style="flex:2"><label>Function f(x) or f(x,y,...)</label><input type="text" id="diff-f" value="x^3 + 2*x^2 - 5*x + 7"></div>
+          <div><label>Variable</label><input type="text" id="diff-var" value="x"></div>
+          <div><label>Order</label><input type="number" id="diff-order" value="1" min="1" max="5"></div>
+        </div>
+        <button class="btn btn-primary" onclick="computeDerivative()">Differentiate</button>
+        <button class="btn btn-outline" onclick="computePartial()">Partial Derivatives (multi-var)</button>
+        <div id="diff-result"></div>
+      </div>
+    </section>
+
+    <!-- APPLICATIONS OF DERIVATIVES -->
+    <section id="mod-appdiff" class="module hidden">
+      <div class="panel">
+        <h3>Applications of Derivatives</h3>
+        <div class="form-row">
+          <div style="flex:2"><label>Function f(x)</label><input type="text" id="appd-f" value="x^3 - 3*x^2 - 9*x + 5"></div>
+          <div><label>Point x₀ (for tangent/slope)</label><input type="number" id="appd-x0" value="1" step="any"></div>
+        </div>
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="tangent">Tangent / Normal</button>
+          <button class="tab-btn" data-tab="critical">Critical Points</button>
+          <button class="tab-btn" data-tab="intervals">Increase / Decrease</button>
+          <button class="tab-btn" data-tab="concavity">Concavity</button>
+        </div>
+        <div id="appd-controls">
+          <button class="btn btn-primary" onclick="runAppDiff()">Compute</button>
+        </div>
+        <div id="appd-result"></div>
+        <div id="appd-graph" class="graph-container"></div>
+      </div>
+    </section>
+
+    <!-- INTEGRATION -->
+    <section id="mod-integ" class="module hidden">
+      <div class="panel">
+        <h3>Integration</h3>
+        <div class="form-row">
+          <div style="flex:2"><label>Integrand f(x)</label><input type="text" id="int-f" value="x^2"></div>
+          <div><label>Variable</label><input type="text" id="int-var" value="x"></div>
+        </div>
+        <div class="form-row">
+          <div><label>Lower limit (leave empty for indefinite)</label><input type="text" id="int-a" placeholder="e.g. 0"></div>
+          <div><label>Upper limit</label><input type="text" id="int-b" placeholder="e.g. 1"></div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label>Numerical method (for definite)</label>
+            <select id="int-method">
+              <option value="auto">Auto (symbolic preferred)</option>
+              <option value="trap">Trapezoidal Rule</option>
+              <option value="simp13">Simpson 1/3</option>
+              <option value="simp38">Simpson 3/8</option>
+            </select>
+          </div>
+          <div><label>n (subintervals, even for Simpson 1/3)</label><input type="number" id="int-n" value="100" min="2"></div>
+        </div>
+        <button class="btn btn-primary" onclick="computeIntegral()">Integrate</button>
+        <div id="int-result"></div>
+      </div>
+    </section>
+
+    <!-- APPLICATIONS OF INTEGRATION -->
+    <section id="mod-appinteg" class="module hidden">
+      <div class="panel">
+        <h3>Applications of Integration</h3>
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="area">Area under curve</button>
+          <button class="tab-btn" data-tab="between">Area between curves</button>
+          <button class="tab-btn" data-tab="volume">Volume of revolution</button>
+          <button class="tab-btn" data-tab="arc">Arc length</button>
+        </div>
+        <div id="appi-inputs">
+          <div class="form-row">
+            <div style="flex:2"><label>f(x)</label><input type="text" id="appi-f" value="x^2"></div>
+            <div style="flex:2"><label>g(x) (for between curves)</label><input type="text" id="appi-g" value="x"></div>
+          </div>
+          <div class="form-row">
+            <div><label>a</label><input type="number" id="appi-a" value="0" step="any"></div>
+            <div><label>b</label><input type="number" id="appi-b" value="1" step="any"></div>
+            <div>
+              <label>Axis (volume)</label>
+              <select id="appi-axis"><option value="x">x-axis</option><option value="y">y-axis</option></select>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runAppInteg()">Compute</button>
+        <div id="appi-result"></div>
+        <div id="appi-graph" class="graph-container"></div>
+      </div>
+    </section>
+
+    <!-- DIFFERENTIAL EQUATIONS -->
+    <section id="mod-de" class="module hidden">
+      <div class="panel">
+        <h3>Differential Equations</h3>
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">Supported: separable first-order, first-order linear, and simple linear constant-coefficient (homogeneous).</p>
+        <div class="form-row">
+          <div style="flex:2"><label>Equation (use y' or dy/dx, y for dependent)</label><input type="text" id="de-eq" value="y' = 2*x" placeholder="y' = 2*x  or  y' + 2*y = x"></div>
+        </div>
+        <div class="form-row">
+          <div><label>Initial condition (optional) x0</label><input type="text" id="de-x0" placeholder="0"></div>
+          <div><label>y(x0)</label><input type="text" id="de-y0" placeholder="1"></div>
+        </div>
+        <button class="btn btn-primary" onclick="solveDE()">Solve</button>
+        <div id="de-result"></div>
+      </div>
+    </section>
+
+    <!-- MULTIVARIABLE -->
+    <section id="mod-multi" class="module hidden">
+      <div class="panel">
+        <h3>Multivariable Calculus</h3>
+        <div class="form-row">
+          <div style="flex:2"><label>Function f(x,y) or f(x,y,z)</label><input type="text" id="mv-f" value="x^2 + y^2"></div>
+        </div>
+        <div class="form-row">
+          <div><label>Point (x0,y0[,z0]) comma-separated</label><input type="text" id="mv-pt" value="1,2"></div>
+        </div>
+        <button class="btn btn-primary" onclick="computeMulti()">Compute Partial / Gradient / Hessian</button>
+        <div id="mv-result"></div>
+      </div>
+    </section>
+
+    <!-- VECTOR CALCULUS -->
+    <section id="mod-vector" class="module hidden">
+      <div class="panel">
+        <h3>Vector Calculus</h3>
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="grad">Gradient (scalar)</button>
+          <button class="tab-btn" data-tab="div">Divergence</button>
+          <button class="tab-btn" data-tab="curl">Curl</button>
+          <button class="tab-btn" data-tab="lap">Laplacian</button>
+        </div>
+        <div id="vec-scalar-inputs">
+          <label>Scalar field φ(x,y,z)</label>
+          <input type="text" id="vec-scalar" value="x^2 + y^2 + z^2">
+        </div>
+        <div id="vec-vector-inputs" class="hidden">
+          <label>Vector field F = (P, Q, R)</label>
+          <div class="form-row">
+            <div><input type="text" id="vec-P" value="x" placeholder="P"></div>
+            <div><input type="text" id="vec-Q" value="y" placeholder="Q"></div>
+            <div><input type="text" id="vec-R" value="z" placeholder="R"></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="computeVector()" style="margin-top:0.75rem">Compute</button>
+        <div id="vec-result"></div>
+      </div>
+    </section>
+
+    <!-- GRAPHING LAB -->
+    <section id="mod-graph" class="module hidden">
+      <div class="panel">
+        <h3>Interactive Graphing Lab</h3>
+        <div class="form-row">
+          <div style="flex:2"><label>f(x)</label><input type="text" id="gr-f" value="sin(x)"></div>
+          <div style="flex:2"><label>g(x) (optional second)</label><input type="text" id="gr-g" placeholder="optional"></div>
+        </div>
+        <div class="form-row">
+          <div><label>x min</label><input type="number" id="gr-xmin" value="-6.28" step="any"></div>
+          <div><label>x max</label><input type="number" id="gr-xmax" value="6.28" step="any"></div>
+          <div><label>Show derivative</label>
+            <select id="gr-deriv"><option value="0">No</option><option value="1">Yes</option></select>
+          </div>
+          <div><label>Tangent at x=</label><input type="number" id="gr-tanx" value="" step="any" placeholder="optional"></div>
+        </div>
+        <button class="btn btn-primary" onclick="plotGraphLab()">Plot</button>
+        <div id="gr-plot" class="graph-container"></div>
+      </div>
+    </section>
+
+    <!-- LEARNING CORNER -->
+    <section id="mod-learn" class="module hidden">
+      <div class="panel">
+        <h3>Calculus Learning Corner</h3>
+        <div class="tab-bar" id="learn-tabs">
+          <button class="tab-btn active" data-tab="limits-f">Limit Laws</button>
+          <button class="tab-btn" data-tab="diff-f">Differentiation Formulas</button>
+          <button class="tab-btn" data-tab="int-f">Integration Formulas</button>
+          <button class="tab-btn" data-tab="theorems">Important Theorems</button>
+          <button class="tab-btn" data-tab="mistakes">Common Mistakes</button>
+          <button class="tab-btn" data-tab="eng">Engineering Applications</button>
+        </div>
+        <div id="learn-content"></div>
+      </div>
+    </section>
+
+    <!-- PRACTICE LAB -->
+    <section id="mod-practice" class="module hidden">
+      <div class="panel">
+        <h3>Calculus Practice Lab</h3>
+        <div class="form-row">
+          <div>
+            <label>Difficulty</label>
+            <select id="prac-diff">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          <div>
+            <label>Topic</label>
+            <select id="prac-topic">
+              <option value="derivative">Derivative</option>
+              <option value="integral">Integral</option>
+              <option value="limit">Limit</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="newPracticeQ()">New Question</button>
+        <button class="btn btn-outline" onclick="showPracticeHint()">Hint</button>
+        <button class="btn btn-outline" onclick="revealPractice()">Reveal Solution</button>
+        <div style="margin-top:1rem">Score this session: <span class="score-box" id="prac-score">0</span> / <span id="prac-total">0</span></div>
+        <div id="prac-q" class="practice-q"></div>
+        <div id="prac-options"></div>
+        <div id="prac-feedback"></div>
+      </div>
+    </section>
+
+    <!-- REPORT -->
+    <section id="mod-report" class="module hidden">
+      <div class="panel">
+        <h3>Report & Export</h3>
+        <p style="color:var(--muted);margin-bottom:1rem">Use the browser Print function (or the top-bar Print button) to generate a print-friendly / PDF report of the current solution view. You can also copy results to the clipboard from the result panels.</p>
+        <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+        <button class="btn btn-outline" onclick="copyLastResult()">Copy Last Result to Clipboard</button>
+        <div id="report-preview" class="result-box" style="margin-top:1rem">
+          <div class="label">Last computed result will appear here for export.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer-note">
+    GNANA CALCULUS BOT V1.0 · GNANA MATH LEARNING CENTRE · V • G • R · Standalone client-side application · Mathematical reliability prioritized
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   GNANA CALCULUS BOT V1.0
+   Core application logic
+   ============================================================ */
+
+const state = {
+  currentModule: 'home',
+  appDiffTab: 'tangent',
+  appIntegTab: 'area',
+  vecTab: 'grad',
+  lastResult: '',
+  practice: { score: 0, total: 0, answer: null, type: 'mc' }
+};
+
+// ---------- UI Navigation ----------
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => switchModule(el.dataset.module));
+});
+document.querySelectorAll('.module-card').forEach(el => {
+  el.addEventListener('click', () => switchModule(el.dataset.goto));
+});
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('gnana-theme', next);
+});
+if (localStorage.getItem('gnana-theme') === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+function switchModule(name) {
+  state.currentModule = name;
+  document.querySelectorAll('.module').forEach(m => m.classList.add('hidden'));
+  const target = document.getElementById('mod-' + name);
+  if (target) target.classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.module === name));
+  const titles = {
+    home: 'GNANA CALCULUS BOT', limits: 'Limits & Continuity', diff: 'Differentiation',
+    appdiff: 'Applications of Derivatives', integ: 'Integration', appinteg: 'Applications of Integration',
+    de: 'Differential Equations', multi: 'Multivariable Calculus', vector: 'Vector Calculus',
+    graph: 'Interactive Graphing Lab', learn: 'Calculus Learning Corner', practice: 'Practice Lab',
+    report: 'Report & Export'
+  };
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  if (name === 'learn') renderLearnContent('limits-f');
+  document.getElementById('sidebar').classList.remove('open');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// Tab helpers
+document.querySelectorAll('#mod-appdiff .tab-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#mod-appdiff .tab-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.appDiffTab = b.dataset.tab;
+  });
+});
+document.querySelectorAll('#mod-appinteg .tab-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#mod-appinteg .tab-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.appIntegTab = b.dataset.tab;
+  });
+});
+document.querySelectorAll('#mod-vector .tab-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#mod-vector .tab-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.vecTab = b.dataset.tab;
+    const scalar = document.getElementById('vec-scalar-inputs');
+    const vector = document.getElementById('vec-vector-inputs');
+    if (b.dataset.tab === 'grad' || b.dataset.tab === 'lap') {
+      scalar.classList.remove('hidden'); vector.classList.add('hidden');
+    } else {
+      scalar.classList.add('hidden'); vector.classList.remove('hidden');
+    }
+  });
+});
+document.querySelectorAll('#learn-tabs .tab-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#learn-tabs .tab-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderLearnContent(b.dataset.tab);
+  });
+});
+
+// ---------- Utility ----------
+function safeParse(expr) {
+  try {
+    return math.parse(expr);
+  } catch (e) {
+    throw new Error('Invalid expression: ' + e.message);
+  }
+}
+function compileFn(expr, vars = ['x']) {
+  try {
+    const node = math.parse(expr);
+    return node.compile();
+  } catch (e) {
+    throw new Error('Cannot compile: ' + e.message);
+  }
+}
+function evalAt(expr, scope) {
+  try {
+    return math.evaluate(expr, scope);
+  } catch (e) {
+    return NaN;
+  }
+}
+function toLatex(expr) {
+  try {
+    if (typeof expr === 'string') return math.parse(expr).toTex({ parenthesis: 'keep' });
+    return expr.toTex ? expr.toTex({ parenthesis: 'keep' }) : String(expr);
+  } catch {
+    return String(expr);
+  }
+}
+function setResult(id, html, plainText) {
+  document.getElementById(id).innerHTML = html;
+  state.lastResult = plainText || html.replace(/<[^>]+>/g, ' ');
+  document.getElementById('report-preview').innerHTML = '<div class="label">Last result</div>' + html;
+  if (window.MathJax) MathJax.typesetPromise([document.getElementById(id)]);
+}
+function showError(id, msg) {
+  document.getElementById(id).innerHTML = `<div class="error-msg">${msg}</div>`;
+}
+
+// ---------- LIMITS ----------
+function computeLimit() {
+  const f = document.getElementById('lim-f').value.trim();
+  const v = document.getElementById('lim-var').value.trim() || 'x';
+  let pt = document.getElementById('lim-point').value.trim();
+  const dir = document.getElementById('lim-dir').value;
+  if (!f) return showError('lim-result', 'Please enter a function.');
+  try {
+    let exact = null;
+    let method = '';
+    // Try nerdamer first
+    try {
+      let limExpr;
+      if (pt.toLowerCase() === 'infinity' || pt === '∞') {
+        limExpr = nerdamer(`limit(${f}, ${v}, infinity)`);
+      } else if (pt.toLowerCase() === '-infinity' || pt === '-∞') {
+        limExpr = nerdamer(`limit(${f}, ${v}, -infinity)`);
+      } else {
+        const side = dir === 'left' ? '-' : (dir === 'right' ? '+' : '');
+        limExpr = nerdamer(`limit(${f}, ${v}, ${pt}${side})`);
+      }
+      exact = limExpr.toString();
+      method = 'Symbolic (Nerdamer)';
+    } catch (e) { /* fall through to numerical */ }
+
+    // Numerical approximation
+    let numApprox = null;
+    const isInf = /infinity|∞/i.test(pt);
+    if (!isInf) {
+      const point = parseFloat(pt);
+      const deltas = [1e-4, 1e-5, 1e-6, 1e-7];
+      const vals = [];
+      for (const d of deltas) {
+        let left, right;
+        if (dir !== 'right') left = evalAt(f, { [v]: point - d });
+        if (dir !== 'left') right = evalAt(f, { [v]: point + d });
+        if (dir === 'both') {
+          if (isFinite(left) && isFinite(right) && Math.abs(left - right) < 1e-4)
+            vals.push((left + right) / 2);
+        } else if (dir === 'left' && isFinite(left)) vals.push(left);
+        else if (dir === 'right' && isFinite(right)) vals.push(right);
+      }
+      if (vals.length) numApprox = vals[vals.length - 1];
+    } else {
+      // rough numerical infinity probe
+      const large = pt.startsWith('-') ? -1e6 : 1e6;
+      numApprox = evalAt(f, { [v]: large });
+    }
+
+    let html = `<div class="result-box">
+      <div class="label">Input</div>
+      <div>$$\\lim_{${v} \\to ${pt}${dir==='left'?'^-':dir==='right'?'^+':''}} ${toLatex(f)}$$</div>`;
+    if (exact !== null && exact !== 'Infinity' && exact !== '-Infinity') {
+      html += `<div class="label" style="margin-top:0.75rem">Exact / Symbolic result (${method})</div>
+        <div class="result-exact">$$${toLatex(exact)}$$</div>`;
+    }
+    if (numApprox !== null && isFinite(numApprox)) {
+      html += `<div class="label" style="margin-top:0.75rem">Numerical approximation</div>
+        <div class="result-num">${numApprox.toPrecision(8)}</div>`;
+    }
+    if (exact === null && numApprox === null) {
+      html += `<div class="warning-msg">Could not determine a finite limit. The limit may not exist or may be infinite.</div>`;
+    }
+    html += `<div class="label" style="margin-top:0.75rem">Method note</div>
+      <p style="font-size:0.85rem;color:var(--muted)">Limits are computed symbolically when possible; otherwise a sequence of numerical probes approaching the point is used. Indeterminate forms are handled by the symbolic engine when recognized.</p>
+    </div>`;
+    setResult('lim-result', html, `lim ${f} as ${v}->${pt} = ${exact || numApprox}`);
+    plotLimitGraph(f, v, pt, dir);
+  } catch (e) {
+    showError('lim-result', e.message);
+  }
+}
+
+function analyzeContinuity() {
+  const f = document.getElementById('lim-f').value.trim();
+  const v = document.getElementById('lim-var').value.trim() || 'x';
+  const pt = parseFloat(document.getElementById('lim-point').value);
+  if (!f || isNaN(pt)) return showError('lim-result', 'Enter a valid function and finite point.');
+  try {
+    const fval = evalAt(f, { [v]: pt });
+    let lim = null;
+    try {
+      lim = nerdamer(`limit(${f}, ${v}, ${pt})`).evaluate().text();
+      lim = parseFloat(lim);
+    } catch {
+      const d = 1e-7;
+      const L = evalAt(f, { [v]: pt - d });
+      const R = evalAt(f, { [v]: pt + d });
+      if (isFinite(L) && isFinite(R) && Math.abs(L - R) < 1e-5) lim = (L + R) / 2;
+    }
+    let html = `<div class="result-box"><div class="label">Continuity analysis at ${v} = ${pt}</div>`;
+    if (isFinite(fval) && lim !== null && Math.abs(fval - lim) < 1e-5) {
+      html += `<div class="success-msg">The function is continuous at ${v} = ${pt}. $$f(${pt}) = ${fval.toPrecision(6)}, \\quad \\lim = ${lim.toPrecision(6)}$$</div>`;
+    } else if (lim !== null && isFinite(lim) && !isFinite(fval)) {
+      html += `<div class="warning-msg">Removable discontinuity possible: limit exists (= ${lim.toPrecision(6)}) but function is undefined or infinite at the point.</div>`;
+    } else if (lim === null) {
+      html += `<div class="warning-msg">Limit does not appear to exist (or is infinite). Function is discontinuous at this point.</div>`;
+    } else {
+      html += `<div class="warning-msg">Discontinuous: f(${pt}) ≠ limit (or function undefined).</div>`;
+    }
+    html += `</div>`;
+    setResult('lim-result', html);
+  } catch (e) {
+    showError('lim-result', e.message);
+  }
+}
+
+function plotLimitGraph(f, v, pt, dir) {
+  try {
+    const point = /infinity/i.test(pt) ? 0 : parseFloat(pt);
+    const xs = [], ys = [];
+    const span = 3;
+    for (let i = 0; i <= 200; i++) {
+      const x = point - span + (2 * span * i) / 200;
+      if (Math.abs(x - point) < 1e-9) continue;
+      const y = evalAt(f, { [v]: x });
+      if (isFinite(y) && Math.abs(y) < 1e4) { xs.push(x); ys.push(y); }
+    }
+    const traces = [{ x: xs, y: ys, mode: 'lines', name: 'f(x)', line: { color: '#3b82f6' } }];
+    Plotly.newPlot('lim-graph', traces, {
+      margin: { t: 30, r: 20, b: 40, l: 50 },
+      paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+      xaxis: { title: v, gridcolor: '#33415522' },
+      yaxis: { title: 'f', gridcolor: '#33415522' },
+      showlegend: false
+    }, { responsive: true, displayModeBar: false });
+  } catch (e) { /* ignore graph errors */ }
+}
+
+// ---------- DIFFERENTIATION ----------
+function computeDerivative() {
+  const f = document.getElementById('diff-f').value.trim();
+  const v = document.getElementById('diff-var').value.trim() || 'x';
+  let order = parseInt(document.getElementById('diff-order').value) || 1;
+  order = Math.min(Math.max(order, 1), 5);
+  if (!f) return showError('diff-result', 'Enter a function.');
+  try {
+    let deriv = f;
+    let steps = [];
+    for (let i = 1; i <= order; i++) {
+      let d;
+      try {
+        d = nerdamer(`diff(${deriv}, ${v})`).toString();
+      } catch {
+        d = math.derivative(deriv, v).toString();
+      }
+      steps.push({ order: i, expr: d });
+      deriv = d;
+    }
+    const simplified = (() => {
+      try { return nerdamer(deriv).expand().toString(); } catch { return math.simplify(deriv).toString(); }
+    })();
+    let html = `<div class="result-box">
+      <div class="label">Original function</div>
+      <div>$$f(${v}) = ${toLatex(f)}$$</div>
+      <div class="label" style="margin-top:0.75rem">${order === 1 ? 'First' : order + '-th'} derivative</div>
+      <div class="result-exact">$$\\frac{d^{${order}}}{d${v}^{${order}}} = ${toLatex(simplified)}$$</div>`;
+    if (steps.length > 1) {
+      html += `<div class="label" style="margin-top:0.75rem">Intermediate derivatives</div><ol class="steps">`;
+      steps.forEach(s => { html += `<li>Order ${s.order}: $$${toLatex(s.expr)}$$</li>`; });
+      html += `</ol>`;
+    }
+    html += `<p style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem">Computed symbolically. Result simplified where possible. No fabricated intermediate pedagogical steps are shown beyond the successive differentiation.</p></div>`;
+    setResult('diff-result', html, `d^${order}/d${v}^${order} (${f}) = ${simplified}`);
+  } catch (e) {
+    showError('diff-result', 'Differentiation failed: ' + e.message);
+  }
+}
+
+function computePartial() {
+  const f = document.getElementById('diff-f').value.trim();
+  if (!f) return showError('diff-result', 'Enter a multivariable function.');
+  try {
+    const vars = [];
+    if (f.includes('x')) vars.push('x');
+    if (f.includes('y')) vars.push('y');
+    if (f.includes('z')) vars.push('z');
+    if (vars.length < 2) vars.push('x', 'y');
+    let html = `<div class="result-box"><div class="label">Partial derivatives of $$f = ${toLatex(f)}$$</div>`;
+    vars.forEach(v => {
+      let p;
+      try { p = nerdamer(`diff(${f}, ${v})`).toString(); }
+      catch { p = math.derivative(f, v).toString(); }
+      html += `<div style="margin-top:0.5rem">$$\\frac{\\partial f}{\\partial ${v}} = ${toLatex(p)}$$</div>`;
+    });
+    html += `</div>`;
+    setResult('diff-result', html);
+  } catch (e) {
+    showError('diff-result', e.message);
+  }
+}
+
+// ---------- APPLICATIONS OF DERIVATIVES ----------
+function runAppDiff() {
+  const f = document.getElementById('appd-f').value.trim();
+  const x0 = parseFloat(document.getElementById('appd-x0').value);
+  if (!f) return showError('appd-result', 'Enter a function.');
+  try {
+    let df, d2f;
+    try { df = nerdamer(`diff(${f}, x)`).toString(); } catch { df = math.derivative(f, 'x').toString(); }
+    try { d2f = nerdamer(`diff(${df}, x)`).toString(); } catch { d2f = math.derivative(df, 'x').toString(); }
+
+    if (state.appDiffTab === 'tangent') {
+      const m = evalAt(df, { x: x0 });
+      const y0 = evalAt(f, { x: x0 });
+      if (!isFinite(m) || !isFinite(y0)) throw new Error('Function or derivative not defined at the point.');
+      const c = y0 - m * x0;
+      const tangent = `y = ${m.toPrecision(6)}*x ${c >= 0 ? '+' : ''} ${c.toPrecision(6)}`;
+      const normalM = m === 0 ? 'undefined (vertical)' : (-1 / m);
+      let html = `<div class="result-box">
+        <div class="label">At x = ${x0}</div>
+        <div>$$f(${x0}) = ${y0.toPrecision(6)}, \\quad f'(${x0}) = ${m.toPrecision(6)}$$</div>
+        <div class="label" style="margin-top:0.75rem">Equation of tangent</div>
+        <div class="result-exact">$$y - ${y0.toPrecision(5)} = ${m.toPrecision(5)}(x - ${x0})$$</div>
+        <div>Simplified: $$${toLatex(tangent)}$$</div>
+        <div class="label" style="margin-top:0.75rem">Normal line slope</div>
+        <div>${typeof normalM === 'number' ? normalM.toPrecision(6) : normalM}</div>
+      </div>`;
+      setResult('appd-result', html, tangent);
+      plotAppDiff(f, df, x0, y0, m);
+    } else if (state.appDiffTab === 'critical') {
+      // numerical critical point search on a reasonable interval
+      const crit = findCriticalPoints(f, df, -10, 10);
+      let html = `<div class="result-box"><div class="label">Critical points (numerical search on [-10,10])</div>`;
+      if (crit.length === 0) html += `<p>No critical points found in the search interval (or derivative never zero).</p>`;
+      else {
+        html += `<table><tr><th>x</th><th>f(x)</th><th>f'(x)≈0</th><th>Nature (2nd deriv test)</th></tr>`;
+        crit.forEach(c => {
+          const y = evalAt(f, { x: c });
+          const d2 = evalAt(d2f, { x: c });
+          let nature = 'Inconclusive / inflection candidate';
+          if (d2 > 1e-6) nature = 'Local minimum';
+          else if (d2 < -1e-6) nature = 'Local maximum';
+          html += `<tr><td>${c.toPrecision(5)}</td><td>${isFinite(y)?y.toPrecision(5):'—'}</td><td>≈0</td><td>${nature}</td></tr>`;
+        });
+        html += `</table>`;
+      }
+      html += `<p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem">Critical points are located numerically. Exact algebraic roots of f'=0 are not guaranteed for arbitrary functions.</p></div>`;
+      setResult('appd-result', html);
+      plotAppDiff(f, df, null, null, null, crit);
+    } else if (state.appDiffTab === 'intervals') {
+      const crit = findCriticalPoints(f, df, -8, 8);
+      const testPts = [-9, ...crit, 9];
+      let html = `<div class="result-box"><div class="label">Sign of f' and monotonicity (sampled)</div><table><tr><th>Interval / point</th><th>f' sign</th><th>Behaviour</th></tr>`;
+      for (let i = 0; i < testPts.length - 1; i++) {
+        const mid = (testPts[i] + testPts[i+1]) / 2;
+        const s = evalAt(df, { x: mid });
+        const sign = s > 1e-8 ? '+' : (s < -1e-8 ? '−' : '0');
+        const beh = sign === '+' ? 'Increasing' : (sign === '−' ? 'Decreasing' : 'Critical');
+        html += `<tr><td>(${testPts[i].toFixed(2)}, ${testPts[i+1].toFixed(2)})</td><td>${sign}</td><td>${beh}</td></tr>`;
+      }
+      html += `</table></div>`;
+      setResult('appd-result', html);
+    } else if (state.appDiffTab === 'concavity') {
+      const infl = findCriticalPoints(df, d2f, -8, 8); // zeros of second derivative
+      let html = `<div class="result-box"><div class="label">Concavity & possible inflection points</div>`;
+      if (infl.length) {
+        html += `<p>Candidate inflection points (f'' ≈ 0): ${infl.map(x => x.toPrecision(4)).join(', ')}</p>`;
+      } else html += `<p>No zeros of f'' found in the search window.</p>`;
+      html += `<table><tr><th>Test region</th><th>f'' sign</th><th>Concavity</th></tr>`;
+      const pts = [-9, ...infl, 9];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const mid = (pts[i] + pts[i+1]) / 2;
+        const s = evalAt(d2f, { x: mid });
+        html += `<tr><td>(${pts[i].toFixed(1)}, ${pts[i+1].toFixed(1)})</td><td>${s>0?'+':s<0?'−':'0'}</td><td>${s>0?'Concave up':s<0?'Concave down':'—'}</td></tr>`;
+      }
+      html += `</table></div>`;
+      setResult('appd-result', html);
+    }
+  } catch (e) {
+    showError('appd-result', e.message);
+  }
+}
+
+function findCriticalPoints(f, df, a, b, n = 400) {
+  const pts = [];
+  const dx = (b - a) / n;
+  let prev = evalAt(df, { x: a });
+  for (let i = 1; i <= n; i++) {
+    const x = a + i * dx;
+    const curr = evalAt(df, { x });
+    if (isFinite(prev) && isFinite(curr) && prev * curr <= 0) {
+      // bisection refine
+      let lo = x - dx, hi = x;
+      for (let k = 0; k < 30; k++) {
+        const mid = (lo + hi) / 2;
+        const mval = evalAt(df, { x: mid });
+        if (prev * mval <= 0) hi = mid; else lo = mid;
+      }
+      const root = (lo + hi) / 2;
+      if (pts.length === 0 || Math.abs(root - pts[pts.length-1]) > 1e-4) pts.push(root);
+    }
+    prev = curr;
+  }
+  return pts;
+}
+
+function plotAppDiff(f, df, x0, y0, m, crits = []) {
+  try {
+    const xs = [], ys = [], dxs = [], dys = [];
+    for (let i = 0; i <= 300; i++) {
+      const x = -6 + 12 * i / 300;
+      const y = evalAt(f, { x });
+      const dy = evalAt(df, { x });
+      if (isFinite(y)) { xs.push(x); ys.push(y); }
+      if (isFinite(dy)) { dxs.push(x); dys.push(dy); }
+    }
+    const traces = [
+      { x: xs, y: ys, mode: 'lines', name: 'f(x)', line: { color: '#3b82f6' } },
+      { x: dxs, y: dys, mode: 'lines', name: "f'(x)", line: { color: '#0d9488', dash: 'dot' } }
+    ];
+    if (x0 != null && isFinite(m)) {
+      const tx = [x0 - 2, x0 + 2];
+      const ty = tx.map(x => y0 + m * (x - x0));
+      traces.push({ x: tx, y: ty, mode: 'lines', name: 'Tangent', line: { color: '#d97706', width: 2 } });
+      traces.push({ x: [x0], y: [y0], mode: 'markers', name: 'Point', marker: { size: 10, color: '#dc2626' } });
+    }
+    if (crits.length) {
+      traces.push({
+        x: crits, y: crits.map(c => evalAt(f, { x: c })),
+        mode: 'markers', name: 'Critical', marker: { size: 9, color: '#7c3aed', symbol: 'diamond' }
+      });
+    }
+    Plotly.newPlot('appd-graph', traces, {
+      margin: { t: 30, r: 20, b: 40, l: 50 },
+      paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+      legend: { orientation: 'h' },
+      xaxis: { gridcolor: '#33415522' }, yaxis: { gridcolor: '#33415522' }
+    }, { responsive: true, displayModeBar: false });
+  } catch (e) {}
+}
+
+// ---------- INTEGRATION ----------
+function computeIntegral() {
+  const f = document.getElementById('int-f').value.trim();
+  const v = document.getElementById('int-var').value.trim() || 'x';
+  const aStr = document.getElementById('int-a').value.trim();
+  const bStr = document.getElementById('int-b').value.trim();
+  const method = document.getElementById('int-method').value;
+  const n = parseInt(document.getElementById('int-n').value) || 100;
+  if (!f) return showError('int-result', 'Enter an integrand.');
+  try {
+    const isDefinite = aStr !== '' && bStr !== '';
+    let html = `<div class="result-box">`;
+    if (!isDefinite) {
+      // Indefinite
+      let antideriv;
+      try {
+        antideriv = nerdamer(`integrate(${f}, ${v})`).toString();
+      } catch (e) {
+        antideriv = null;
+      }
+      if (antideriv) {
+        html += `<div class="label">Indefinite integral</div>
+          <div class="result-exact">$$\\int ${toLatex(f)}\\,d${v} = ${toLatex(antideriv)} + C$$</div>
+          <p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem">Symbolic antiderivative (Nerdamer). Arbitrary constant C included.</p>`;
+      } else {
+        html += `<div class="warning-msg">Symbolic antiderivative could not be found for this integrand. Try a simpler function or use a definite integral with a numerical method.</div>`;
+      }
+    } else {
+      const a = parseFloat(aStr), b = parseFloat(bStr);
+      if (!isFinite(a) || !isFinite(b)) throw new Error('Limits must be finite numbers.');
+      let exact = null;
+      if (method === 'auto') {
+        try {
+          const F = nerdamer(`integrate(${f}, ${v})`).toString();
+          const Fa = evalAt(F, { [v]: a });
+          const Fb = evalAt(F, { [v]: b });
+          if (isFinite(Fa) && isFinite(Fb)) exact = Fb - Fa;
+        } catch (e) {}
+      }
+      let num = null, usedMethod = '';
+      if (method === 'auto' || method === 'trap') {
+        num = trapezoidal(f, v, a, b, n);
+        usedMethod = 'Trapezoidal Rule';
+      }
+      if (method === 'simp13' || (method === 'auto' && exact === null)) {
+        const nn = n % 2 === 0 ? n : n + 1;
+        num = simpson13(f, v, a, b, nn);
+        usedMethod = "Simpson's 1/3 Rule";
+      }
+      if (method === 'simp38') {
+        let nn = n;
+        while (nn % 3 !== 0) nn++;
+        num = simpson38(f, v, a, b, nn);
+        usedMethod = "Simpson's 3/8 Rule";
+      }
+      html += `<div class="label">Definite integral</div>
+        <div>$$\\int_{${a}}^{${b}} ${toLatex(f)}\\,d${v}$$</div>`;
+      if (exact !== null) {
+        html += `<div class="label" style="margin-top:0.5rem">Exact (Fundamental Theorem)</div>
+          <div class="result-exact">$$${exact}$$ ≈ ${Number(exact).toPrecision(10)}</div>`;
+      }
+      if (num !== null) {
+        html += `<div class="label" style="margin-top:0.5rem">Numerical (${usedMethod}, n≈${n})</div>
+          <div class="result-num">${num.toPrecision(10)}</div>`;
+      }
+      html += `<p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem">Exact result uses symbolic antiderivative when available; otherwise the selected quadrature rule is applied.</p>`;
+    }
+    html += `</div>`;
+    setResult('int-result', html);
+  } catch (e) {
+    showError('int-result', e.message);
+  }
+}
+
+function trapezoidal(f, v, a, b, n) {
+  const h = (b - a) / n;
+  let sum = 0.5 * (evalAt(f, { [v]: a }) + evalAt(f, { [v]: b }));
+  for (let i = 1; i < n; i++) sum += evalAt(f, { [v]: a + i * h });
+  return sum * h;
+}
+function simpson13(f, v, a, b, n) {
+  if (n % 2 !== 0) n++;
+  const h = (b - a) / n;
+  let sum = evalAt(f, { [v]: a }) + evalAt(f, { [v]: b });
+  for (let i = 1; i < n; i++) {
+    const x = a + i * h;
+    sum += (i % 2 === 0 ? 2 : 4) * evalAt(f, { [v]: x });
+  }
+  return sum * h / 3;
+}
+function simpson38(f, v, a, b, n) {
+  while (n % 3 !== 0) n++;
+  const h = (b - a) / n;
+  let sum = evalAt(f, { [v]: a }) + evalAt(f, { [v]: b });
+  for (let i = 1; i < n; i++) {
+    const x = a + i * h;
+    sum += (i % 3 === 0 ? 2 : 3) * evalAt(f, { [v]: x });
+  }
+  return sum * 3 * h / 8;
+}
+
+// ---------- APPLICATIONS OF INTEGRATION ----------
+function runAppInteg() {
+  const f = document.getElementById('appi-f').value.trim();
+  const g = document.getElementById('appi-g').value.trim();
+  const a = parseFloat(document.getElementById('appi-a').value);
+  const b = parseFloat(document.getElementById('appi-b').value);
+  const axis = document.getElementById('appi-axis').value;
+  if (!f || !isFinite(a) || !isFinite(b)) return showError('appi-result', 'Enter function and finite limits.');
+  try {
+    let html = `<div class="result-box">`;
+    if (state.appIntegTab === 'area') {
+      const area = simpson13(f, 'x', a, b, 200);
+      html += `<div class="label">Area under y = f(x) from ${a} to ${b}</div>
+        <div class="result-num">$$A = \\int_{${a}}^{${b}} ${toLatex(f)}\\,dx \\approx ${Math.abs(area).toPrecision(8)}$$</div>
+        <p style="font-size:0.8rem;color:var(--muted)">(Absolute value reported for geometric area.)</p>`;
+      plotArea(f, null, a, b);
+    } else if (state.appIntegTab === 'between') {
+      if (!g) throw new Error('Enter second function g(x).');
+      const area = simpson13(`(${f})-(${g})`, 'x', a, b, 200);
+      html += `<div class="label">Area between curves</div>
+        <div>$$A = \\int_{${a}}^{${b}} \\left| ${toLatex(f)} - (${toLatex(g)}) \\right| dx \\approx ${Math.abs(area).toPrecision(8)}$$</div>`;
+      plotArea(f, g, a, b);
+    } else if (state.appIntegTab === 'volume') {
+      // disk method about x-axis: π ∫ [f(x)]² dx
+      const integrand = axis === 'x' ? `pi*(${f})^2` : `pi*(${f})^2`; // simplified disk
+      const vol = simpson13(integrand, 'x', a, b, 200);
+      html += `<div class="label">Volume of solid of revolution (disk method about ${axis}-axis)</div>
+        <div class="result-num">$$V = \\pi \\int_{${a}}^{${b}} [${toLatex(f)}]^2 \\,dx \\approx ${vol.toPrecision(8)}$$</div>
+        <p style="font-size:0.8rem;color:var(--muted)">Washer / shell methods for more complex regions are not fully automated.</p>`;
+    } else if (state.appIntegTab === 'arc') {
+      // L = ∫ sqrt(1 + (f')²) dx
+      let df;
+      try { df = nerdamer(`diff(${f}, x)`).toString(); } catch { df = math.derivative(f, 'x').toString(); }
+      const integrand = `sqrt(1 + (${df})^2)`;
+      const len = simpson13(integrand, 'x', a, b, 300);
+      html += `<div class="label">Arc length of y = f(x) from ${a} to ${b}</div>
+        <div class="result-num">$$L = \\int_{${a}}^{${b}} \\sqrt{1 + [f'(x)]^2}\\,dx \\approx ${len.toPrecision(8)}$$</div>`;
+    }
+    html += `</div>`;
+    setResult('appi-result', html);
+  } catch (e) {
+    showError('appi-result', e.message);
+  }
+}
+
+function plotArea(f, g, a, b) {
+  try {
+    const xs = [], ys = [], gs = [];
+    for (let i = 0; i <= 200; i++) {
+      const x = a + (b - a) * i / 200;
+      xs.push(x);
+      ys.push(evalAt(f, { x }));
+      if (g) gs.push(evalAt(g, { x }));
+    }
+    const traces = [{ x: xs, y: ys, mode: 'lines', name: 'f(x)', fill: g ? 'none' : 'tozeroy', line: { color: '#3b82f6' } }];
+    if (g) {
+      traces.push({ x: xs, y: gs, mode: 'lines', name: 'g(x)', line: { color: '#0d9488' } });
+      traces.push({ x: xs, y: ys, mode: 'lines', fill: 'tonexty', fillcolor: 'rgba(59,130,246,0.25)', line: { width: 0 }, showlegend: false });
+    }
+    Plotly.newPlot('appi-graph', traces, {
+      margin: { t: 30, r: 20, b: 40, l: 50 },
+      paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+      xaxis: { gridcolor: '#33415522' }, yaxis: { gridcolor: '#33415522' }
+    }, { responsive: true, displayModeBar: false });
+  } catch (e) {}
+}
+
+// ---------- DIFFERENTIAL EQUATIONS ----------
+function solveDE() {
+  const eq = document.getElementById('de-eq').value.trim();
+  const x0s = document.getElementById('de-x0').value.trim();
+  const y0s = document.getElementById('de-y0').value.trim();
+  if (!eq) return showError('de-result', 'Enter a differential equation.');
+  try {
+    let html = `<div class="result-box"><div class="label">Input</div><div><code>${eq}</code></div>`;
+    // Very basic pattern matching for educational cases
+    // Case: y' = f(x)  (separable, g(y)=1)
+    let m = eq.match(/y'\s*=\s*(.+)/i) || eq.match(/dy\/dx\s*=\s*(.+)/i);
+    if (m) {
+      const rhs = m[1].trim();
+      // Try integrate rhs
+      let antideriv;
+      try {
+        antideriv = nerdamer(`integrate(${rhs}, x)`).toString();
+        html += `<div class="label" style="margin-top:0.75rem">General solution (separable / direct integration)</div>
+          <div class="result-exact">$$y = ${toLatex(antideriv)} + C$$</div>`;
+        if (x0s !== '' && y0s !== '') {
+          const x0 = parseFloat(x0s), y0 = parseFloat(y0s);
+          const C = y0 - evalAt(antideriv, { x: x0 });
+          html += `<div class="label" style="margin-top:0.5rem">Particular solution with y(${x0}) = ${y0}</div>
+            <div class="result-exact">$$y = ${toLatex(antideriv)} + (${C.toPrecision(6)})$$</div>`;
+        }
+        html += `<p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem">Recognized as y' = f(x). Solution obtained by direct integration.</p>`;
+      } catch (e) {
+        html += `<div class="warning-msg">Could not symbolically integrate the right-hand side. More general first-order solvers are limited in the browser environment.</div>`;
+      }
+    } else if (/y'\s*\+\s*.*y\s*=/.test(eq) || /dy\/dx\s*\+\s*.*y\s*=/.test(eq)) {
+      html += `<div class="warning-msg">First-order linear form detected. Full integrating-factor solver is not fully automated in this version. Rewrite as y' = ... and try the separable path, or solve manually using the standard formula.</div>`;
+    } else {
+      html += `<div class="warning-msg">Equation form not recognized by the built-in patterns. Supported educational cases: y' = f(x) (direct integration) and simple separable equations. Higher-order or non-linear equations generally require a full CAS or numerical methods beyond the current scope.</div>`;
+    }
+    html += `</div>`;
+    setResult('de-result', html);
+  } catch (e) {
+    showError('de-result', e.message);
+  }
+}
+
+// ---------- MULTIVARIABLE ----------
+function computeMulti() {
+  const f = document.getElementById('mv-f').value.trim();
+  const ptStr = document.getElementById('mv-pt').value.trim();
+  if (!f) return showError('mv-result', 'Enter a function.');
+  try {
+    const vars = [];
+    ['x','y','z'].forEach(v => { if (f.includes(v)) vars.push(v); });
+    if (vars.length === 0) vars.push('x', 'y');
+    const partials = {};
+    vars.forEach(v => {
+      try { partials[v] = nerdamer(`diff(${f}, ${v})`).toString(); }
+      catch { partials[v] = math.derivative(f, v).toString(); }
+    });
+    // Gradient
+    const grad = vars.map(v => partials[v]);
+    // Hessian (second partials)
+    const hess = {};
+    vars.forEach(vi => {
+      vars.forEach(vj => {
+        const key = vi + vj;
+        try { hess[key] = nerdamer(`diff(${partials[vi]}, ${vj})`).toString(); }
+        catch { hess[key] = math.derivative(partials[vi], vj).toString(); }
+      });
+    });
+    let html = `<div class="result-box">
+      <div class="label">Function</div><div>$$f = ${toLatex(f)}$$</div>
+      <div class="label" style="margin-top:0.75rem">First partial derivatives</div>`;
+    vars.forEach(v => { html += `<div>$$f_{${v}} = ${toLatex(partials[v])}$$</div>`; });
+    html += `<div class="label" style="margin-top:0.75rem">Gradient</div>
+      <div class="result-exact">$$\\nabla f = \\left( ${grad.map(g => toLatex(g)).join(',\\;')} \\right)$$</div>`;
+    html += `<div class="label" style="margin-top:0.75rem">Hessian matrix (second partials)</div><div>`;
+    vars.forEach(vi => {
+      html += `$$( `;
+      html += vars.map(vj => toLatex(hess[vi+vj])).join(',\\;');
+      html += ` )$$`;
+    });
+    html += `</div>`;
+    if (ptStr) {
+      const pts = ptStr.split(',').map(s => parseFloat(s.trim()));
+      if (pts.length >= vars.length && pts.every(isFinite)) {
+        const scope = {};
+        vars.forEach((v, i) => scope[v] = pts[i]);
+        html += `<div class="label" style="margin-top:0.75rem">Evaluation at (${pts.slice(0,vars.length).join(', ')})</div>`;
+        html += `<div>$$f = ${evalAt(f, scope)}$$</div>`;
+        html += `<div>$$\\nabla f = (${grad.map(g => evalAt(g, scope)).join(',\\;')})$$</div>`;
+      }
+    }
+    html += `</div>`;
+    setResult('mv-result', html);
+  } catch (e) {
+    showError('mv-result', e.message);
+  }
+}
+
+// ---------- VECTOR CALCULUS ----------
+function computeVector() {
+  try {
+    let html = `<div class="result-box">`;
+    if (state.vecTab === 'grad' || state.vecTab === 'lap') {
+      const phi = document.getElementById('vec-scalar').value.trim();
+      if (!phi) throw new Error('Enter a scalar field.');
+      const dx = nerdamer(`diff(${phi}, x)`).toString();
+      const dy = nerdamer(`diff(${phi}, y)`).toString();
+      let dz = '0';
+      try { dz = nerdamer(`diff(${phi}, z)`).toString(); } catch {}
+      if (state.vecTab === 'grad') {
+        html += `<div class="label">Gradient of $$\\phi = ${toLatex(phi)}$$</div>
+          <div class="result-exact">$$\\nabla\\phi = \\left( ${toLatex(dx)},\\; ${toLatex(dy)},\\; ${toLatex(dz)} \\right)$$</div>`;
+      } else {
+        const dxx = nerdamer(`diff(${dx}, x)`).toString();
+        const dyy = nerdamer(`diff(${dy}, y)`).toString();
+        let dzz = '0';
+        try { dzz = nerdamer(`diff(${dz}, z)`).toString(); } catch {}
+        html += `<div class="label">Laplacian of $$\\phi = ${toLatex(phi)}$$</div>
+          <div class="result-exact">$$\\nabla^2\\phi = ${toLatex(dxx)} + ${toLatex(dyy)} + ${toLatex(dzz)}$$</div>`;
+      }
+    } else {
+      const P = document.getElementById('vec-P').value.trim();
+      const Q = document.getElementById('vec-Q').value.trim();
+      const R = document.getElementById('vec-R').value.trim() || '0';
+      if (!P || !Q) throw new Error('Enter at least P and Q components.');
+      if (state.vecTab === 'div') {
+        const dP = nerdamer(`diff(${P}, x)`).toString();
+        const dQ = nerdamer(`diff(${Q}, y)`).toString();
+        let dR = '0';
+        try { dR = nerdamer(`diff(${R}, z)`).toString(); } catch {}
+        html += `<div class="label">Divergence of $$\\mathbf{F} = (${toLatex(P)}, ${toLatex(Q)}, ${toLatex(R)})$$</div>
+          <div class="result-exact">$$\\nabla\\cdot\\mathbf{F} = ${toLatex(dP)} + ${toLatex(dQ)} + ${toLatex(dR)}$$</div>`;
+      } else { // curl
+        const dRdy = nerdamer(`diff(${R}, y)`).toString();
+        const dQdz = (() => { try { return nerdamer(`diff(${Q}, z)`).toString(); } catch { return '0'; } })();
+        const dPdz = (() => { try { return nerdamer(`diff(${P}, z)`).toString(); } catch { return '0'; } })();
+        const dRdx = nerdamer(`diff(${R}, x)`).toString();
+        const dQdx = nerdamer(`diff(${Q}, x)`).toString();
+        const dPdy = nerdamer(`diff(${P}, y)`).toString();
+        const cx = nerdamer(`(${dRdy}) - (${dQdz})`).toString();
+        const cy = nerdamer(`(${dPdz}) - (${dRdx})`).toString();
+        const cz = nerdamer(`(${dQdx}) - (${dPdy})`).toString();
+        html += `<div class="label">Curl of $$\\mathbf{F} = (${toLatex(P)}, ${toLatex(Q)}, ${toLatex(R)})$$</div>
+          <div class="result-exact">$$\\nabla\\times\\mathbf{F} = \\left( ${toLatex(cx)},\\; ${toLatex(cy)},\\; ${toLatex(cz)} \\right)$$</div>`;
+      }
+    }
+    html += `</div>`;
+    setResult('vec-result', html);
+  } catch (e) {
+    showError('vec-result', e.message);
+  }
+}
+
+// ---------- GRAPHING LAB ----------
+function plotGraphLab() {
+  const f = document.getElementById('gr-f').value.trim();
+  const g = document.getElementById('gr-g').value.trim();
+  const xmin = parseFloat(document.getElementById('gr-xmin').value);
+  const xmax = parseFloat(document.getElementById('gr-xmax').value);
+  const showDeriv = document.getElementById('gr-deriv').value === '1';
+  const tanxStr = document.getElementById('gr-tanx').value.trim();
+  if (!f) return;
+  try {
+    const xs = [], ys = [], dys = [], gs = [];
+    const n = 400;
+    let df = null;
+    if (showDeriv || tanxStr !== '') {
+      try { df = nerdamer(`diff(${f}, x)`).toString(); } catch { df = math.derivative(f, 'x').toString(); }
+    }
+    for (let i = 0; i <= n; i++) {
+      const x = xmin + (xmax - xmin) * i / n;
+      const y = evalAt(f, { x });
+      if (isFinite(y)) { xs.push(x); ys.push(y); }
+      if (df) {
+        const dy = evalAt(df, { x });
+        if (isFinite(dy)) dys.push(dy); else dys.push(null);
+      }
+      if (g) {
+        const gy = evalAt(g, { x });
+        gs.push(isFinite(gy) ? gy : null);
+      }
+    }
+    const traces = [{ x: xs, y: ys, mode: 'lines', name: 'f(x)', line: { color: '#3b82f6', width: 2 } }];
+    if (g) traces.push({ x: xs, y: gs, mode: 'lines', name: 'g(x)', line: { color: '#0d9488' } });
+    if (showDeriv && df) traces.push({ x: xs, y: dys, mode: 'lines', name: "f'(x)", line: { color: '#d97706', dash: 'dot' } });
+    if (tanxStr !== '' && df) {
+      const tx = parseFloat(tanxStr);
+      const y0 = evalAt(f, { x: tx });
+      const m = evalAt(df, { x: tx });
+      if (isFinite(y0) && isFinite(m)) {
+        const txs = [tx - (xmax-xmin)*0.15, tx + (xmax-xmin)*0.15];
+        traces.push({
+          x: txs, y: txs.map(x => y0 + m * (x - tx)),
+          mode: 'lines', name: 'Tangent', line: { color: '#dc2626', width: 2 }
+        });
+        traces.push({ x: [tx], y: [y0], mode: 'markers', marker: { size: 9, color: '#dc2626' }, showlegend: false });
+      }
+    }
+    Plotly.newPlot('gr-plot', traces, {
+      margin: { t: 30, r: 20, b: 40, l: 50 },
+      paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+      legend: { orientation: 'h' },
+      xaxis: { title: 'x', gridcolor: '#33415522', zeroline: true },
+      yaxis: { title: 'y', gridcolor: '#33415522', zeroline: true }
+    }, { responsive: true });
+  } catch (e) {
+    alert('Plot error: ' + e.message);
+  }
+}
+
+// ---------- LEARNING CORNER ----------
+function renderLearnContent(tab) {
+  const content = {
+    'limits-f': `
+      <h4>Limit Laws</h4>
+      <table class="formula-table">
+        <tr><td>$\\lim (f+g) = \\lim f + \\lim g$</td><td>Sum rule</td></tr>
+        <tr><td>$\\lim (f\\cdot g) = (\\lim f)(\\lim g)$</td><td>Product rule</td></tr>
+        <tr><td>$\\lim \\frac{f}{g} = \\frac{\\lim f}{\\lim g}$ (if $\\lim g \\neq 0$)</td><td>Quotient rule</td></tr>
+        <tr><td>$\\lim [f(x)]^n = [\\lim f(x)]^n$</td><td>Power rule</td></tr>
+        <tr><td>$\\lim_{x\\to a} c = c$</td><td>Constant</td></tr>
+        <tr><td>$\\lim_{x\\to a} x = a$</td><td>Identity</td></tr>
+      </table>
+      <p style="margin-top:0.75rem;font-size:0.9rem;color:var(--muted)">These hold provided the individual limits exist.</p>`,
+    'diff-f': `
+      <h4>Differentiation Formulas</h4>
+      <table class="formula-table">
+        <tr><td>$\\frac{d}{dx}(x^n) = n x^{n-1}$</td><td>Power rule</td></tr>
+        <tr><td>$\\frac{d}{dx}(\\sin x) = \\cos x$</td><td></td></tr>
+        <tr><td>$\\frac{d}{dx}(\\cos x) = -\\sin x$</td><td></td></tr>
+        <tr><td>$\\frac{d}{dx}(e^x) = e^x$</td><td></td></tr>
+        <tr><td>$\\frac{d}{dx}(\\ln x) = \\frac{1}{x}$</td><td></td></tr>
+        <tr><td>$(uv)' = u'v + uv'$</td><td>Product rule</td></tr>
+        <tr><td>$\\left(\\frac{u}{v}\\right)' = \\frac{u'v - uv'}{v^2}$</td><td>Quotient rule</td></tr>
+        <tr><td>$(f(g(x)))' = f'(g(x))\\,g'(x)$</td><td>Chain rule</td></tr>
+      </table>`,
+    'int-f': `
+      <h4>Integration Formulas</h4>
+      <table class="formula-table">
+        <tr><td>$\\int x^n\\,dx = \\frac{x^{n+1}}{n+1}+C$ $(n\\neq -1)$</td><td></td></tr>
+        <tr><td>$\\int \\frac{1}{x}\\,dx = \\ln|x|+C$</td><td></td></tr>
+        <tr><td>$\\int e^x\\,dx = e^x+C$</td><td></td></tr>
+        <tr><td>$\\int \\sin x\\,dx = -\\cos x+C$</td><td></td></tr>
+        <tr><td>$\\int \\cos x\\,dx = \\sin x+C$</td><td></td></tr>
+        <tr><td>$\\int u\\,dv = uv - \\int v\\,du$</td><td>Integration by parts</td></tr>
+      </table>`,
+    'theorems': `
+      <h4>Important Theorems</h4>
+      <ul style="padding-left:1.2rem;font-size:0.9rem">
+        <li><strong>Intermediate Value Theorem</strong> — continuous function on [a,b] attains every value between f(a) and f(b).</li>
+        <li><strong>Mean Value Theorem</strong> — exists c in (a,b) with f'(c) = (f(b)-f(a))/(b-a).</li>
+        <li><strong>Fundamental Theorem of Calculus</strong> — if F' = f then ∫_a^b f = F(b)-F(a); and d/dx ∫_a^x f(t)dt = f(x).</li>
+        <li><strong>Extreme Value Theorem</strong> — continuous function on closed interval attains absolute max and min.</li>
+      </ul>`,
+    'mistakes': `
+      <h4>Common Mistakes</h4>
+      <ul style="padding-left:1.2rem;font-size:0.9rem">
+        <li>Forgetting the chain rule when differentiating composite functions.</li>
+        <li>Dropping the absolute value in ∫ dx/x = ln|x| + C.</li>
+        <li>Writing (uv)' = u'v' (product rule is not that simple).</li>
+        <li>Confusing the variable of differentiation in related-rates problems.</li>
+        <li>Assuming a limit exists because left and right numerical probes look close without checking carefully.</li>
+        <li>Forgetting +C for indefinite integrals.</li>
+      </ul>`,
+    'eng': `
+      <h4>Engineering Applications</h4>
+      <ul style="padding-left:1.2rem;font-size:0.9rem">
+        <li><strong>Related rates</strong> — volumes, lengths changing with time (tank draining, ladder sliding).</li>
+        <li><strong>Optimization</strong> — minimize material, maximize volume, cost functions.</li>
+        <li><strong>Moments & centroids</strong> — integrals for centre of mass, moment of inertia.</li>
+        <li><strong>Work & fluid force</strong> — work = ∫ F(x) dx; hydrostatic pressure integrals.</li>
+        <li><strong>Differential equations</strong> — RC circuits, mixing problems, population models, beam deflection.</li>
+        <li><strong>Fourier / Laplace</strong> — signal processing and control (advanced continuum of calculus).</li>
+      </ul>`
+  };
+  document.getElementById('learn-content').innerHTML = content[tab] || '';
+  if (window.MathJax) MathJax.typesetPromise([document.getElementById('learn-content')]);
+}
+
+// ---------- PRACTICE LAB ----------
+const practiceBank = {
+  beginner: {
+    derivative: [
+      { q: 'What is the derivative of $x^2$?', opts: ['$2x$', '$x$', '$2$', '$x^2$'], ans: 0, hint: 'Power rule: $n x^{n-1}$' },
+      { q: 'Derivative of $\\sin x$?', opts: ['$\\cos x$', '$-\\sin x$', '$\\sin x$', '$-\\cos x$'], ans: 0, hint: 'Standard trigonometric derivative.' },
+      { q: 'Derivative of $e^x$?', opts: ['$e^x$', '$xe^{x-1}$', '$\\ln x$', '$1/x$'], ans: 0, hint: 'Exponential is its own derivative.' }
+    ],
+    integral: [
+      { q: 'Indefinite integral of $x$?', opts: ['$x^2/2 + C$', '$x^2 + C$', '$1/x + C$', '$2x + C$'], ans: 0, hint: 'Power rule for integration.' },
+      { q: '$\\int_0^1 2x\\,dx = $?', opts: ['$1$', '$2$', '$0$', '$1/2$'], ans: 0, hint: 'Antiderivative $x^2$ evaluated from 0 to 1.' }
+    ],
+    limit: [
+      { q: '$\\lim_{x\\to 0} \\frac{\\sin x}{x} = $?', opts: ['$1$', '$0$', '$\\infty$', 'does not exist'], ans: 0, hint: 'Standard trigonometric limit.' }
+    ]
+  },
+  intermediate: {
+    derivative: [
+      { q: 'Derivative of $x^3 \\sin x$ (product rule)?', opts: ['$3x^2\\sin x + x^3\\cos x$', '$3x^2\\cos x$', '$x^3\\cos x$', '$3x^2\\sin x$'], ans: 0, hint: '$(uv)\' = u\'v + uv\'$' },
+      { q: 'Second derivative of $x^4$?', opts: ['$12x^2$', '$4x^3$', '$24x$', '$x^2$'], ans: 0, hint: 'Differentiate twice.' }
+    ],
+    integral: [
+      { q: '$\\int \\cos x\\,dx = $?', opts: ['$\\sin x + C$', '$-\\sin x + C$', '$\\cos x + C$', '$-\\cos x + C$'], ans: 0, hint: 'Derivative of sin is cos.' }
+    ],
+    limit: [
+      { q: '$\\lim_{x\\to \\infty} \\frac{1}{x} = $?', opts: ['$0$', '$1$', '$\\infty$', 'does not exist'], ans: 0, hint: 'As x grows, reciprocal vanishes.' }
+    ]
+  },
+  advanced: {
+    derivative: [
+      { q: 'Derivative of $\\ln(x^2+1)$?', opts: ['$\\frac{2x}{x^2+1}$', '$\\frac{1}{x^2+1}$', '$\\frac{2x}{\\ln(x^2+1)}$', '$2x$'], ans: 0, hint: 'Chain rule with 1/u.' }
+    ],
+    integral: [
+      { q: '$\\int_0^{\\pi/2} \\sin x\\,dx = $?', opts: ['$1$', '$0$', '$2$', '$\\pi/2$'], ans: 0, hint: '$-\\cos x$ from 0 to π/2.' }
+    ],
+    limit: [
+      { q: '$\\lim_{x\\to 0} \\frac{1-\\cos x}{x^2} = $?', opts: ['$1/2$', '$1$', '$0$', '$\\infty$'], ans: 0, hint: 'Use 1−cos x = 2 sin²(x/2) or L\'Hôpital / Taylor.' }
+    ]
+  }
+};
+
+function newPracticeQ() {
+  const diff = document.getElementById('prac-diff').value;
+  const topic = document.getElementById('prac-topic').value;
+  const bank = practiceBank[diff][topic];
+  if (!bank || !bank.length) {
+    document.getElementById('prac-q').textContent = 'No questions for this combination yet.';
+    return;
+  }
+  const item = bank[Math.floor(Math.random() * bank.length)];
+  state.practice.answer = item.ans;
+  state.practice.hint = item.hint;
+  state.practice.item = item;
+  document.getElementById('prac-q').innerHTML = item.q;
+  const optsDiv = document.getElementById('prac-options');
+  optsDiv.innerHTML = '';
+  item.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = o;
+    btn.onclick = () => checkPractice(i, btn);
+    optsDiv.appendChild(btn);
+  });
+  document.getElementById('prac-feedback').innerHTML = '';
+  if (window.MathJax) MathJax.typesetPromise([document.getElementById('prac-q'), optsDiv]);
+}
+
+function checkPractice(idx, btn) {
+  state.practice.total++;
+  document.getElementById('prac-total').textContent = state.practice.total;
+  const correct = idx === state.practice.answer;
+  if (correct) {
+    state.practice.score++;
+    document.getElementById('prac-score').textContent = state.practice.score;
+    btn.classList.add('correct');
+    document.getElementById('prac-feedback').innerHTML = `<div class="success-msg">Correct!</div>`;
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('prac-feedback').innerHTML = `<div class="error-msg">Incorrect. Try another question or reveal the solution.</div>`;
+  }
+  document.querySelectorAll('#prac-options .option-btn').forEach(b => b.onclick = null);
+}
+
+function showPracticeHint() {
+  if (state.practice.hint) {
+    document.getElementById('prac-feedback').innerHTML = `<div class="warning-msg">Hint: ${state.practice.hint}</div>`;
+  }
+}
+
+function revealPractice() {
+  if (!state.practice.item) return;
+  const ans = state.practice.item.opts[state.practice.answer];
+  document.getElementById('prac-feedback').innerHTML = `<div class="success-msg">Solution: ${ans}</div>`;
+  if (window.MathJax) MathJax.typesetPromise([document.getElementById('prac-feedback')]);
+}
+
+function copyLastResult() {
+  const text = state.lastResult || 'No result yet.';
+  navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard.')).catch(() => alert('Clipboard unavailable.'));
+}
+
+// Initial plot on graph module when first opened could be added; for now user triggers.
+// Ensure MathJax renders on load for home if needed.
+window.addEventListener('load', () => {
+  if (window.MathJax) MathJax.typesetPromise();
+});
+</script>
+</body>
+</html>

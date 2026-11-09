@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GNANA Thiruvalluvar AI Bot</title>
+<style>
+:root{--navy:#142b4a;--gold:#b58b36;--paper:#fbfaf6;--ink:#243247;--muted:#657286;--line:#e2e6ec;--soft:#eef3f8}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Tamil","Latha",sans-serif;line-height:1.55}
+header{background:linear-gradient(120deg,#102541,#1e4269);color:#fff;padding:26px 18px 30px;border-bottom:4px solid var(--gold)}.wrap,main{max-width:1050px;margin:auto}.brand{font-size:.78rem;letter-spacing:.16em;color:#f0d79f;font-weight:700}h1{font-size:clamp(1.65rem,4vw,2.5rem);line-height:1.2;margin:.45rem 0}header p{margin:.5rem 0 0;color:#e2eaf3}
+main{padding:22px 16px 36px}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.8fr);gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:0 5px 18px #162b4610;margin-bottom:18px}
+h2{font-size:1.16rem;color:var(--navy);margin:0 0 12px}h3{font-size:1rem;color:var(--navy);margin:0 0 8px}.sub,.small{color:var(--muted);font-size:.9rem}label{display:block;font-weight:650;margin:12px 0 6px}
+textarea,input[type=file]{width:100%;border:1px solid #cbd4df;border-radius:10px;padding:12px;font:inherit;background:white}textarea{min-height:112px;resize:vertical}
+button{border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}.primary{background:var(--navy);color:white}.gold{background:#f4ead3;color:#654913;border:1px solid #e6d4a8}.secondary{background:var(--soft);color:var(--navy);border:1px solid #dbe4ed}button:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.status{font-size:.9rem;padding:10px 12px;border-radius:10px;background:#f0f4f8;color:#43536a;margin-top:12px}.status.good{background:#e9f6ed;color:#205b37}.status.warn{background:#fff5e4;color:#77551b}
+.result{background:#fbfaf6;border:1px solid #e8e1d2;border-radius:13px;padding:16px;margin-top:14px}.kuralno{font-size:.78rem;letter-spacing:.08em;color:#8b6723;font-weight:800;text-transform:uppercase}.kuralline{font-size:1.12rem;font-weight:700;line-height:1.9;color:#142b4a}.explanation{margin-top:10px;white-space:pre-wrap}.pill{display:inline-block;border:1px solid #d9e2ec;background:#f6f8fa;padding:4px 9px;border-radius:999px;font-size:.8rem;color:#4b5a6d;margin:3px 4px 0 0}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}details{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}summary{font-weight:700;cursor:pointer}ol,ul{padding-left:21px}footer{text-align:center;color:var(--muted);font-size:.84rem;padding:12px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.card{padding:16px}header{padding:23px 16px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand">V • G • R | GNANA MATH LEARNING CENTRE</div><h1>GNANA Thiruvalluvar AI Bot</h1><p>Ask about the Thirukkural in Tamil. Search couplets, read source-based responses, and listen when your browser supports a Tamil voice.</p></div></header>
+<main><div class="layout"><section>
+<div class="card"><h2>🎙️ Ask your question</h2><p class="sub">Type a question or use the microphone if your browser supports Tamil speech recognition.</p><label for="question">Your question / உங்கள் கேள்வி</label><textarea id="question" placeholder="எடுத்துக்காட்டு: கல்வியின் முக்கியத்துவத்தைப் பற்றி திருக்குறள் என்ன கூறுகிறது?"></textarea><div class="actions"><button class="primary" id="askBtn">🔎 Find relevant Kurals</button><button class="secondary" id="micBtn">🎙️ Speak in Tamil</button><button class="gold" id="clearBtn">Clear</button></div><div id="micStatus" class="status">Ready. Microphone recognition may require internet and browser support.</div></div>
+<div class="card"><h2>📜 Answer</h2><div id="answerArea" class="sub">Your answer will appear here. The built-in sample is small; upload a complete Thirukkural JSON file for broader search.</div><div class="actions"><button class="primary" id="speakBtn" disabled>🔊 Read answer aloud</button><button class="secondary" id="stopBtn">⏹ Stop voice</button><button class="secondary" id="copyBtn" disabled>Copy answer</button></div><div id="voiceStatus" class="small" style="margin-top:8px"></div></div>
+<div class="card"><h2>📚 Add your Thirukkural dataset</h2><p class="sub">Choose a JSON file on your device. It is read locally by this page and is not uploaded to a server.</p><label for="datasetFile">Thirukkural JSON file</label><input id="datasetFile" type="file" accept=".json,application/json"><div class="actions"><button class="secondary" id="loadDatasetBtn">Load dataset</button><button class="secondary" id="resetDatasetBtn">Use built-in sample</button></div><div id="datasetStatus" class="status">Using the built-in sample collection.</div><details><summary>Supported data formats</summary><p class="small">Accepts an array of records or an object with a <code>kural</code>, <code>kurals</code>, or <code>data</code> array. Common fields: <code>Number</code>, <code>Line1</code>, <code>Line2</code>, <code>mv</code>, <code>sp</code>, <code>mk</code>, <code>Translation</code>, <code>explanation</code>.</p></details></div>
+</section><aside>
+<div class="card"><h2>🪷 About this prototype</h2><p>This is a standalone HTML starter bot. It makes no AI API calls and requires no API key.</p><span class="pill">Local dataset search</span><span class="pill">Tamil text</span><span class="pill">Browser speech</span><span class="pill">No API key</span><hr><h3>How it works</h3><ol><li>Enter or dictate a question.</li><li>The page searches couplets and commentary fields.</li><li>Relevant source text is displayed with the Kural number.</li><li>Use Read aloud if a Tamil voice is available.</li></ol><div class="status warn">This is keyword retrieval, not a full language model. It does not generate explanations absent from the loaded dataset.</div></div>
+<div class="card"><h2>🧪 Quick tests</h2><p class="sub">Select a sample to place it in the question box.</p><div class="actions"><button class="secondary sampleBtn" data-q="அகர முதல">Kural 1</button><button class="secondary sampleBtn" data-q="கல்வி">Education</button><button class="secondary sampleBtn" data-q="அன்பு">Love and kindness</button><button class="secondary sampleBtn" data-q="ஒழுக்கம்">Conduct</button></div><hr><div id="countStatus" class="small">Built-in sample records: 5</div></div>
+<div class="card"><h2>🔒 Offline use: what to know</h2><p class="small">Keyword search works locally after opening this page. Browser speech recognition commonly relies on an online service and may not work offline. Speech output depends on installed/browser voices. Fully offline voice input and Tamil TTS require local models; a single HTML file cannot reliably include them.</p></div>
+</aside></div><footer>GNANA Thiruvalluvar AI Bot · Educational prototype · Verify quotations and interpretations against a trusted edition.</footer></main>
+<script>
+"use strict";
+// Small built-in examples allow immediate testing. Load a complete trusted JSON dataset for broader coverage.
+const BUILTIN_KURALS=[
+{Number:1,Line1:"அகர முதல எழுத்தெல்லாம் ஆதி",Line2:"பகவன் முதற்றே உலகு",mv:"எழுத்துக்கள் எல்லாவற்றிற்கும் அகரம் முதன்மை; உலகிற்கு இறைவன் முதன்மை.",sp:"அகரம் எழுத்துகளுக்கு முதலாக இருப்பது போல, உலகிற்கு இறைவன் முதன்மையானவர்.",topic:"அகரம் ஆதி இறைவன்"},
+{Number:2,Line1:"கற்றதனால் ஆய பயனென்கொல் வாலறிவன்",Line2:"நற்றாள் தொழாஅர் எனின்",mv:"தூய அறிவுடைய இறைவனின் திருவடிகளை வணங்காதவர், கற்ற கல்வியால் என்ன பயன் அடைவர்?",topic:"கல்வி கற்றல் அறிவு"},
+{Number:34,Line1:"மனத்துக்கண் மாசிலன் ஆதல் அனைத்தறன்",Line2:"ஆகுல நீர பிற",mv:"மனத்தில் குற்றமில்லாதவனாக இருப்பதே அறம்; மற்றவை ஆரவாரமானவை.",topic:"அறம் மனம் ஒழுக்கம்"},
+{Number:80,Line1:"அன்பின் வழியது உயிர்நிலை அஃதிலார்க்கு",Line2:"என்புதோல் போர்த்த உடம்பு",mv:"அன்பின் வழியில் அமைவதே உயிரின் உண்மையான நிலை; அன்பில்லாதவர்க்கு உடம்பு எலும்பைத் தோலால் போர்த்தியதே.",topic:"அன்பு அன்பின் உயிர்"},
+{Number:391,Line1:"கற்க கசடறக் கற்பவை கற்றபின்",Line2:"நிற்க அதற்குத் தக",mv:"கற்க வேண்டியவற்றைப் பிழையின்றிக் கற்க வேண்டும்; கற்றபின் அதற்கேற்ப நடக்க வேண்டும்.",topic:"கல்வி கற்க கற்றல்"}
+];
+let kurals=BUILTIN_KURALS.map(x=>({...x})),lastAnswer="";
+const $=id=>document.getElementById(id);
+function normalize(text){return String(text??"").normalize("NFC").toLocaleLowerCase("ta");}
+function tokens(text){return normalize(text).match(/[\u0B80-\u0BFF]+|[a-z0-9]+/gi)||[];}
+function getSearchText(record){return Object.entries(record).filter(([key,value])=>!["Number","number","score"].includes(key)&&typeof value==="string").map(([,value])=>value).join(" ");}
+function canonicalRecord(raw,index){
+ const lower={};Object.entries(raw||{}).forEach(([k,v])=>lower[k.toLowerCase()]=v);
+ const num=Number(lower.number??lower.kuralnumber??lower.id??index+1);
+ return {...raw,Number:Number.isFinite(num)?num:index+1,Line1:String(lower.line1??lower.line_1??lower.kural1??""),Line2:String(lower.line2??lower.line_2??lower.kural2??""),mv:String(lower.mv??lower.meaning??lower.meaning_tamil??""),sp:String(lower.sp??lower.explanation??lower.commentary??""),mk:String(lower.mk??""),Translation:String(lower.translation??lower.english??""),topic:String(lower.topic??lower.athigaram??lower.chapter??"")};
+}
+function search(question,limit=5){
+ const qTokens=[...new Set(tokens(question).filter(t=>t.length>1))];if(!qTokens.length)return [];
+ const scored=kurals.map(record=>{const textTokens=new Set(tokens(getSearchText(record)));let score=0;qTokens.forEach(token=>{if(textTokens.has(token))score+=2;});if(normalize(getSearchText(record)).includes(normalize(question).trim()))score+=4;if(normalize(record.topic||"").includes(normalize(question).trim()))score+=2;return {record,score};}).filter(item=>item.score>0);
+ scored.sort((a,b)=>b.score-a.score||a.record.Number-b.record.Number);return scored.slice(0,limit);
+}
+function buildAnswer(question){
+ const matches=search(question,5);
+ if(!matches.length)return {text:"இந்தச் சிறிய தரவுத்தொகுப்பில் பொருத்தமான குறள் கிடைக்கவில்லை. முழுமையான திருக்குறள் JSON கோப்பை ஏற்றவும் அல்லது வேறு சொற்களில் கேட்கவும்.",matches:[]};
+ const best=matches[0].record,parts=[`குறள் எண் ${best.Number}`,best.Line1,best.Line2],explanation=best.sp||best.mv||best.mk;
+ if(explanation)parts.push("விளக்கம்: "+explanation);if(best.Translation)parts.push("English meaning: "+best.Translation);parts.push("","குறிப்பு: இது தரவுத்தொகுப்பிலிருந்து மீட்டெடுக்கப்பட்ட பதில்; AI உருவாக்கிய புதிய விளக்கம் அல்ல.");
+ return {text:parts.join("\\n"),matches};
+}
+function renderAnswer(question){
+ const result=buildAnswer(question);lastAnswer=result.text;const area=$("answerArea");area.innerHTML="";
+ if(!result.matches.length){const p=document.createElement("p");p.textContent=result.text;area.appendChild(p);}
+ else{
+  const best=result.matches[0].record,block=document.createElement("div");block.className="result";
+  const no=document.createElement("div");no.className="kuralno";no.textContent="THIRUKKURAL · "+best.Number;
+  const k1=document.createElement("div");k1.className="kuralline";k1.textContent=best.Line1;
+  const k2=document.createElement("div");k2.className="kuralline";k2.textContent=best.Line2;block.append(no,k1,k2);
+  const explanation=best.sp||best.mv||best.mk;if(explanation){const exp=document.createElement("div");exp.className="explanation";exp.textContent="விளக்கம்: "+explanation;block.appendChild(exp);}
+  if(best.Translation){const en=document.createElement("p");en.className="small";en.textContent="English meaning: "+best.Translation;block.appendChild(en);}area.appendChild(block);
+  if(result.matches.length>1){const others=document.createElement("div");others.style.marginTop="12px";const heading=document.createElement("h3");heading.textContent="Other possible matches";others.appendChild(heading);result.matches.slice(1).forEach(({record})=>{const item=document.createElement("div");item.className="result";const label=document.createElement("strong");label.textContent="குறள் "+record.Number;const text=document.createElement("div");text.textContent=record.Line1+" "+record.Line2;item.append(label,text);others.appendChild(item);});area.appendChild(others);}
+  const note=document.createElement("p");note.className="small";note.textContent="குறிப்பு: பதில் ஏற்றப்பட்ட தரவிலிருந்து மீட்டெடுக்கப்பட்டது. தேடல் மதிப்பெண் பொருத்தத்தை மட்டும் குறிக்கும்; அது விளக்கத்தின் தரத்தை உறுதி செய்யாது.";area.appendChild(note);
+ }
+ $("speakBtn").disabled=false;$("copyBtn").disabled=false;$("voiceStatus").textContent="";
+}
+$("askBtn").addEventListener("click",()=>{const q=$("question").value.trim();if(!q){$("micStatus").textContent="முதலில் ஒரு கேள்வியை உள்ளிடவும்.";return;}renderAnswer(q);});
+$("clearBtn").addEventListener("click",()=>{$("question").value="";$("answerArea").textContent="Your answer will appear here." ;lastAnswer="";$("speakBtn").disabled=true;$("copyBtn").disabled=true;$("micStatus").textContent="Ready.";});
+$("speakBtn").addEventListener("click",()=>{if(!lastAnswer)return;if(!("speechSynthesis"in window)){$("voiceStatus").textContent="This browser does not support speech synthesis.";return;}window.speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(lastAnswer);utterance.lang="ta-IN";utterance.rate=.88;const voices=window.speechSynthesis.getVoices(),tamilVoice=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith("ta"));if(tamilVoice)utterance.voice=tamilVoice;utterance.onstart=()=>$("voiceStatus").textContent=tamilVoice?"Speaking with: "+tamilVoice.name:"Trying the browser default voice. A Tamil voice may not be installed.";utterance.onerror=e=>$("voiceStatus").textContent="Speech could not start ("+e.error+"). Read the answer on screen.";window.speechSynthesis.speak(utterance);});
+$("stopBtn").addEventListener("click",()=>{if("speechSynthesis"in window)window.speechSynthesis.cancel();$("voiceStatus").textContent="Speech stopped.";});
+$("copyBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(lastAnswer);$("voiceStatus").textContent="Answer copied.";}catch{$("voiceStatus").textContent="Clipboard unavailable. Select and copy the visible text manually."; }});
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(SpeechRecognition){$("micBtn").addEventListener("click",()=>{const recognition=new SpeechRecognition();recognition.lang="ta-IN";recognition.continuous=false;recognition.interimResults=false;$("micStatus").textContent="Listening… Please speak in Tamil.";recognition.onresult=event=>{const transcript=event.results[0][0].transcript;$("question").value=transcript;$("micStatus").textContent="Recognized: "+transcript;renderAnswer(transcript);};recognition.onerror=event=>$("micStatus").textContent="Microphone error: "+event.error+". You can type your question instead.";try{recognition.start();}catch(error){$("micStatus").textContent="Could not start microphone. Try Chrome or type your question.";}});}
+else $("micBtn").addEventListener("click",()=>$("micStatus").textContent="This browser does not provide speech recognition here. Try Chrome on a supported secure page, or type your Tamil question.");
+document.querySelectorAll(".sampleBtn").forEach(button=>button.addEventListener("click",()=>{$("question").value=button.dataset.q;$("question").focus();}));
+$("loadDatasetBtn").addEventListener("click",async()=>{
+ const file=$("datasetFile").files[0];if(!file){$("datasetStatus").textContent="Please select a JSON file first.";return;}
+ try{const parsed=JSON.parse(await file.text()),records=Array.isArray(parsed)?parsed:(parsed.kural||parsed.Kural||parsed.kurals||parsed.data);if(!Array.isArray(records)||!records.length)throw new Error("Could not find a non-empty array of Kural records.");const normalized=records.map(canonicalRecord).filter(r=>r.Line1||r.Line2);if(!normalized.length)throw new Error("No records with recognizable Line1 and Line2 fields.");kurals=normalized.sort((a,b)=>a.Number-b.Number);$("datasetStatus").className="status good";$("datasetStatus").textContent=`Loaded ${kurals.length} records from ${file.name}.`;$("countStatus").textContent=`Loaded records: ${kurals.length}`;}
+ catch(error){$("datasetStatus").className="status warn";$("datasetStatus").textContent="Could not load dataset: "+error.message;}
+});
+$("resetDatasetBtn").addEventListener("click",()=>{kurals=BUILTIN_KURALS.map(x=>({...x}));$("datasetStatus").className="status";$("datasetStatus").textContent="Using the built-in sample collection.";$("countStatus").textContent="Built-in sample records: "+kurals.length;});
+</script>
+</body></html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Madurai Wind & Weather | Refined</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root { --navy:#10243a; --blue:#1677c8; --gold:#e2b85b; --panel:rgba(255,255,255,.96); }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family:Arial,Helvetica,sans-serif; color:#172638; background:#edf3f8; }
+  header { height:auto; min-height:68px; padding:12px 18px; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .brand { font-size:19px; font-weight:700; letter-spacing:.2px; }
+  .subtitle { font-size:12px; color:#c9d8e8; margin-top:4px; }
+  .status { font-size:12px; padding:7px 10px; border:1px solid #56718a; border-radius:20px; }
+  main { height:calc(100% - 68px); min-height:500px; display:grid; grid-template-columns:300px 1fr; }
+  aside { padding:15px; overflow:auto; background:#f4f7fa; border-right:1px solid #d7e0e8; }
+  .section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#64768a; margin:3px 0 10px; }
+  .current { background:linear-gradient(145deg,#fff,#e8f3fc); border:1px solid #d7e7f4; border-radius:16px; padding:16px; margin-bottom:16px; }
+  .place { font-size:17px; font-weight:700; }
+  .time { color:#6c7e8e; font-size:12px; margin-top:5px; }
+  .temp-line { display:flex; align-items:center; gap:10px; margin:13px 0; }
+  .temp { font-size:43px; font-weight:700; color:#123c62; }
+  .weather-icon { font-size:35px; }
+  .condition { font-size:13px; color:#4c6276; }
+  .metrics { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .metric { background:#fff; border:1px solid #e0e7ed; border-radius:10px; padding:10px; }
+  .metric-label { font-size:11px; color:#728397; }
+  .metric-value { font-size:17px; font-weight:700; margin-top:5px; color:#183b5a; }
+  .city-entry { display:flex; flex-direction:column; gap:7px; }
+  .city-entry input { width:100%; padding:10px; border:1px solid #cbd7e2; border-radius:9px; font:inherit; color:#29435b; }
+  .city-entry .action { margin-top:0; }
+  .weekly-forecast { background:#fff; border:1px solid #dce5ed; border-radius:13px; overflow:hidden; margin:0 0 13px; }
+  .weekly-heading { padding:13px 13px 9px; font-size:12px; font-weight:700; letter-spacing:1px; color:#64768a; text-transform:uppercase; }
+  .daily-row { display:grid; grid-template-columns:58px 34px minmax(72px,1fr) 50px; align-items:center; gap:7px; padding:10px 11px; border-top:1px solid #e4e9ee; min-height:62px; }
+  .daily-day { font-weight:700; font-size:12px; color:#172638; }
+  .daily-date { display:block; font-size:10px; font-weight:400; color:#718194; margin-top:3px; }
+  .daily-icon { font-size:24px; text-align:center; }
+  .daily-temps { white-space:nowrap; font-size:17px; font-weight:700; color:#111; }
+  .daily-temps .low { color:#73808d; font-weight:400; font-size:15px; margin-left:4px; }
+  .daily-rain { font-size:12px; color:#63717e; text-align:right; white-space:nowrap; }
+  .daily-rain .drop { color:#263b4f; margin-right:3px; }
+  .weekly-note { padding:9px 12px; border-top:1px solid #e4e9ee; font-size:10px; line-height:1.45; color:#758496; }
+  @media (max-width:400px) { .daily-row { grid-template-columns:51px 29px minmax(65px,1fr) 45px; gap:5px; padding:9px 8px; } .daily-temps { font-size:16px; } .daily-temps .low { font-size:14px; } }
+  .controls { background:#fff; border:1px solid #dce5ed; border-radius:13px; padding:13px; margin-bottom:13px; }
+  .layer-buttons { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  button, select { font:inherit; }
+  button { cursor:pointer; border:1px solid #cbd7e2; background:#f7fafc; color:#29435b; border-radius:9px; padding:9px 8px; font-size:12px; }
+  button.active { background:#dceeff; border-color:#5b9bd2; color:#064f88; font-weight:700; }
+  .timeline-label { display:flex; justify-content:space-between; gap:8px; font-size:12px; margin:10px 0 7px; }
+  input[type=range] { width:100%; accent-color:#1677c8; }
+  .action { width:100%; margin-top:8px; background:var(--navy); color:#fff; border:0; padding:11px; font-weight:700; }
+  .note { font-size:11px; line-height:1.5; color:#667b8e; }
+  #map-wrap { position:relative; min-width:0; min-height:0; }
+  #map { height:100%; width:100%; background:#dce7ef; }
+  #particles { position:absolute; inset:0; width:100%; height:100%; z-index:450; pointer-events:none; }
+  button:focus-visible, input:focus-visible { outline:3px solid #e2b85b; outline-offset:2px; }
+  .status { transition: color .2s ease, border-color .2s ease; }
+  .map-chip { position:absolute; z-index:600; top:12px; left:58px; background:var(--panel); border:1px solid #d8e2ea; box-shadow:0 2px 8px #17334a18; border-radius:10px; padding:9px 12px; font-size:12px; }
+  .legend { position:absolute; z-index:600; right:12px; bottom:25px; width:180px; background:var(--panel); border:1px solid #d8e2ea; box-shadow:0 2px 8px #17334a18; border-radius:11px; padding:11px; font-size:11px; }
+  .gradient { height:8px; border-radius:5px; margin:8px 0 5px; background:linear-gradient(90deg,#2b83ba,#abdda4,#ffffbf,#fdae61,#d7191c); }
+  .legend-scale { display:flex; justify-content:space-between; color:#617387; }
+  .map-credit { position:absolute; z-index:600; bottom:3px; left:8px; background:#ffffffc9; padding:3px 5px; font-size:10px; }
+  .error { color:#a52a2a; font-size:12px; margin-top:8px; }
+  @media (max-width:760px) {
+    header { padding:10px 13px; }
+    .brand { font-size:16px; }
+    main { height:auto; min-height:calc(100% - 68px); display:flex; flex-direction:column; }
+    #map-wrap { order:1; height:53vh; min-height:340px; }
+    aside { order:2; overflow:visible; border-right:0; }
+    .map-chip { left:12px; top:12px; }
+    .legend { bottom:22px; right:8px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">🌬️ CITY WIND & WEATHER</div>
+    <div class="subtitle">Interactive local forecast · Tamil Nadu, India</div>
+  </div>
+  <div class="status" id="connectionStatus">Connecting to weather service…</div>
+</header>
+<main>
+  <aside>
+    <section class="controls city-controls">
+      <div class="section-title">Choose city</div>
+      <div class="city-entry">
+        <input id="cityInput" type="text" value="Madurai" placeholder="Enter city (e.g., Chennai)" aria-label="City name">
+        <button id="citySearch" class="action">Show weather</button>
+      </div>
+      <div class="note">Enter a city or town. Weather and wind animation will update for the selected location.</div>
+    </section>
+    <div class="section-title">Current conditions</div>
+    <section class="current">
+      <div class="place" id="placeName">Madurai</div>
+      <div class="time" id="updatedAt">Weather data will load shortly</div>
+      <div class="temp-line">
+        <div class="temp" id="temperature">--°</div>
+        <div><div class="weather-icon" id="weatherIcon">🌤️</div><div class="condition" id="condition">Loading forecast…</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">WIND SPEED</div><div class="metric-value" id="windSpeed">-- km/h</div></div>
+        <div class="metric"><div class="metric-label">WIND DIRECTION</div><div class="metric-value" id="windDirection">--</div></div>
+        <div class="metric"><div class="metric-label">HUMIDITY</div><div class="metric-value" id="humidity">--%</div></div>
+        <div class="metric"><div class="metric-label">RAINFALL</div><div class="metric-value" id="rainfall">-- mm</div></div>
+      </div>
+    </section>
+
+    <section class="weekly-forecast" aria-label="Seven day weather forecast">
+      <div class="weekly-heading">📅 7-Day Forecast</div>
+      <div id="dailyForecast">
+        <div class="daily-row"><div class="daily-day">Loading</div><div class="daily-icon">🌤️</div><div class="daily-temps">--° <span class="low">--°</span></div><div class="daily-rain">--%</div></div>
+      </div>
+      <div class="weekly-note">Daily maximum / minimum temperature and maximum precipitation probability. Forecast provided by Open-Meteo.</div>
+    </section>
+
+    <section class="controls">
+      <div class="section-title">Map layer</div>
+      <div class="layer-buttons">
+        <button class="layer active" data-layer="wind">🌬️ Wind</button>
+        <button class="layer" data-layer="temperature">🌡️ Temperature</button>
+        <button class="layer" data-layer="rain">🌧️ Rainfall</button>
+        <button id="centerButton">📍 Re-centre</button>
+      </div>
+      <p class="note" id="layerDescription">Wind particles move according to the selected hour’s forecast direction and speed at Madurai.</p>
+    </section>
+
+    <section class="controls">
+      <div class="section-title">Hourly forecast</div>
+      <div class="timeline-label"><span id="forecastTime">Select forecast hour</span><strong id="forecastTemp">--°C</strong></div>
+      <input id="hourSlider" type="range" min="0" max="23" value="0" step="1" aria-label="Forecast hour">
+      <button class="action" id="playButton">Ⅱ Pause wind animation</button>
+      <div class="note" style="margin-top:10px">Choose an hour to update the selected city's forecast and wind animation. Wind particles are illustrative, not a gridded wind simulation.</div>
+    </section>
+
+    <div class="note">
+      <strong>Data and limitations</strong><br>
+      Forecast data: Open-Meteo. Map tiles: Esri. Wind particles are a visual aid based on local wind at the selected city (not a full gridded simulation). Internet required.
+    </div>
+    <div class="error" id="errorMessage" role="status"></div>
+  </aside>
+
+  <div id="map-wrap">
+    <div id="map" aria-label="Interactive weather map of selected city"></div>
+    <canvas id="particles"></canvas>
+    <div class="map-chip" id="mapChip">🌬️ Wind over Madurai</div>
+    <div class="legend">
+      <strong id="legendTitle">Wind speed · km/h</strong>
+      <div class="gradient"></div>
+      <div class="legend-scale"><span>Calm</span><span>Moderate</span><span>Strong</span></div>
+    </div>
+    <div class="map-credit">Weather: Open-Meteo · Map tiles © Esri</div>
+  </div>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  // Coordinates are updated after the user selects a city through geocoding.
+  let selectedLocation = { name: "Madurai", latitude: 9.9252, longitude: 78.1198 };
+  const locationCoords = () => [selectedLocation.latitude, selectedLocation.longitude];
+  const map = L.map("map", { zoomControl: true }).setView(locationCoords(), 10);
+
+  // Esri World Street Map – reliable free tiles that work well for demos (OSM free servers often block)
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+    maxZoom: 19,
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom'
+  }).addTo(map);
+
+  let cityMarker = L.marker(locationCoords()).addTo(map)
+    .bindPopup("<strong>Madurai</strong><br>Weather forecast reference point");
+  cityMarker.openPopup();
+
+  // Wind direction arrow marker (updates with selected hour)
+  let windArrowMarker = null;
+
+  const els = {
+    status: document.getElementById("connectionStatus"),
+    placeName: document.getElementById("placeName"),
+    cityInput: document.getElementById("cityInput"),
+    citySearch: document.getElementById("citySearch"),
+    updated: document.getElementById("updatedAt"),
+    temperature: document.getElementById("temperature"),
+    icon: document.getElementById("weatherIcon"),
+    condition: document.getElementById("condition"),
+    windSpeed: document.getElementById("windSpeed"),
+    windDirection: document.getElementById("windDirection"),
+    humidity: document.getElementById("humidity"),
+    rainfall: document.getElementById("rainfall"),
+    slider: document.getElementById("hourSlider"),
+    forecastTime: document.getElementById("forecastTime"),
+    forecastTemp: document.getElementById("forecastTemp"),
+    layerDescription: document.getElementById("layerDescription"),
+    mapChip: document.getElementById("mapChip"),
+    legendTitle: document.getElementById("legendTitle"),
+    error: document.getElementById("errorMessage"),
+    play: document.getElementById("playButton")
+  };
+
+  let weather = null;
+  let selectedLayer = "wind";
+  let animationRunning = true;
+  let particles = [];
+  const canvas = document.getElementById("particles");
+  const ctx = canvas.getContext("2d");
+
+  // Meteorological direction (FROM) → screen movement vector
+  function windVector(directionDegrees, speedKmh) {
+    // Direction wind is blowing TOWARD = direction + 180
+    const angle = (directionDegrees + 180) * Math.PI / 180;
+    // Scale speed: higher wind = faster particles
+    const magnitude = Math.max(0.8, Math.min(5.5, speedKmh / 8));
+    return {
+      x: Math.sin(angle) * magnitude,
+      y: -Math.cos(angle) * magnitude,
+      speed: magnitude
+    };
+  }
+
+  function describeWeather(code) {
+    if (code === 0) return ["Clear sky", "☀️"];
+    if ([1, 2, 3].includes(code)) return ["Partly cloudy", "🌤️"];
+    if ([45, 48].includes(code)) return ["Foggy", "🌫️"];
+    if ([51, 53, 55, 56, 57].includes(code)) return ["Drizzle", "🌦️"];
+    if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return ["Rain", "🌧️"];
+    if ([71, 73, 75, 77, 85, 86].includes(code)) return ["Snow", "❄️"];
+    if ([95, 96, 99].includes(code)) return ["Thunderstorm", "⛈️"];
+    return ["Weather forecast", "🌥️"];
+  }
+
+  function compassDirection(degrees) {
+    const names = ["N","NE","E","SE","S","SW","W","NW"];
+    return names[Math.round(degrees / 45) % 8] + " · " + Math.round(degrees) + "°";
+  }
+
+
+
+  // Geocode a city name with Open-Meteo's free geocoding service.
+  // After finding coordinates, reload the forecast and redraw map overlays.
+  async function selectCity() {
+    const city = els.cityInput.value.trim();
+    if (!city) {
+      els.error.textContent = "Please enter a city name.";
+      return;
+    }
+    els.citySearch.disabled = true;
+    els.citySearch.textContent = "Searching…";
+    els.error.textContent = "";
+    try {
+      const geoUrl = new URL("https://geocoding-api.open-meteo.com/v1/search");
+      geoUrl.search = new URLSearchParams({
+        name: city,
+        count: "1",
+        language: "en",
+        format: "json"
+      }).toString();
+      const geoResponse = await fetch(geoUrl);
+      if (!geoResponse.ok) throw new Error("City search returned HTTP " + geoResponse.status);
+      const geoData = await geoResponse.json();
+      if (!geoData.results || geoData.results.length === 0) {
+        throw new Error("City not found. Try another city name.");
+      }
+      const result = geoData.results[0];
+      selectedLocation = {
+        name: result.name + (result.admin1 ? ", " + result.admin1 : ""),
+        latitude: result.latitude,
+        longitude: result.longitude
+      };
+      els.placeName.textContent = selectedLocation.name;
+      cityMarker.setLatLng(locationCoords())
+        .setPopupContent("<strong>" + selectedLocation.name + "</strong><br>Weather forecast reference point");
+      map.setView(locationCoords(), 10);
+      await loadWeather();
+      updateLayerPresentation();
+      resizeCanvas();
+      resetParticles();
+    } catch (error) {
+      els.error.textContent = error.message || "Unable to search for this city.";
+    } finally {
+      els.citySearch.disabled = false;
+      els.citySearch.textContent = "Show weather";
+    }
+  }
+
+  async function loadWeather() {
+    els.status.textContent = "Loading live forecast…";
+    els.error.textContent = "";
+    const url = new URL("https://api.open-meteo.com/v1/forecast");
+    url.search = new URLSearchParams({
+      latitude: selectedLocation.latitude,
+      longitude: selectedLocation.longitude,
+      current: "temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+      hourly: "temperature_2m,precipitation,precipitation_probability,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code",
+      daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+      forecast_days: "7",
+      timezone: "Asia/Kolkata",
+      wind_speed_unit: "kmh"
+    }).toString();
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Weather service returned HTTP " + response.status);
+      weather = await response.json();
+      renderDailyForecast();
+      els.placeName.textContent = selectedLocation.name;
+      cityMarker.setLatLng(locationCoords()).setPopupContent("<strong>" + selectedLocation.name + "</strong><br>Weather forecast reference point");
+      map.setView(locationCoords(), 10);
+      updateCurrentConditions();
+      els.status.textContent = "● Forecast connected";
+      els.status.style.color = "#b8f2cf";
+      els.status.style.borderColor = "#5d9277";
+      els.slider.max = Math.min(23, weather.hourly.time.length - 1);
+
+      // Find closest hour to current time
+      const now = weather.current.time;
+      let bestIndex = 0;
+      let bestDifference = Infinity;
+      weather.hourly.time.forEach((time, index) => {
+        const difference = Math.abs(new Date(time).getTime() - new Date(now).getTime());
+        if (difference < bestDifference) {
+          bestDifference = difference;
+          bestIndex = index;
+        }
+      });
+      els.slider.value = bestIndex;
+      updateForecastHour();
+      // Ensure canvas is sized after map is ready
+      setTimeout(() => {
+        resizeCanvas();
+        resetParticles();
+      }, 300);
+    } catch (error) {
+      els.status.textContent = "Weather unavailable";
+      els.status.style.color = "#ffd4d4";
+      els.error.textContent = "Could not load forecast. Check internet connection. " + error.message;
+      els.condition.textContent = "Data unavailable";
+    }
+  }
+
+
+
+  // Render the seven-day outlook using Open-Meteo's daily forecast arrays.
+  function renderDailyForecast() {
+    if (!weather || !weather.daily) return;
+    const daily = weather.daily;
+    const container = document.getElementById("dailyForecast");
+    const weekdayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+    container.innerHTML = daily.time.map((dateString, index) => {
+      const date = new Date(dateString + "T12:00:00");
+      const dayLabel = index === 0 ? "TODAY" : weekdayNames[date.getDay()];
+      const dateLabel = date.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit" });
+      const [condition, icon] = describeWeather(daily.weather_code[index]);
+      const high = Math.round(daily.temperature_2m_max[index]);
+      const low = Math.round(daily.temperature_2m_min[index]);
+      const rainChance = daily.precipitation_probability_max[index];
+
+      return `
+        <div class="daily-row">
+          <div class="daily-day">${dayLabel}<span class="daily-date">${dateLabel}</span></div>
+          <div class="daily-icon" title="${condition}">${icon}</div>
+          <div class="daily-temps">${high}° <span class="low">${low}°</span></div>
+          <div class="daily-rain"><span class="drop">♧</span>${rainChance == null ? "—" : Math.round(rainChance) + "%"}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function updateCurrentConditions() {
+    const c = weather.current;
+    const [label, icon] = describeWeather(c.weather_code);
+    els.temperature.textContent = Math.round(c.temperature_2m) + "°";
+    els.icon.textContent = icon;
+    els.condition.textContent = label;
+    els.windSpeed.textContent = Math.round(c.wind_speed_10m) + " km/h";
+    els.windDirection.textContent = compassDirection(c.wind_direction_10m);
+    els.humidity.textContent = Math.round(c.relative_humidity_2m) + "%";
+    els.rainfall.textContent = Number(c.precipitation).toFixed(1) + " mm";
+    els.updated.textContent = "Updated: " + c.time.replace("T", " ") + " (India time)";
+  }
+
+  function updateForecastHour() {
+    if (!weather) return;
+    const i = Number(els.slider.value);
+    const h = weather.hourly;
+    const date = new Date(h.time[i]);
+    els.forecastTime.textContent = date.toLocaleString("en-IN", {
+      weekday: "short", hour: "2-digit", minute: "2-digit", hour12: true,
+      timeZone: "Asia/Kolkata"
+    });
+    els.forecastTemp.textContent = Math.round(h.temperature_2m[i]) + "°C";
+    els.updated.textContent = "Forecast for: " + date.toLocaleString("en-IN", {
+      day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
+      hour12: true, timeZone: "Asia/Kolkata"
+    }) + " (India time)";
+    const [label, icon] = describeWeather(h.weather_code[i]);
+    els.condition.textContent = label;
+    els.icon.textContent = icon;
+    els.temperature.textContent = Math.round(h.temperature_2m[i]) + "°";
+    els.windSpeed.textContent = Math.round(h.wind_speed_10m[i]) + " km/h";
+    els.windDirection.textContent = compassDirection(h.wind_direction_10m[i]);
+    els.humidity.textContent = Math.round(h.relative_humidity_2m[i]) + "%";
+    els.rainfall.textContent = Number(h.precipitation[i]).toFixed(1) + " mm";
+
+    updateWindArrow(h.wind_direction_10m[i], h.wind_speed_10m[i]);
+    resetParticles();
+    updateLayerPresentation();
+  }
+
+  // Large visible wind arrow on the map
+  function updateWindArrow(direction, speed) {
+    if (windArrowMarker) {
+      map.removeLayer(windArrowMarker);
+      windArrowMarker = null;
+    }
+    if (selectedLayer !== "wind") return;
+
+    const arrowHtml = `
+      <div style="
+        width: 0; height: 0;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-bottom: 36px solid #0d6efd;
+        transform: rotate(${(direction + 180) % 360}deg);
+        transform-origin: 50% 70%;
+        filter: drop-shadow(0 0 4px rgba(13,110,253,0.7));
+      "></div>
+    `;
+    windArrowMarker = L.marker(locationCoords(), {
+      icon: L.divIcon({
+        className: "",
+        html: arrowHtml,
+        iconSize: [24, 36],
+        iconAnchor: [12, 28]
+      }),
+      interactive: false
+    }).addTo(map);
+  }
+
+  function updateLayerPresentation() {
+    const labels = {
+      wind: [`🌬️ Wind over ${selectedLocation.name}`, "Wind speed · km/h", `Wind particles move according to the selected hour’s forecast direction and speed at ${selectedLocation.name}.`],
+      temperature: [`🌡️ Temperature · ${selectedLocation.name}`, "Temperature · °C", "The selected hour's temperature is shown in the side panel. The map is a location map, not a gridded temperature heatmap."],
+      rain: [`🌧️ Rainfall · ${selectedLocation.name}`, "Rainfall · mm", "The selected hour's forecast precipitation is shown in the side panel. This is not weather-radar imagery."]
+    };
+    const value = labels[selectedLayer];
+    els.mapChip.textContent = value[0];
+    els.legendTitle.textContent = value[1];
+    els.layerDescription.textContent = value[2];
+    document.querySelectorAll(".layer").forEach(button =>
+      button.classList.toggle("active", button.dataset.layer === selectedLayer)
+    );
+    // Show particles only on wind layer
+    canvas.style.opacity = selectedLayer === "wind" ? "1" : "0";
+    if (weather) {
+      const i = Number(els.slider.value);
+      updateWindArrow(weather.hourly.wind_direction_10m[i], weather.hourly.wind_speed_10m[i]);
+    }
+  }
+
+  function resizeCanvas() {
+    const wrap = document.getElementById("map-wrap");
+    const rect = wrap.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+    canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+    canvas.style.width = rect.width + "px";
+    canvas.style.height = rect.height + "px";
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  }
+
+  function resetParticles() {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 10 || rect.height < 10) return;
+
+    // More particles for better visual density
+    const count = Math.max(80, Math.min(280, Math.floor(rect.width * rect.height / 4500)));
+    particles = Array.from({ length: count }, () => ({
+      x: Math.random() * rect.width,
+      y: Math.random() * rect.height,
+      age: Math.random() * 60,
+      length: 8 + Math.random() * 14
+    }));
+  }
+
+  function drawAnimation() {
+    const rect = canvas.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    // Clear only the transparent canvas, keeping the map tiles crisp.
+    ctx.clearRect(0, 0, w, h);
+
+    if (weather && selectedLayer === "wind" && animationRunning && w > 10 && h > 10) {
+      const i = Number(els.slider.value);
+      const hourly = weather.hourly;
+      const vector = windVector(hourly.wind_direction_10m[i], hourly.wind_speed_10m[i]);
+      const speed = Number(hourly.wind_speed_10m[i]) || 0;
+      const streakLength = Math.max(8, Math.min(24, 8 + speed * 0.45));
+
+      particles.forEach(p => {
+        // Advance each particle along the selected forecast wind vector.
+        p.x += vector.x * 1.25;
+        p.y += vector.y * 1.25;
+        p.age++;
+
+        // Recycle particles that leave the map or have completed their lifetime.
+        if (p.x < -30 || p.x > w + 30 || p.y < -30 || p.y > h + 30 || p.age > 110) {
+          p.x = Math.random() * w;
+          p.y = Math.random() * h;
+          p.age = 0;
+          return;
+        }
+
+        // Draw a longer trail behind each moving particle.
+        const magnitude = Math.hypot(vector.x, vector.y) || 1;
+        const ux = vector.x / magnitude;
+        const uy = vector.y / magnitude;
+        const tailX = p.x - ux * streakLength;
+        const tailY = p.y - uy * streakLength;
+        const alpha = Math.min(0.92, 0.42 + p.age / 180);
+        const trail = ctx.createLinearGradient(tailX, tailY, p.x, p.y);
+        trail.addColorStop(0, "rgba(13,110,253,0)");
+        trail.addColorStop(1, `rgba(13,110,253,${alpha})`);
+
+        ctx.beginPath();
+        ctx.strokeStyle = trail;
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+
+        // A bright particle head improves visibility against map details.
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(7,76,150,${alpha})`;
+        ctx.arc(p.x, p.y, 1.7, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    requestAnimationFrame(drawAnimation);
+  }
+
+  // Event listeners
+  document.querySelectorAll(".layer").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedLayer = button.dataset.layer;
+      updateLayerPresentation();
+      if (selectedLayer === "wind") {
+        resizeCanvas();
+        resetParticles();
+      }
+    });
+  });
+
+  els.slider.addEventListener("input", updateForecastHour);
+  els.citySearch.addEventListener("click", selectCity);
+  els.cityInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") selectCity();
+  });
+
+  els.play.addEventListener("click", () => {
+    animationRunning = !animationRunning;
+    els.play.textContent = animationRunning ? "Ⅱ Pause wind animation" : "▶ Play wind animation";
+  });
+
+  document.getElementById("centerButton").addEventListener("click", () => {
+    map.setView(locationCoords(), 10);
+  });
+
+  map.on("moveend zoomend", () => {
+    resizeCanvas();
+    resetParticles();
+  });
+
+  window.addEventListener("resize", () => {
+    map.invalidateSize();
+    resizeCanvas();
+    resetParticles();
+  });
+
+  // Start everything
+  updateLayerPresentation();
+  // Initial size after layout
+  setTimeout(() => {
+    resizeCanvas();
+    resetParticles();
+    drawAnimation();
+  }, 100);
+
+  loadWeather();
+})();
+</script>
+</body>
+</html>
